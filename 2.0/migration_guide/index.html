@@ -460,6 +460,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#updating-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating configuration
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -832,11 +841,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../samplesheets/fromSamplesheet.md" class="md-nav__link">
+      <a href="../samplesheets/samplesheetToList/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
+    Create a list
   </span>
   
 
@@ -900,7 +909,7 @@
             
   
   <span class="md-ellipsis">
-    Contributing
+    Configuration
   </span>
   
 
@@ -909,6 +918,74 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Contributing
           </label>
@@ -1007,6 +1084,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#updating-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating configuration
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1043,7 +1129,8 @@
 <li>The JSON schema draft has been updated from <code>draft-07</code> to <code>draft-2020-12</code>. See <a href="https://json-schema.org/draft/2020-12/release-notes">JSON Schema draft 2020-12 release notes</a> and <a href="https://json-schema.org/draft/2019-09/release-notes">JSON schema draft 2019-09 release notes</a> for more information.</li>
 <li>The <code>fromSamplesheet</code> channel factory has been converted to a function called <code>samplesheetToList</code>. See <a href="#updating-fromsamplesheet">updating <code>fromSamplesheet</code></a> for more information.</li>
 <li>The <code>unique</code> keyword for samplesheet schemas has been removed. Please use <a href="https://json-schema.org/understanding-json-schema/reference/array#uniqueItems"><code>uniqueItems</code></a> or <a href="../nextflow_schema/nextflow_schema_specification/#uniqueentries"><code>uniqueEntries</code></a> now instead.</li>
-<li>The <code>dependentRequired</code> keyword now works as it's supposed to work in JSON schema. See <a href="https://json-schema.org/understanding-json-schema/reference/conditionals#dependentRequired"><code>dependentRequired</code></a> for more information</li>
+<li>The <code>dependentRequired</code> keyword now works as it's supposed to work in JSON schema. See <a href="https://json-schema.org/understanding-json-schema/reference/conditionals#dependentRequired"><code>dependentRequired</code></a> for more information.</li>
+<li>All configuration parameters have been converted to Nextflow configuration options. See <a href="#updating-configuration">Updating configuration</a> for more information.</li>
 </ol>
 <p>A full list of changes can be found in the <a href="https://github.com/nextflow-io/nf-schema/blob/master/CHANGELOG.md">changelog</a>.</p>
 <h2 id="updating-your-pipeline">Updating your pipeline</h2>
@@ -1196,6 +1283,51 @@
 </code></pre></div>
 </div>
 </div>
+</div>
+<h3 id="updating-configuration">Updating configuration</h3>
+<p>The configuration parameters have been converted to a Nextflow configuration option. You can now access these options using the <code>validation</code> config scope:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">validation</span><span class="o">.&lt;</span><span class="n">option</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+</code></pre></div>
+<p>OR</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">validation</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="n">option1</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">value1</span><span class="o">&gt;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="n">option2</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">value2</span><span class="o">&gt;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="o">}</span>
+</code></pre></div>
+<p>See this table for an overview of what the new configuration options are for the old parameters</p>
+<table>
+<thead>
+<tr>
+<th>Old parameter</th>
+<th>New config option(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>params.validationMonochromeLogs = &lt;boolean&gt;</code></td>
+<td><code>validation.monochromeLogs = &lt;boolean&gt;</code></td>
+</tr>
+<tr>
+<td><code>params.validationLenientMode = &lt;boolean&gt;</code></td>
+<td><code>validation.lenientMode = &lt;boolean&gt;</code></td>
+</tr>
+<tr>
+<td><code>params.validationFailUnrecognisedParams = &lt;boolean&gt;</code></td>
+<td><code>validation.failUnrecognisedParams = &lt;boolean&gt;</code></td>
+</tr>
+<tr>
+<td><code>params.validationShowHiddenParams = &lt;boolean&gt;</code></td>
+<td><code>validation.showHiddenParams = &lt;boolean&gt;</code></td>
+</tr>
+<tr>
+<td><code>params.validationIgnoreParams = &lt;string&gt;</code></td>
+<td><code>validation.defaultIgnoreParams = &lt;list&gt;</code> and <code>validation.ignoreParams = &lt;list&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>defaultIgnoreParams</code> is meant to be used by pipeline developers to set the parameters which should always be ignored. <code>ignoreParams</code> is meant for the pipeline user to ignore certain parameters.</p>
 </div>
 
 

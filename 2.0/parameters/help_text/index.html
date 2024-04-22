@@ -818,11 +818,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../samplesheets/fromSamplesheet.md" class="md-nav__link">
+      <a href="../../samplesheets/samplesheetToList/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    None
+    Create a list
   </span>
   
 
@@ -886,7 +886,7 @@
             
   
   <span class="md-ellipsis">
-    Contributing
+    Configuration
   </span>
   
 
@@ -895,6 +895,74 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Contributing
           </label>
@@ -1133,12 +1201,7 @@ See <a href="https://github.com/nextflow-io/nextflow/issues/3984"><code>nextflow
 </code></pre></div>
 <h2 id="hidden-parameters">Hidden parameters</h2>
 <p>Params that are set as <code>hidden</code> in the JSON Schema are not shown in the help message.
-To show these parameters, set the <code>validationShowHiddenParams</code> parameter:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>nextflow<span class="w"> </span>run<span class="w"> </span>my_pipeline<span class="w"> </span>--help<span class="w"> </span>--validationShowHiddenParams
-</code></pre></div>
-<p>or specifying it in the configuration file</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">params</span><span class="o">.</span><span class="na">validationShowHiddenParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-</code></pre></div>
+To show these parameters, set the <code>validation.showHiddenParams = true</code> configuration option</p>
 <h2 id="coloured-logs">Coloured logs</h2>
 <p>By default, the help output is coloured using ANSI escape codes.</p>
 <p>If you prefer, you can disable these by using the argument monochrome_logs, e.g. <code>paramsHelp(monochrome_logs: true)</code>. Alternatively this can be set at a global level via parameter <code>--monochrome_logs</code> or adding <code>params.monochrome_logs = true</code> to a configuration file. <code>--monochromeLogs</code> or <code>params.monochromeLogs</code> is also supported.</p>
