@@ -1107,6 +1107,10 @@
 <mark class="critic block">
 <p><strong>A Nextflow plugin to work with validation of pipeline parameters and sample sheets.</strong></p>
 </mark>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>nf-schema is the new version of the now deprecated <a href="https://github.com/nextflow-io/nf-validation">nf-validation</a>. Please follow the <a href="https://nextflow-io.github.io/nf-schema/latest/migration_guide/">migration guide</a> to migrate your code to this new version.</p>
+</div>
 <h2 id="introduction">Introduction</h2>
 <p>This <a href="https://www.nextflow.io/docs/latest/plugins.html#plugins">Nextflow plugin</a> provides a number of functions that can be included into a Nextflow pipeline script to work with parameter and sample sheet schema. Using these functions you can:</p>
 <ul>
@@ -1120,7 +1124,7 @@
 <h2 id="quick-start">Quick Start</h2>
 <p>Declare the plugin in your Nextflow pipeline configuration file:</p>
 <div class="highlight"><span class="filename">nextflow.config</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;nf-schema&#39;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;nf-schema@2.0.0&#39;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">}</span>
 </code></pre></div>
 <p>This is all that is needed - Nextflow will automatically fetch the plugin code at run time.</p>
