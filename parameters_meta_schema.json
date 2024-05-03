@@ -59,6 +59,15 @@
             "required": {
               "type": "array"
             },
+            "dependentRequired": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": { "type": "string" },
+                "uniqueItems": true,
+                "default": []
+              }
+            },
             "properties": {
               "type": "object",
               "patternProperties": {
@@ -69,12 +78,44 @@
                     ],
                     "properties": {
                       "type": {
-                        "type": "string",
-                        "enum": ["string", "boolean", "integer", "number"]
+                        "anyOf": [
+                          { 
+                            "$ref": "#/$defs/typeAnnotation"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/$defs/typeAnnotation"
+                            }
+                          }
+                        ]
                       },
                       "format": {
                         "type": "string",
-                        "enum": ["file-path", "directory-path", "path", "file-path-pattern"]
+                        "enum": [
+                          "file-path",
+                          "directory-path",
+                          "path",
+                          "file-path-pattern",
+                          "date-time",
+                          "date",
+                          "time",
+                          "duration",
+                          "email",
+                          "idn-email",
+                          "hostname",
+                          "id-hostname",
+                          "ipv4",
+                          "ipv6",
+                          "uuid",
+                          "uri",
+                          "uri-reference",
+                          "iri",
+                          "iri-reference",
+                          "uri-template",
+                          "json-pointer",
+                          "regex"
+                        ]
                       },
                       "exists": {
                         "type": "boolean"
@@ -85,6 +126,7 @@
                       },
                       "pattern": {
                         "type": "string",
+                        "format": "regex",
                         "minLength": 1
                       },
                       "schema": {
@@ -105,20 +147,51 @@
                         "type": "string",
                         "minLength": 1
                       },
+                      "default": {
+                        "$ref": "#/$def/allTypes"
+                      },
+                      "examples": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$def/allTypes"
+                        }
+                      },
+                      "deprecated": {
+                        "type": "boolean"
+                      },
                       "hidden": {
                         "type": "boolean"
                       },
                       "minLength": {
-                        "type": "integer"
+                        "$ref": "#/$def/nonNegativeInteger"
                       },
                       "maxLength": {
-                        "type": "integer"
+                        "$ref": "#/$def/nonNegativeInteger"
                       },
                       "minimum": {
-                        "type": "integer"
+                        "type": "number"
+                      },
+                      "exclusiveMinimum": {
+                        "type": "number"
                       },
                       "maximum": {
-                        "type": "integer"
+                        "type": "number"
+                      },
+                      "exclusiveMaximum": {
+                        "type": "number"
+                      },
+                      "multipleOf": {
+                        "type": "number"
+                      },
+                      "enum": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                          "$ref": "#/$def/allTypes"
+                        }
+                      },
+                      "const": {
+                        "$ref": "#/$def/allTypes"
                       }
                     }
                   }
@@ -151,5 +224,24 @@
     "title",
     "description",
     "type"
-  ]
+  ],
+  "$defs": {
+    "typeAnnotation": {
+      "type": "string",
+      "enum": [
+        "string",
+        "boolean",
+        "integer",
+        "number",
+        "null"
+      ]
+    },
+    "allTypes": {
+      "type": ["integer", "boolean", "number", "string", "null"]
+    },
+    "nonNegativeInteger": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
 }
