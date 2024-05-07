@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Function to create a list from a sample sheet.">
+        <meta name="description" content="Functions to create a list from a sample sheet.">
       
       
       
@@ -24,7 +24,7 @@
     
     
       
-        <title>Create a list - nf-schema</title>
+        <title>Create a channel - nf-schema</title>
       
     
     
@@ -61,9 +61,9 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="Create a list - nf-schema" >
+        <meta  property="og:title"  content="Create a channel - nf-schema" >
       
-        <meta  property="og:description"  content="Function to create a list from a sample sheet." >
+        <meta  property="og:description"  content="Functions to create a list from a sample sheet." >
       
         <meta  property="og:image"  content="https://nextflow-io.github.io/nf-schema/latest/2.0/assets/images/social/samplesheets/samplesheetToList.png" >
       
@@ -77,9 +77,9 @@
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="Create a list - nf-schema" >
+        <meta  name="twitter:title"  content="Create a channel - nf-schema" >
       
-        <meta  name="twitter:description"  content="Function to create a list from a sample sheet." >
+        <meta  name="twitter:description"  content="Functions to create a list from a sample sheet." >
       
         <meta  name="twitter:image"  content="https://nextflow-io.github.io/nf-schema/latest/2.0/assets/images/social/samplesheets/samplesheetToList.png" >
       
@@ -144,7 +144,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Create a list
+              Create a channel
             
           </span>
         </div>
@@ -761,7 +761,7 @@
           
   
   <span class="md-ellipsis">
-    Create a list
+    Create a channel
   </span>
   
 
@@ -772,7 +772,7 @@
         
   
   <span class="md-ellipsis">
-    Create a list
+    Create a channel
   </span>
   
 
@@ -796,11 +796,11 @@
         <li class="md-nav__item">
   <a href="#samplesheettolist" class="md-nav__link">
     <span class="md-ellipsis">
-      samplesheetToList
+      samplesheetToList()
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="samplesheetToList">
+    <nav class="md-nav" aria-label="samplesheetToList()">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1055,11 +1055,11 @@
         <li class="md-nav__item">
   <a href="#samplesheettolist" class="md-nav__link">
     <span class="md-ellipsis">
-      samplesheetToList
+      samplesheetToList()
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="samplesheetToList">
+    <nav class="md-nav" aria-label="samplesheetToList()">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1136,9 +1136,9 @@
 
 
 <h1 id="create-a-list-from-a-sample-sheet">Create a list from a sample sheet</h1>
-<h2 id="samplesheettolist"><code>samplesheetToList</code></h2>
-<p>This function validates and converts a sample sheet to a list. This is done using information encoded within a sample sheet schema (see the <a href="../../nextflow_schema/sample_sheet_schema_specification/">docs</a>).</p>
-<p>The function has two mandatory arguments:</p>
+<h2 id="samplesheettolist"><code>samplesheetToList()</code></h2>
+<p>This function validates and converts a sample sheet to a Groovy list. This is done using information encoded within a sample sheet schema (see the <a href="../../nextflow_schema/sample_sheet_schema_specification/">docs</a>).</p>
+<p>The function has two required arguments:</p>
 <ol>
 <li>The path to the samplesheet</li>
 <li>The path to the JSON schema file corresponding to the samplesheet.</li>
@@ -1152,15 +1152,15 @@
 </div>
 <p>This function can be used together with existing channel factories/operators to create one channel entry per samplesheet entry.</p>
 <h3 id="use-as-a-channel-factory">Use as a channel factory</h3>
-<p>The function can be given to the <code>.fromList</code> channel factory to mimic the functionality of a channel factory:</p>
+<p>The function can be used with the <code>.fromList</code> channel factory to generate a queue channel:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Channel</span><span class="o">.</span><span class="na">fromList</span><span class="o">(</span><span class="n">samplesheetToList</span><span class="o">(</span><span class="s2">&quot;path/to/samplesheet&quot;</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;path/to/json/schema&quot;</span><span class="o">))</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This will mimic the <code>fromSamplesheet</code> channel factory as it was in <a href="https://github.com/nextflow-io/nf-validation">nf-validation</a>.</p>
+<p>This will mimic the <code>fromSamplesheet</code> channel factory, found in the previous <a href="https://github.com/nextflow-io/nf-validation">nf-validation</a>.</p>
 </div>
 <h3 id="use-as-a-channel-operator">Use as a channel operator</h3>
-<p>The function can be used with the <code>.flatMap</code> channel operator to create a channel from samplesheets that are already in a channel:</p>
+<p>Alternatively, the function can be used with the <code>.flatMap</code> channel operator to create a channel from samplesheet paths that are already in a channel:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Channel</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s2">&quot;path/to/samplesheet&quot;</span><span class="o">).</span><span class="na">flatMap</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">samplesheetToList</span><span class="o">(</span><span class="n">it</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;path/to/json/schema&quot;</span><span class="o">)</span><span class="w"> </span><span class="o">}</span>
 </code></pre></div>
 <h2 id="basic-example">Basic example</h2>
