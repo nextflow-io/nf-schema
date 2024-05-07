@@ -2,87 +2,87 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/background/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/migration_guide/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/configuration/configuration/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/contributing/setup/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/nextflow_schema/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/nextflow_schema/create_schema/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/nextflow_schema/nextflow_schema_examples/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/nextflow_schema/nextflow_schema_specification/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/nextflow_schema/sample_sheet_schema_examples/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/nextflow_schema/sample_sheet_schema_specification/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/parameters/help_text/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/parameters/summary_log/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/parameters/validation/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/samplesheets/examples/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/samplesheets/samplesheetToList/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.0/samplesheets/validate_sample_sheet/</loc>
-         <lastmod>2024-05-02</lastmod>
+         <lastmod>2024-05-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

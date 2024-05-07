@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
     
     
       
@@ -813,9 +813,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#use-as-a-channel-oprator" class="md-nav__link">
+  <a href="#use-as-a-channel-operator" class="md-nav__link">
     <span class="md-ellipsis">
-      Use as a channel oprator
+      Use as a channel operator
     </span>
   </a>
   
@@ -1072,9 +1072,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#use-as-a-channel-oprator" class="md-nav__link">
+  <a href="#use-as-a-channel-operator" class="md-nav__link">
     <span class="md-ellipsis">
-      Use as a channel oprator
+      Use as a channel operator
     </span>
   </a>
   
@@ -1127,7 +1127,7 @@
                   
 
   
-    <a href="https://github.com/nextflow-io/nf-schema/edit/main/docs/samplesheets/samplesheetToList.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/nextflow-io/nf-schema/edit/master/docs/samplesheets/samplesheetToList.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -1159,7 +1159,7 @@
 <p class="admonition-title">Note</p>
 <p>This will mimic the <code>fromSamplesheet</code> channel factory as it was in <a href="https://github.com/nextflow-io/nf-validation">nf-validation</a>.</p>
 </div>
-<h3 id="use-as-a-channel-oprator">Use as a channel oprator</h3>
+<h3 id="use-as-a-channel-operator">Use as a channel operator</h3>
 <p>The function can be used with the <code>.flatMap</code> channel operator to create a channel from samplesheets that are already in a channel:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Channel</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s2">&quot;path/to/samplesheet&quot;</span><span class="o">).</span><span class="na">flatMap</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">samplesheetToList</span><span class="o">(</span><span class="n">it</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;path/to/json/schema&quot;</span><span class="o">)</span><span class="w"> </span><span class="o">}</span>
 </code></pre></div>
@@ -1484,7 +1484,7 @@ This returns a channel with a meta map.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.code.annotate", "content.code.copy", "navigation.instant", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.footer", "search.share", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
       
     
   </body>
