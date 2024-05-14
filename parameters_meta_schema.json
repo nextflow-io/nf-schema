@@ -30,7 +30,7 @@
       "type": "string",
       "const": "object"
     },
-    "defs": {
+    "definitions": {
       "title": "Parameter groups",
       "type": "object",
       "patternProperties": {
@@ -63,70 +63,13 @@
               "type": "object",
               "patternProperties": {
                 "^.*$": {
-                    "type": "object",
-                    "required": [
-                      "type"
-                    ],
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": ["string", "boolean", "integer", "number"]
-                      },
-                      "format": {
-                        "type": "string",
-                        "enum": ["file-path", "directory-path", "path", "file-path-pattern"]
-                      },
-                      "exists": {
-                        "type": "boolean"
-                      },
-                      "mimetype": {
-                        "type": "string",
-                        "pattern": ".+/.+"
-                      },
-                      "pattern": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "schema": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "description": {
-                        "type": "string"
-                      },
-                      "help_text": {
-                        "type": "string"
-                      },
-                      "fa_icon": {
-                        "type": "string",
-                        "pattern": "^fa"
-                      },
-                      "errorMessage": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "hidden": {
-                        "type": "boolean"
-                      },
-                      "minLength": {
-                        "type": "integer"
-                      },
-                      "maxLength": {
-                        "type": "integer"
-                      },
-                      "minimum": {
-                        "type": "integer"
-                      },
-                      "maximum": {
-                        "type": "integer"
-                      }
-                    }
-                  }
+                  "$ref": "#/$defs/parameter"
                 }
               }
             }
           }
         }
+      }
     },
     "allOf": {
       "title": "Combine definition groups",
@@ -139,7 +82,7 @@
         "properties": {
           "$ref": {
             "type": "string",
-            "pattern": "^#/defs/"
+            "pattern": "^#/definitions/"
           }
         }
       }
@@ -151,5 +94,270 @@
     "title",
     "description",
     "type"
-  ]
+  ],
+  "$defs": {
+    "base-parameter": {
+      "type": "object",
+      "required": [ "type" ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "boolean",
+            "integer",
+            "number"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "help_text": {
+          "type": "string"
+        },
+        "fa_icon": {
+          "type": "string",
+          "pattern": "^fa"
+        },
+        "errorMessage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hidden": {
+          "type": "boolean"
+        }
+      }
+    },
+    "boolean-parameter": {
+      "properties": {
+        "type": {
+          "const": "boolean"
+        },
+        "default": {
+          "type": [ "boolean", "null" ]
+        }
+      }
+    },
+    "integer-parameter": {
+      "properties": {
+        "type": {
+          "const": "integer"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "minimum": {
+          "type": "integer"
+        },
+        "maximum": {
+          "type": "integer"
+        },
+        "exclusiveMinimum": {
+          "type": "integer"
+        },
+        "exclusiveMaximum": {
+          "type": "integer"
+        },
+        "default": {
+          "type": ["integer", "null" ]
+        }
+      }
+    },
+    "number-parameter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "number"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "exclusiveMinimum": {
+          "type": "number"
+        },
+        "exclusiveMaximum": {
+          "type": "number"
+        },
+        "default": {
+          "type": ["number", "null" ]
+        }
+      }
+    },
+    "string-parameter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "string"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "minLength": {
+          "type": "integer"
+        },
+        "maxLength": {
+          "type": "integer"
+        },
+        "default": {
+          "type": ["string", "null" ]
+        },
+        "pattern": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "path-parameter": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "string" },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "file-path",
+            "directory-path",
+            "path",
+            "file-path-pattern"
+          ]
+        },
+        "default": {
+          "type": ["string", "null" ]
+        },
+        "exists": {
+          "type": ["boolean", "null" ]
+        }
+      }
+    },
+    "file-path-parameter": {
+      "allOf": [
+        { "$ref": "#/$defs/path-parameter"},
+        {
+          "type": "object",
+          "properties": {
+            "mimetype": {
+              "type": "string",
+              "pattern": ".+/.+"
+            },
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "parameter": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/base-parameter"
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "boolean"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/$defs/boolean-parameter"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "integer"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/$defs/integer-parameter"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "number"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/$defs/number-parameter"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/$defs/string-parameter"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "string"
+              }
+            }
+          },
+          "then": {
+            "$ref": "#/$defs/string-parameter"
+          }
+        },
+        {
+          "if": {
+            "required": [ "format" ],
+            "properties": {
+              "type": {
+                "const": "string"
+              }
+            }
+          },
+          "then": {
+            "if": {
+              "properties": {
+                "format": { "const": "file-path" }
+              }
+            },
+            "then": {
+              "$ref": "#/$defs/file-path-parameter"
+            },
+            "else": {
+              "$ref": "#/$defs/path-parameter"
+            }
+          }
+        }
+      ]
+    }
+  }
 }
