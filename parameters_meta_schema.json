@@ -76,6 +76,22 @@
                     "required": [
                       "type"
                     ],
+                    "dependentSchemas": {
+                      "exists": {
+                        "comment": "This checks if the type is a 'string' and the format corresponds to a file or directory when 'exists' is used.",
+                        "properties": {
+                          "type": { "const": "string" },
+                          "format": { "enum": ["path", "file-path", "file-path-pattern", "directory-path"] }
+                        }
+                      },
+                      "schema": {
+                        "comment": "This checks if the type is a 'string' and the format is 'path' or 'file-path'",
+                        "properties": {
+                          "type": { "const": "string" },
+                          "format": { "enum": ["path", "file-path"] }
+                        }
+                      }
+                    },
                     "properties": {
                       "type": {
                         "description": "The type of the parameter value. Can be one or more of these: ['integer', 'boolean', 'number', 'string', 'null']",
