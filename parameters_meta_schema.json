@@ -136,12 +136,12 @@
                         "minLength": 1
                       },
                       "default": {
-                        "$ref": "#/$def/allTypes"
+                        "$ref": "#/$defs/allTypes"
                       },
                       "examples": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/$def/allTypes"
+                          "$ref": "#/$defs/allTypes"
                         }
                       },
                       "deprecated": {
@@ -151,10 +151,10 @@
                         "type": "boolean"
                       },
                       "minLength": {
-                        "$ref": "#/$def/nonNegativeInteger"
+                        "$ref": "#/$defs/nonNegativeInteger"
                       },
                       "maxLength": {
-                        "$ref": "#/$def/nonNegativeInteger"
+                        "$ref": "#/$defs/nonNegativeInteger"
                       },
                       "minimum": {
                         "type": "number"
@@ -175,11 +175,11 @@
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
-                          "$ref": "#/$def/allTypes"
+                          "$ref": "#/$defs/allTypes"
                         }
                       },
                       "const": {
-                        "$ref": "#/$def/allTypes"
+                        "$ref": "#/$defs/allTypes"
                       }
                     }
                   }
