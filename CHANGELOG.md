@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.0.1 - Tsukemen
+
+## Vulnerability fix
+
+1. Updated the org.json package to version `20240303`.
+
 # Version 2.0.0 - Kagoshima
 
 To migrate from nf-validation please follow the [migration guide](https://nextflow-io.github.io/nf-schema/latest/migration_guide/)

@@ -1,15 +1,15 @@
 ---
-title: Create a list
-description: Function to create a list from a sample sheet.
+title: Create a channel
+description: Functions to create a list from a sample sheet.
 ---
 
 # Create a list from a sample sheet
 
-## `samplesheetToList`
+## `samplesheetToList()`
 
-This function validates and converts a sample sheet to a list. This is done using information encoded within a sample sheet schema (see the [docs](../nextflow_schema/sample_sheet_schema_specification.md)).
+This function validates and converts a sample sheet to a Groovy list. This is done using information encoded within a sample sheet schema (see the [docs](../nextflow_schema/sample_sheet_schema_specification.md)).
 
-The function has two mandatory arguments:
+The function has two required arguments:
 
 1. The path to the samplesheet
 2. The path to the JSON schema file corresponding to the samplesheet.
@@ -28,7 +28,7 @@ This function can be used together with existing channel factories/operators to 
 
 ### Use as a channel factory
 
-The function can be given to the `.fromList` channel factory to mimic the functionality of a channel factory:
+The function can be used with the `.fromList` channel factory to generate a queue channel:
 
 ```groovy
 Channel.fromList(samplesheetToList("path/to/samplesheet", "path/to/json/schema"))
@@ -36,11 +36,11 @@ Channel.fromList(samplesheetToList("path/to/samplesheet", "path/to/json/schema")
 
 !!! note
 
-    This will mimic the `fromSamplesheet` channel factory as it was in [nf-validation](https://github.com/nextflow-io/nf-validation).
+    This will mimic the `fromSamplesheet` channel factory, found in the previous [nf-validation](https://github.com/nextflow-io/nf-validation).
 
-### Use as a channel oprator
+### Use as a channel operator
 
-The function can be used with the `.flatMap` channel operator to create a channel from samplesheets that are already in a channel:
+Alternatively, the function can be used with the `.flatMap` channel operator to create a channel from samplesheet paths that are already in a channel:
 
 ```groovy
 Channel.of("path/to/samplesheet").flatMap { samplesheetToList(it, "path/to/json/schema") }

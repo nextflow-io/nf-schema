@@ -54,7 +54,7 @@ dependencies {
     compileOnly "io.nextflow:nextflow:$nextflowVersion"
     compileOnly 'org.slf4j:slf4j-api:1.7.10'
     compileOnly 'org.pf4j:pf4j:3.4.1'
-    implementation 'org.json:json:20230227'
+    implementation 'org.json:json:20240303'
     implementation 'dev.harrel:json-schema:1.5.0'
 
     // test configuration

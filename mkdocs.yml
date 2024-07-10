@@ -2,7 +2,7 @@ site_name: nf-schema
 repo_name: nextflow-io/nf-schema
 repo_url: https://github.com/nextflow-io/nf-schema
 site_url: https://nextflow-io.github.io/nf-schema/latest/
-edit_uri: edit/main/docs/
+edit_uri: edit/master/docs/
 
 nav:
   - Home:

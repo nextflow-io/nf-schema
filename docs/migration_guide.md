@@ -7,6 +7,14 @@ hide:
 
 # Migration guide
 
+!!! warning
+
+    `nf-schema` currently is not supported by the nf-core tooling. Using this plugin will break the linting and schema builder. See these issues for the progress on the nf-core migration to nf-schema:
+
+    1. [https://github.com/nf-core/tools/issues/2932](https://github.com/nf-core/tools/issues/2932)
+    2. [https://github.com/nf-core/tools/issues/2784](https://github.com/nf-core/tools/issues/2784)
+    3. [https://github.com/nf-core/tools/issues/2429](https://github.com/nf-core/tools/issues/2429)
+
 This guide is intended to help you migrate your pipeline from [nf-validation](https://github.com/nextflow-io/nf-validation) to nf-schema.
 
 ## Major changes in the plugin
