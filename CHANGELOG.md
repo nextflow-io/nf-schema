@@ -2,6 +2,10 @@
 
 # Version 2.1.0
 
+## New features
+
+1. The plugin now fully supports nested parameters!
+
 ## JSON schema fixes
 
 1. The `defs` keyword is now deprecated in favor of the `$defs` keyword. This to follow the JSON schema guidelines. We will continue supporting `defs` for backwards compatibility.

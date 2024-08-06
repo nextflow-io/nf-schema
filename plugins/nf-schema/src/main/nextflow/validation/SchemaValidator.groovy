@@ -23,6 +23,7 @@ import nextflow.script.WorkflowMetadata
 import nextflow.Session
 import nextflow.util.Duration
 import nextflow.util.MemoryUnit
+import nextflow.config.ConfigMap
 import org.json.JSONException
 import org.json.JSONArray
 import org.json.JSONObject
@@ -112,6 +113,12 @@ class SchemaValidator extends PluginExtensionPoint {
     private List<String> errors = []
     private List<String> warnings = []
 
+    // The amount of parameters hidden (for help messages)
+    private Integer hiddenParametersCount = 0
+
+    // The length of the terminal
+    private Integer terminalLength = System.getenv("COLUMNS")?.toInteger() ?: 100
+
     @Override
     protected void init(Session session) {
         def plugins = session?.config?.navigate("plugins") as ArrayList
@@ -127,7 +134,7 @@ class SchemaValidator extends PluginExtensionPoint {
 !       and the functionality of this pipeline in the future      !
 !                                                                 !
 !                    plugins {                                    !
-!                        id "nf-schema@2.0.0"                     !
+!                        id "nf-schema@<version>"                 !
 !                    }                                            !
 !                                                                 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -330,11 +337,11 @@ class SchemaValidator extends PluginExtensionPoint {
     //
     // Wrap too long text
     //
-    String wrapText(String text, Integer lineWidth, Integer indent) {
+    String wrapText(String text) {
         List olines = []
-        String oline = "" // " " * indent
+        String oline = ""
         text.split(" ").each() { wrd ->
-            if ((oline.size() + wrd.size()) <= lineWidth) {
+            if ((oline.size() + wrd.size()) <= terminalLength) {
                 oline += wrd + " "
             } else {
                 olines += oline
@@ -342,7 +349,7 @@ class SchemaValidator extends PluginExtensionPoint {
             }
         }
         olines += oline
-        return olines.join("\n" + " " * indent)
+        return olines.join("\n")
     }
 
     //
@@ -362,76 +369,43 @@ class SchemaValidator extends PluginExtensionPoint {
         String output  = ''
         output        += 'Typical pipeline command:\n\n'
         output        += "  ${colors.cyan}${command}${colors.reset}\n\n"
-        Map params_map = paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
-        Integer max_chars  = paramsMaxChars(params_map) + 1
-        Integer desc_indent = max_chars + 14
-        Integer dec_linewidth = 160 - desc_indent
+        Map paramsMap = paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
+        Integer maxChars  = paramsMaxChars(paramsMap) + 1
+
+        // Make sure the hidden parameters count is 0
+        hiddenParametersCount = 0
 
         // If a value is passed to help
         if (params.help instanceof String) {
-            def String param = params.help
-            def Map get_param = [:]
-            for (group in params_map.keySet()) {
-                def Map group_params = params_map.get(group) as Map // This gets the parameters of that particular group
-                if (group_params.containsKey(param)) {
-                    get_param = group_params.get(param) as Map 
+            def String paramName = params.help
+            def List<String> paramNames = params.help.tokenize(".") as List<String>
+            def Map paramOptions = [:]
+            for (group in paramsMap.keySet()) {
+                def Map group_params = paramsMap.get(group) as Map // This gets the parameters of that particular group
+                if (group_params.containsKey(paramNames[0])) {
+                    paramOptions = group_params.get(paramNames[0]) as Map 
                 }
             }
-            if (!get_param) {
-                throw new Exception("Specified param '${param}' does not exist in JSON schema.")
-            }
-            output += "--" + param + '\n'
-            for (property in get_param) {
-                if (property.key == "fa_icon") {
-                    continue;
+            if (paramNames.size() > 1) {
+                paramNames.remove(0)
+                paramNames.each {
+                    paramOptions = (Map) paramOptions?.properties?[it] ?: [:]
                 }
-                def String key = property.key
-                def String value = property.value
-                def Integer lineWidth = 160 - 17
-                def Integer indent = 17
-                if (value.length() > lineWidth) {
-                    value = wrapText(value, lineWidth, indent)
-                }
-                output += "    " + colors.dim + key.padRight(11) + ": " + colors.reset + value + '\n'
             }
+            if (!paramOptions) {
+                throw new Exception("Specified param '${paramName}' does not exist in JSON schema.")
+            }
+            output += getDetailedHelpString(paramName, paramOptions, colors)
             output += "-${colors.dim}----------------------------------------------------${colors.reset}-"
             return output
         }
 
-        for (group in params_map.keySet()) {
+        for (group in paramsMap.keySet()) {
             Integer num_params = 0
             String group_output = "$colors.underlined$colors.bold$group$colors.reset\n"
-            def Map group_params = params_map.get(group) as Map // This gets the parameters of that particular group
-            for (String param in group_params.keySet()) {
-                def Map get_param = group_params.get(param) as Map 
-                def String type = '[' + get_param.type + ']'
-                def String enums_string = ""
-                if (get_param.enum != null) {
-                    def List enums = (List) get_param.enum
-                    def String chop_enums = enums.join(", ")
-                    if(chop_enums.length() > dec_linewidth){
-                        chop_enums = chop_enums.substring(0, dec_linewidth-5)
-                        chop_enums = chop_enums.substring(0, chop_enums.lastIndexOf(",")) + ", ..."
-                    }
-                    enums_string = " (accepted: " + chop_enums + ")"
-                }
-                def String description = get_param.description
-                def defaultValue = get_param.default != null ? " [default: " + get_param.default.toString() + "]" : ''
-                def description_default = description + colors.dim + enums_string + defaultValue + colors.reset
-                // Wrap long description texts
-                // Loosely based on https://dzone.com/articles/groovy-plain-text-word-wrap
-                if (description_default.length() > dec_linewidth){
-                    description_default = wrapText(description_default, dec_linewidth, desc_indent)
-                }
-                if (get_param.hidden && !config.showHiddenParams) {
-                    num_hidden += 1
-                    continue;
-                }
-                group_output += "  --" +  param.padRight(max_chars) + colors.dim + type.padRight(10) + colors.reset + description_default + '\n'
-                num_params += 1
-            }
-            group_output += '\n'
-            if (num_params > 0){
+            def Map group_params = paramsMap.get(group) as Map // This gets the parameters of that particular group
+            group_output += getHelpList(group_params, colors, maxChars).join("\n") + "\n"
+            if (group_output != "\n"){
                 output += group_output
             }
         }
@@ -440,6 +414,73 @@ class SchemaValidator extends PluginExtensionPoint {
         }
         output += "-${colors.dim}----------------------------------------------------${colors.reset}-"
         return output
+    }
+
+    //
+    // Get help text in string format
+    //
+    private List<String> getHelpList(Map<String,Map> params, Map colors, Integer maxChars, String parentParameter = "") {
+        def List helpMessage = []
+        for (String paramName in params.keySet()) {
+            def Map paramOptions = params.get(paramName) as Map 
+            if (paramOptions.hidden && !config.showHiddenParams) {
+                hiddenParametersCount += 1
+                continue
+            }
+            def String type = '[' + paramOptions.type + ']'
+            def String enumsString = ""
+            if (paramOptions.enum != null) {
+                def List enums = (List) paramOptions.enum
+                def String chopEnums = enums.join(", ")
+                if(chopEnums.length() > terminalLength){
+                    chopEnums = chopEnums.substring(0, terminalLength-5)
+                    chopEnums = chopEnums.substring(0, chopEnums.lastIndexOf(",")) + ", ..."
+                }
+                enumsString = " (accepted: " + chopEnums + ") "
+            }
+            def String description = paramOptions.description ? paramOptions.description as String + " " : ""
+            def defaultValue = paramOptions.default != null ? "[default: " + paramOptions.default.toString() + "] " : ''
+            def String nestedParamName = parentParameter ? parentParameter + "." + paramName : paramName
+            def String nestedString = paramOptions.properties ? "(This parameter has sub-parameters. Use '--help ${nestedParamName}' to see all sub-parameters) " : ""
+            def descriptionDefault = description + colors.dim + enumsString + defaultValue + colors.reset + nestedString
+            // Wrap long description texts
+            // Loosely based on https://dzone.com/articles/groovy-plain-text-word-wrap
+            if (descriptionDefault.length() > terminalLength){
+                descriptionDefault = wrapText(descriptionDefault)
+            }
+            helpMessage.add("  --" +  paramName.padRight(maxChars) + colors.dim + type.padRight(10) + colors.reset + descriptionDefault)
+        }
+        return helpMessage
+    }
+
+    //
+    // Get a detailed help string from one parameter
+    //
+    private String getDetailedHelpString(String paramName, Map paramOptions, Map colors) {
+        def String helpMessage = "--" + paramName + '\n'
+        for (option in paramOptions) {
+            def String key = option.key
+            if (key == "fa_icon" || (key == "type" && option.value == "object")) {
+                continue
+            }
+            if (key == "properties") {
+                def Map subParamsOptions = option.value as Map
+                def Integer maxChars = paramsMaxChars(subParamsOptions) + 2
+                def String subParamsHelpString = getHelpList(subParamsOptions, colors, maxChars, paramName)
+                    .collect {
+                        "      ." + it[4..it.length()-1]
+                    }
+                    .join("\n")
+                helpMessage += "    " + colors.dim + "options".padRight(11) + ": " + colors.reset + "\n" + subParamsHelpString + "\n"
+                continue
+            }
+            def String value = option.value
+            if (value.length() > terminalLength) {
+                value = wrapText(value)
+            }
+            helpMessage += "    " + colors.dim + key.padRight(11) + ": " + colors.reset + value + '\n'
+        }
+        return helpMessage
     }
 
     //
@@ -455,69 +496,82 @@ class SchemaValidator extends PluginExtensionPoint {
         def Map params = session.params
         
         // Get a selection of core Nextflow workflow options
-        def Map workflow_summary = [:]
+        def Map workflowSummary = [:]
         if (workflow.revision) {
-            workflow_summary['revision'] = workflow.revision
+            workflowSummary['revision'] = workflow.revision
         }
-        workflow_summary['runName']      = workflow.runName
+        workflowSummary['runName']      = workflow.runName
         if (workflow.containerEngine) {
-            workflow_summary['containerEngine'] = workflow.containerEngine
+            workflowSummary['containerEngine'] = workflow.containerEngine
         }
         if (workflow.container) {
-            workflow_summary['container'] = workflow.container
+            workflowSummary['container'] = workflow.container
         }
         def String configFiles = workflow.configFiles
-        workflow_summary['launchDir']    = workflow.launchDir
-        workflow_summary['workDir']      = workflow.workDir
-        workflow_summary['projectDir']   = workflow.projectDir
-        workflow_summary['userName']     = workflow.userName
-        workflow_summary['profile']      = workflow.profile
-        workflow_summary['configFiles']  = configFiles.join(', ')
+        workflowSummary['launchDir']    = workflow.launchDir
+        workflowSummary['workDir']      = workflow.workDir
+        workflowSummary['projectDir']   = workflow.projectDir
+        workflowSummary['userName']     = workflow.userName
+        workflowSummary['profile']      = workflow.profile
+        workflowSummary['configFiles']  = configFiles.join(', ')
 
         // Get pipeline parameters defined in JSON Schema
-        def Map params_summary = [:]
-        def Map params_map = paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
-        for (group in params_map.keySet()) {
-            def sub_params = new LinkedHashMap()
-            def Map group_params = params_map.get(group)  as Map // This gets the parameters of that particular group
-            for (String param in group_params.keySet()) {
-                if (params.containsKey(param)) {
-                    def String params_value = params.get(param)
-                    def Map group_params_value = group_params.get(param) as Map 
-                    def String schema_value = group_params_value.default
-                    def String param_type   = group_params_value.type
-                    if (schema_value != null) {
-                        if (param_type == 'string') {
-                            if (schema_value.contains('$projectDir') || schema_value.contains('${projectDir}')) {
-                                def sub_string = schema_value.replace('\$projectDir', '')
-                                sub_string     = sub_string.replace('\${projectDir}', '')
-                                if (params_value.contains(sub_string)) {
-                                    schema_value = params_value
-                                }
+        def Map paramsSummary = [:]
+        def Map paramsMap = paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
+        for (group in paramsMap.keySet()) {
+            def Map groupSummary = getSummaryMapFromParams(params, paramsMap.get(group) as Map)
+            paramsSummary.put(group, groupSummary)
+        }
+        return [ 'Core Nextflow options' : workflowSummary ] << paramsSummary as LinkedHashMap
+    }
+
+
+    //
+    // Create a summary map for the given parameters
+    //
+    private Map getSummaryMapFromParams(Map params, Map paramsSchema) {
+        def Map summary = [:]
+        for (String param in paramsSchema.keySet()) {
+            if (params.containsKey(param)) {
+                def Map schema = paramsSchema.get(param) as Map 
+                if (params.get(param) instanceof Map && schema.containsKey("properties")) {
+                    summary.put(param, getSummaryMapFromParams(params.get(param) as Map, schema.get("properties") as Map))
+                    continue
+                }
+                def String value = params.get(param)
+                def String defaultValue = schema.get("default")
+                def String type = schema.type
+                if (defaultValue != null) {
+                    if (type == 'string') {
+                        // TODO rework this in a more flexible way
+                        if (defaultValue.contains('$projectDir') || defaultValue.contains('${projectDir}')) {
+                            def sub_string = defaultValue.replace('\$projectDir', '')
+                            sub_string     = sub_string.replace('\${projectDir}', '')
+                            if (value.contains(sub_string)) {
+                                defaultValue = value
                             }
-                            if (schema_value.contains('$params.outdir') || schema_value.contains('${params.outdir}')) {
-                                def sub_string = schema_value.replace('\$params.outdir', '')
-                                sub_string     = sub_string.replace('\${params.outdir}', '')
-                                if ("${params.outdir}${sub_string}" == params_value) {
-                                    schema_value = params_value
-                                }
+                        }
+                        if (defaultValue.contains('$params.outdir') || defaultValue.contains('${params.outdir}')) {
+                            def sub_string = defaultValue.replace('\$params.outdir', '')
+                            sub_string     = sub_string.replace('\${params.outdir}', '')
+                            if ("${params.outdir}${sub_string}" == value) {
+                                defaultValue = value
                             }
                         }
                     }
+                }
 
-                    // We have a default in the schema, and this isn't it
-                    if (schema_value != null && params_value != schema_value) {
-                        sub_params.put(param, params_value)
-                    }
-                    // No default in the schema, and this isn't empty or false
-                    else if (schema_value == null && params_value != "" && params_value != null && params_value != false && params_value != 'false') {
-                        sub_params.put(param, params_value)
-                    }
+                // We have a default in the schema, and this isn't it
+                if (defaultValue != null && value != defaultValue) {
+                    summary.put(param, value)
+                }
+                // No default in the schema, and this isn't empty or false
+                else if (defaultValue == null && value != "" && value != null && value != false && value != 'false') {
+                    summary.put(param, value)
                 }
             }
-            params_summary.put(group, sub_params)
         }
-        return [ 'Core Nextflow options' : workflow_summary ] << params_summary as LinkedHashMap
+        return summary
     }
 
     //
@@ -535,14 +589,17 @@ class SchemaValidator extends PluginExtensionPoint {
 
         def colors = Utils.logColours(config.monochromeLogs)
         String output  = ''
-        def LinkedHashMap params_map = paramsSummaryMap(workflow, parameters_schema: schemaFilename)
-        def max_chars  = paramsMaxChars(params_map)
-        for (group in params_map.keySet()) {
-            def Map group_params = params_map.get(group) as Map // This gets the parameters of that particular group
+        def Map paramsMap = paramsSummaryMap(workflow, parameters_schema: schemaFilename)
+        paramsMap.each { key, value ->
+            paramsMap[key] = flattenNestedParamsMap(value as Map)
+        }
+        def maxChars  = paramsMaxChars(paramsMap)
+        for (group in paramsMap.keySet()) {
+            def Map group_params = paramsMap.get(group) as Map // This gets the parameters of that particular group
             if (group_params) {
                 output += "$colors.bold$group$colors.reset\n"
                 for (String param in group_params.keySet()) {
-                    output += "  " + colors.blue + param.padRight(max_chars) + ": " + colors.green +  group_params.get(param) + colors.reset + '\n'
+                    output += "  " + colors.blue + param.padRight(maxChars) + ": " + colors.green +  group_params.get(param) + colors.reset + '\n'
                 }
                 output += '\n'
             }
@@ -550,6 +607,22 @@ class SchemaValidator extends PluginExtensionPoint {
         output += "!! Only displaying parameters that differ from the pipeline defaults !!\n"
         output += "-${colors.dim}----------------------------------------------------${colors.reset}-"
         return output
+    }
+
+    private Map flattenNestedParamsMap(Map paramsMap) {
+        def Map returnMap = [:]
+        paramsMap.each { param, value ->
+            def String key = param as String
+            if (value instanceof Map) {
+                def Map flatMap = flattenNestedParamsMap(value as Map)
+                flatMap.each { flatParam, flatValue ->
+                    returnMap.put(key + "." + flatParam, flatValue)
+                }
+            } else {
+                returnMap.put(key, value)
+            }
+        }
+        return returnMap
     }
 
     //
@@ -574,6 +647,10 @@ class SchemaValidator extends PluginExtensionPoint {
             if (p['value'] instanceof LinkedHashMap) {
                 new_params.replace(p.key, p['value'].toString())
             }
+            // Parsed nested parameters
+            if (p['value'] instanceof Map) {
+                new_params.replace(p.key, cleanParameters(p['value'] as Map))
+            }
         }
         return new_params
     }
@@ -582,14 +659,14 @@ class SchemaValidator extends PluginExtensionPoint {
     // This function tries to read a JSON params file
     //
     private static LinkedHashMap paramsLoad(Path json_schema) {
-        def params_map = new LinkedHashMap()
+        def paramsMap = new LinkedHashMap()
         try {
-            params_map = paramsRead(json_schema)
+            paramsMap = paramsRead(json_schema)
         } catch (Exception e) {
             println "Could not read parameters settings from JSON. $e"
-            params_map = new LinkedHashMap()
+            paramsMap = new LinkedHashMap()
         }
-        return params_map
+        return paramsMap
     }
 
     //
@@ -631,7 +708,7 @@ class SchemaValidator extends PluginExtensionPoint {
                     description
         */
 
-        def params_map = new LinkedHashMap()
+        def paramsMap = new LinkedHashMap()
         // Grouped params
         if (schema_defs) {
             for (group in schema_defs) {
@@ -641,7 +718,7 @@ class SchemaValidator extends PluginExtensionPoint {
                 group_property.each { innerkey, value ->
                     sub_params.put(innerkey, value)
                 }
-                params_map.put(title, sub_params)
+                paramsMap.put(title, sub_params)
             }
         }
 
@@ -651,25 +728,25 @@ class SchemaValidator extends PluginExtensionPoint {
             schema_properties.each { innerkey, value ->
                 ungrouped_params.put(innerkey, value)
             }
-            params_map.put("Other parameters", ungrouped_params)
+            paramsMap.put("Other parameters", ungrouped_params)
         }
 
-        return params_map
+        return paramsMap
     }
 
     //
     // Get maximum number of characters across all parameter names
     //
-    private static Integer paramsMaxChars( Map params_map) {
-        Integer max_chars = 0
-        for (group in params_map.keySet()) {
-            def Map group_params = (Map) params_map.get(group)  // This gets the parameters of that particular group
+    private static Integer paramsMaxChars( Map paramsMap) {
+        Integer maxChars = 0
+        for (group in paramsMap.keySet()) {
+            def Map group_params = (Map) paramsMap.get(group)  // This gets the parameters of that particular group
             for (String param in group_params.keySet()) {
-                if (param.size() > max_chars) {
-                    max_chars = param.size()
+                if (param.size() > maxChars) {
+                    maxChars = param.size()
                 }
             }
         }
-        return max_chars
+        return maxChars
     }
 }

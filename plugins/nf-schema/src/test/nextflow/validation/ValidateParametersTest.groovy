@@ -971,4 +971,78 @@ class ValidateParametersTest extends Dsl2Spec{
         !stdout
     }
 
+    def 'should validate nested params - pass' () {
+        given:
+        def SCRIPT = """
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+        """
+
+        when:
+        def config = [
+            "validation": [
+                "monochromeLogs": true
+            ],
+            "params": [
+                "this": [
+                    "is": [
+                        "so": [
+                            "deep": true
+                        ]
+                    ]
+                ]
+            ]
+        ]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should validate nested params - fail' () {
+        given:
+        def SCRIPT = """
+            params.this.is.so.deep = "this shouldn't be a string"
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+        """
+
+        when:
+        def config = [
+            "validation": [
+                "monochromeLogs": true
+            ],
+            "params": [
+                "this": [
+                    "is": [
+                        "so": [
+                            "deep": true
+                        ]
+                    ]
+                ]
+            ]
+        ]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message == """The following invalid input values have been detected:
+
+* --this.is.so.deep (this shouldn't be a string): Value is [string] but should be [boolean]
+
+"""
+        !stdout
+    }
+
 }

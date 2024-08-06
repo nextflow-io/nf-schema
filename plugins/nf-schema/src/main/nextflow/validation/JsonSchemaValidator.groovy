@@ -90,7 +90,7 @@ public class JsonSchemaValidator {
                 }
                 errors.add("-> ${entryString}: ${fieldError}" as String)
             } else if (validationType == "parameter") {
-                def String fieldName = locationList.join("/")
+                def String fieldName = locationList.join(".")
                 if(fieldName != "") {
                     errors.add("* --${fieldName} (${value}): ${customError ?: errorString}" as String)
                 } else {
