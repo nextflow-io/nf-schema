@@ -119,6 +119,9 @@ class SchemaValidator extends PluginExtensionPoint {
     // The length of the terminal
     private Integer terminalLength = System.getenv("COLUMNS")?.toInteger() ?: 100
 
+    // The configuration class
+    private ValidationConfig config
+
     @Override
     protected void init(Session session) {
         def plugins = session?.config?.navigate("plugins") as ArrayList
@@ -140,15 +143,32 @@ class SchemaValidator extends PluginExtensionPoint {
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             """)
         }
+
+        // Help message logic
+        config = new ValidationConfig(session.config.navigate('validation') as Map)
+        def Map params = session.params as Map
+        def Boolean containsFullParameter = params.containsKey(config.help.fullParameter)
+        def Boolean containsShortParameter = params.containsKey(config.help.shortParameter)
+        if (config.help.enabled && (containsFullParameter || containsShortParameter)) {
+            def HelpMessage helpMessage = new HelpMessage(config, session)
+            helpMessage.printBeforeText()
+            if (containsFullParameter) {
+                log.debug("Printing out the full help message")
+                helpMessage.printFullHelpMessage()
+            } else if (containsShortParameter) {
+                log.debug("Printing out the short help message")
+                def paramValue = params.get(config.help.shortParameter)
+                helpMessage.printShortHelpMessage(paramValue instanceof String ? paramValue : "")
+            }
+            helpMessage.printAfterText()
+            System.exit(0)
+        }
+
     }
 
     Session getSession(){
         Global.getSession() as Session
     }  
-
-    ValidationConfig getConfig() {
-        new ValidationConfig(session.config.navigate('validation') as Map)
-    }
 
     boolean hasErrors() { errors.size()>0 }
     List<String> getErrors() { errors }
@@ -238,7 +258,7 @@ class SchemaValidator extends PluginExtensionPoint {
 
         def Map params = initialiseExpectedParams(session.params)
         def String baseDir = session.baseDir.toString()
-        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : 'nextflow_schema.json'
+        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
         log.debug "Starting parameters validation"
 
         // Clean the parameters
@@ -356,21 +376,22 @@ class SchemaValidator extends PluginExtensionPoint {
     // Beautify parameters for --help
     //
     @Function
-    String paramsHelp(
+    public String paramsHelp(
         Map options = null,
         String command
     ) {
+        // TODO add link to help message migration guide once created
+        log.warn("Using `paramsHelp()` is deprecated. Check out the help message migration guide: <url>")
         def Map params = initialiseExpectedParams(session.params)
 
-        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : 'nextflow_schema.json'
-
+        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
         def colors = Utils.logColours(config.monochromeLogs)
         Integer num_hidden = 0
         String output  = ''
         output        += 'Typical pipeline command:\n\n'
         output        += "  ${colors.cyan}${command}${colors.reset}\n\n"
-        Map paramsMap = paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
-        Integer maxChars  = paramsMaxChars(paramsMap) + 1
+        Map paramsMap = Utils.paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
+        Integer maxChars  = Utils.paramsMaxChars(paramsMap) + 1
 
         // Make sure the hidden parameters count is 0
         hiddenParametersCount = 0
@@ -465,7 +486,7 @@ class SchemaValidator extends PluginExtensionPoint {
             }
             if (key == "properties") {
                 def Map subParamsOptions = option.value as Map
-                def Integer maxChars = paramsMaxChars(subParamsOptions) + 2
+                def Integer maxChars = Utils.paramsMaxChars(subParamsOptions) + 2
                 def String subParamsHelpString = getHelpList(subParamsOptions, colors, maxChars, paramName)
                     .collect {
                         "      ." + it[4..it.length()-1]
@@ -492,7 +513,7 @@ class SchemaValidator extends PluginExtensionPoint {
         WorkflowMetadata workflow
         ) {
         
-        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : 'nextflow_schema.json'
+        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
         def Map params = session.params
         
         // Get a selection of core Nextflow workflow options
@@ -517,7 +538,7 @@ class SchemaValidator extends PluginExtensionPoint {
 
         // Get pipeline parameters defined in JSON Schema
         def Map paramsSummary = [:]
-        def Map paramsMap = paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
+        def Map paramsMap = Utils.paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
         for (group in paramsMap.keySet()) {
             def Map groupSummary = getSummaryMapFromParams(params, paramsMap.get(group) as Map)
             paramsSummary.put(group, groupSummary)
@@ -585,7 +606,7 @@ class SchemaValidator extends PluginExtensionPoint {
 
         def Map params = session.params
 
-        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : 'nextflow_schema.json'
+        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
 
         def colors = Utils.logColours(config.monochromeLogs)
         String output  = ''
@@ -593,7 +614,7 @@ class SchemaValidator extends PluginExtensionPoint {
         paramsMap.each { key, value ->
             paramsMap[key] = flattenNestedParamsMap(value as Map)
         }
-        def maxChars  = paramsMaxChars(paramsMap)
+        def maxChars  = Utils.paramsMaxChars(paramsMap)
         for (group in paramsMap.keySet()) {
             def Map group_params = paramsMap.get(group) as Map // This gets the parameters of that particular group
             if (group_params) {
@@ -653,100 +674,5 @@ class SchemaValidator extends PluginExtensionPoint {
             }
         }
         return new_params
-    }
-
-    //
-    // This function tries to read a JSON params file
-    //
-    private static LinkedHashMap paramsLoad(Path json_schema) {
-        def paramsMap = new LinkedHashMap()
-        try {
-            paramsMap = paramsRead(json_schema)
-        } catch (Exception e) {
-            println "Could not read parameters settings from JSON. $e"
-            paramsMap = new LinkedHashMap()
-        }
-        return paramsMap
-    }
-
-    //
-    // Method to actually read in JSON file using Groovy.
-    // Group (as Key), values are all parameters
-    //    - Parameter1 as Key, Description as Value
-    //    - Parameter2 as Key, Description as Value
-    //    ....
-    // Group
-    //    -
-    private static LinkedHashMap paramsRead(Path json_schema) throws Exception {
-        def slurper = new JsonSlurper()
-        def Map schema = (Map) slurper.parse( json_schema )
-        // $defs is the adviced keyword for definitions. Keeping defs in for backwards compatibility
-        def Map schema_defs = (Map) (schema.get('$defs') ?: schema.get("defs"))
-        def Map schema_properties = (Map) schema.get('properties')
-        /* Tree looks like this in nf-core schema
-        * $defs <- this is what the first get('$defs') gets us
-                group 1
-                    title
-                    description
-                        properties
-                        parameter 1
-                            type
-                            description
-                        parameter 2
-                            type
-                            description
-                group 2
-                    title
-                    description
-                        properties
-                        parameter 1
-                            type
-                            description
-        * properties <- parameters can also be ungrouped, outside of $defs
-                parameter 1
-                    type
-                    description
-        */
-
-        def paramsMap = new LinkedHashMap()
-        // Grouped params
-        if (schema_defs) {
-            for (group in schema_defs) {
-                def Map group_property = (Map) group.value['properties'] // Gets the property object of the group
-                def String title = (String) group.value['title']
-                def sub_params = new LinkedHashMap()
-                group_property.each { innerkey, value ->
-                    sub_params.put(innerkey, value)
-                }
-                paramsMap.put(title, sub_params)
-            }
-        }
-
-        // Ungrouped params
-        if (schema_properties) {
-            def ungrouped_params = new LinkedHashMap()
-            schema_properties.each { innerkey, value ->
-                ungrouped_params.put(innerkey, value)
-            }
-            paramsMap.put("Other parameters", ungrouped_params)
-        }
-
-        return paramsMap
-    }
-
-    //
-    // Get maximum number of characters across all parameter names
-    //
-    private static Integer paramsMaxChars( Map paramsMap) {
-        Integer maxChars = 0
-        for (group in paramsMap.keySet()) {
-            def Map group_params = (Map) paramsMap.get(group)  // This gets the parameters of that particular group
-            for (String param in group_params.keySet()) {
-                if (param.size() > maxChars) {
-                    maxChars = param.size()
-                }
-            }
-        }
-        return maxChars
     }
 }
