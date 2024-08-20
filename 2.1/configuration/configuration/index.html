@@ -1032,6 +1032,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#beforetext_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      beforeText
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aftertext_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      afterText
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1292,6 +1325,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#beforetext_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      beforeText
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aftertext_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      afterText
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1395,6 +1461,10 @@
 <p>Any string provided to this option will printed before the help message.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">validation</span><span class="o">.</span><span class="na">help</span><span class="o">.</span><span class="na">beforeText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Running pipeline version 1.0&quot;</span><span class="w"> </span><span class="c1">// default: &quot;&quot;</span>
 </code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>All color values (like <code>\033[0;31m</code>, which means the color red) will be filtered out when <code>validation.monochromeLogs</code> is set to <code>true</code></p>
+</div>
 <h3 id="command">command</h3>
 <div class="admonition example">
 <p class="admonition-title">This option does not affect the help message created by the <code>paramsHelp()</code> function</p>
@@ -1407,6 +1477,10 @@
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span>nextflow<span class="w"> </span>run<span class="w"> </span>main.nf<span class="w"> </span>--input<span class="w"> </span>samplesheet.csv<span class="w"> </span>--outdir<span class="w"> </span>output
 </code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>All color values (like <code>\033[0;31m</code>, which means the color red) will be filtered out when <code>validation.monochromeLogs</code> is set to <code>true</code></p>
+</div>
 <h3 id="aftertext">afterText</h3>
 <div class="admonition example">
 <p class="admonition-title">This option does not affect the help message created by the <code>paramsHelp()</code> function</p>
@@ -1414,6 +1488,29 @@
 <p>Any string provided to this option will be printed after the help message.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">validation</span><span class="o">.</span><span class="na">help</span><span class="o">.</span><span class="na">afterText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Please cite the pipeline owners when using this pipeline&quot;</span><span class="w"> </span><span class="c1">// default: &quot;&quot;</span>
 </code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>All color values (like <code>\033[0;31m</code>, which means the color red) will be filtered out when <code>validation.monochromeLogs</code> is set to <code>true</code></p>
+</div>
+<h2 id="summary">Summary</h2>
+<p>The <code>validation.summary</code> config scope can be used to configure the output of the <code>paramsSummaryLog()</code> function.</p>
+<p>This scope contains the following options:</p>
+<h3 id="beforetext_1">beforeText</h3>
+<p>Any string provided to this option will printed before the parameters log message.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">validation</span><span class="o">.</span><span class="na">summary</span><span class="o">.</span><span class="na">beforeText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Running pipeline version 1.0&quot;</span><span class="w"> </span><span class="c1">// default: &quot;&quot;</span>
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>All color values (like <code>\033[0;31m</code>, which means the color red) will be filtered out when <code>validation.monochromeLogs</code> is set to <code>true</code></p>
+</div>
+<h3 id="aftertext_1">afterText</h3>
+<p>Any string provided to this option will be printed after the parameters log message.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">validation</span><span class="o">.</span><span class="na">summary</span><span class="o">.</span><span class="na">afterText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Please cite the pipeline owners when using this pipeline&quot;</span><span class="w"> </span><span class="c1">// default: &quot;&quot;</span>
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>All color values (like <code>\033[0;31m</code>, which means the color red) will be filtered out when <code>validation.monochromeLogs</code> is set to <code>true</code></p>
+</div>
 
 
 
