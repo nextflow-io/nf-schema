@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.32">
     
     
       
@@ -1112,50 +1112,52 @@
 <p>nf-schema is the new version of the now deprecated <a href="https://github.com/nextflow-io/nf-validation">nf-validation</a>. Please follow the <a href="https://nextflow-io.github.io/nf-schema/latest/migration_guide/">migration guide</a> to migrate your code to this new version.</p>
 </div>
 <h2 id="introduction">Introduction</h2>
-<p>This <a href="https://www.nextflow.io/docs/latest/plugins.html#plugins">Nextflow plugin</a> provides a number of functions that can be included into a Nextflow pipeline script to work with parameter and sample sheet schema. Using these functions you can:</p>
+<p>This <a href="https://www.nextflow.io/docs/latest/plugins.html#plugins">Nextflow plugin</a> provides functionality that can be used in a Nextflow pipeline to work with parameter and sample sheet schema. The added functionality is:</p>
 <ul>
 <li>📖 Print usage instructions to the terminal (for use with <code>--help</code>)</li>
 <li>✍️ Print log output showing parameters with non-default values</li>
 <li>✅ Validate supplied parameters against the pipeline schema</li>
 <li>📋 Validate the contents of supplied sample sheet files</li>
-<li>🛠️ Create a Nextflow channel with a parsed sample sheet</li>
+<li>🛠️ Create a type-casted list from a parsed sample sheet</li>
 </ul>
 <p>Supported sample sheet formats are CSV, TSV, JSON and YAML.</p>
 <h2 id="quick-start">Quick Start</h2>
 <p>Declare the plugin in your Nextflow pipeline configuration file:</p>
 <div class="highlight"><span class="filename">nextflow.config</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;nf-schema@2.0.0&#39;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;nf-schema@2.1.0&#39;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">}</span>
 </code></pre></div>
 <p>This is all that is needed - Nextflow will automatically fetch the plugin code at run time.</p>
 <blockquote>
 <p>[!NOTE]
-The snippet above will always try to install the latest version, good to make sure
-that the latest bug fixes are included! However, this can cause difficulties if running
-offline. You can pin a specific release using the syntax <code>nf-schema@2.0.0</code></p>
+The snippet above will always try to install the specified version. We encourage always pinning the
+plugin version to make sure the used pipeline will keep working when a new version of <code>nf-schema</code>
+with breaking changes has been released.</p>
 </blockquote>
 <p>You can now include the plugin helper functions into your Nextflow pipeline:</p>
-<div class="highlight"><span class="filename">main.nf</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">include</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">validateParameters</span><span class="o">;</span><span class="w"> </span><span class="n">paramsHelp</span><span class="o">;</span><span class="w"> </span><span class="n">paramsSummaryLog</span><span class="o">;</span><span class="w"> </span><span class="n">samplesheetToList</span><span class="w"> </span><span class="o">}</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="s1">&#39;plugin/nf-schema&#39;</span>
+<div class="highlight"><span class="filename">main.nf</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">include</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">validateParameters</span><span class="o">;</span><span class="w"> </span><span class="n">paramsSummaryLog</span><span class="o">;</span><span class="w"> </span><span class="n">samplesheetToList</span><span class="w"> </span><span class="o">}</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="s1">&#39;plugin/nf-schema&#39;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">// Print help message, supply typical command line usage for the pipeline</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="n">params</span><span class="o">.</span><span class="na">help</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">   </span><span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="w"> </span><span class="n">paramsHelp</span><span class="o">(</span><span class="s2">&quot;nextflow run my_pipeline --input input_file.csv&quot;</span><span class="o">)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">   </span><span class="n">exit</span><span class="w"> </span><span class="mi">0</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="o">}</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">// Validate input parameters</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">validateParameters</span><span class="o">()</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1">// Print summary of supplied parameters</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="w"> </span><span class="nf">paramsSummaryLog</span><span class="o">(</span><span class="n">workflow</span><span class="o">)</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1">// Validate input parameters</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">validateParameters</span><span class="o">()</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="c1">// Print summary of supplied parameters</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="w"> </span><span class="nf">paramsSummaryLog</span><span class="o">(</span><span class="n">workflow</span><span class="o">)</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="c1">// Create a new channel of metadata from a sample sheet passed to the pipeline through the --input parameter</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">ch_input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Channel</span><span class="o">.</span><span class="na">fromList</span><span class="o">(</span><span class="n">samplesheetToList</span><span class="o">(</span><span class="n">params</span><span class="o">.</span><span class="na">input</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;assets/schema_input.json&quot;</span><span class="o">))</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1">// Create a new channel of metadata from a sample sheet passed to the pipeline through the --input parameter</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">ch_input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Channel</span><span class="o">.</span><span class="na">fromList</span><span class="o">(</span><span class="n">samplesheetToList</span><span class="o">(</span><span class="n">params</span><span class="o">.</span><span class="na">input</span><span class="o">,</span><span class="w"> </span><span class="s2">&quot;assets/schema_input.json&quot;</span><span class="o">))</span>
+</code></pre></div>
+<p>Or enable the creation of the help message (using <code>--help</code>) in the configuration file:</p>
+<div class="highlight"><span class="filename">nextflow.config</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">validation</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="n">help</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nl">enabled:</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="o">}</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="o">}</span>
 </code></pre></div>
 <h2 id="dependencies">Dependencies</h2>
 <ul>
 <li>Java 11 or later</li>
 <li><a href="https://github.com/harrel56/json-schema">https://github.com/harrel56/json-schema</a></li>
+<li>Nextflow 23.10.0 or later</li>
 </ul>
 <h2 id="slack-channel">Slack channel</h2>
 <p>There is a dedicated <a href="https://nfcore.slack.com/archives/C056RQB10LU">nf-schema Slack channel</a> in the <a href="https://nextflow.slack.com">Nextflow Slack workspace</a>.</p>
@@ -1252,7 +1254,7 @@ as part of the nf-core pipeline template.</p>
     <script id="__config" type="application/json">{"base": ".", "features": ["content.action.edit", "content.code.annotate", "content.code.copy", "navigation.instant", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.footer", "search.share", "toc.follow"], "search": "assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      <script src="assets/javascripts/bundle.471ce7a9.min.js"></script>
       
     
   </body>

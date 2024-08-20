@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.32">
     
     
       
@@ -958,9 +958,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launch-it-with-nextflow" class="md-nav__link">
+  <a href="#launch-it-with-installed-nextflow" class="md-nav__link">
     <span class="md-ellipsis">
-      Launch it with Nextflow
+      Launch it with installed Nextflow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#launch-it-with-a-local-version-of-nextflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Launch it with a local version of Nextflow
     </span>
   </a>
   
@@ -1027,9 +1036,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launch-it-with-nextflow" class="md-nav__link">
+  <a href="#launch-it-with-installed-nextflow" class="md-nav__link">
     <span class="md-ellipsis">
-      Launch it with Nextflow
+      Launch it with installed Nextflow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#launch-it-with-a-local-version-of-nextflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Launch it with a local version of Nextflow
     </span>
   </a>
   
@@ -1072,28 +1090,57 @@
 <p>To compile and run the tests use the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>./gradlew<span class="w"> </span>check
 </code></pre></div>
-<h2 id="launch-it-with-nextflow">Launch it with Nextflow</h2>
-<p>To test with Nextflow for development purpose:</p>
-<p>Clone the Nextflow repo into a sibling directory</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/nextflow-io/nextflow
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>nextflow<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./gradlew<span class="w"> </span>exportClasspath
+<h2 id="launch-it-with-installed-nextflow">Launch it with installed Nextflow</h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method will add the development version of the plugin to your Nextflow plugins
+Take care when using this method and make sure that you are never using a
+development version to run real pipelines.
+You can delete all <code>nf-schema</code> versions using this command:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>~/.nextflow/plugins/nf-schema*
+</code></pre></div></p>
+</div>
+<ul>
+<li>Install the current version of the plugin in your <code>.nextflow/plugins</code> folder</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>install
 </code></pre></div>
-<p>Append to the <code>settings.gradle</code> in this project the following line:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>includeBuild<span class="o">(</span><span class="s1">&#39;../nextflow&#39;</span><span class="o">)</span>
+<ul>
+<li>Update or add the nf-schema plugin with the installed version in your test pipeline</li>
+</ul>
+<div class="highlight"><span class="filename">nextflow.config</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;nf-schema@x.y.z&#39;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="o">}</span>
 </code></pre></div>
-<p>Compile the plugin code</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./gradlew<span class="w"> </span>compileGroovy
+<h2 id="launch-it-with-a-local-version-of-nextflow">Launch it with a local version of Nextflow</h2>
+<ul>
+<li>Clone the Nextflow repo into a sibling directory</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/nextflow-io/nextflow
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>nextflow<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./gradlew<span class="w"> </span>exportClasspath
 </code></pre></div>
-<p>Run nextflow with this command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>./launch.sh<span class="w"> </span>run<span class="w"> </span>-plugins<span class="w"> </span>nf-schema<span class="w"> </span>&lt;script/pipeline<span class="w"> </span>name&gt;<span class="w"> </span><span class="o">[</span>pipeline<span class="w"> </span>params<span class="o">]</span>
+<ul>
+<li>Append to the <code>settings.gradle</code> in this project the following line:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>includeBuild<span class="o">(</span><span class="s1">&#39;../nextflow&#39;</span><span class="o">)</span>
+</code></pre></div>
+<ul>
+<li>Compile the plugin code</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./gradlew<span class="w"> </span>compileGroovy
+</code></pre></div>
+<ul>
+<li>Run nextflow with this command:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>./launch.sh<span class="w"> </span>run<span class="w"> </span>-plugins<span class="w"> </span>nf-schema<span class="w"> </span>&lt;script/pipeline<span class="w"> </span>name&gt;<span class="w"> </span><span class="o">[</span>pipeline<span class="w"> </span>params<span class="o">]</span>
 </code></pre></div>
 <h2 id="change-and-preview-the-docs">Change and preview the docs</h2>
 <p>The docs are generated using <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a>.
 You can install the required packages as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mkdocs-material<span class="w"> </span>pymdown-extensions<span class="w"> </span>pillow<span class="w"> </span>cairosvg
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mkdocs-material<span class="w"> </span>pymdown-extensions<span class="w"> </span>pillow<span class="w"> </span>cairosvg
 </code></pre></div>
 <p>To change the docs, edit the files in the <a href="https://github.com/nextflow-io/nf-schema/tree/master/docs">docs/</a> folder and run the following command to generate the docs:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mkdocs<span class="w"> </span>serve
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mkdocs<span class="w"> </span>serve
 </code></pre></div>
 <p>To preview the docs, open the URL provided by mkdocs in your browser.</p>
 
@@ -1178,7 +1225,7 @@ You can install the required packages as follows:</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.code.annotate", "content.code.copy", "navigation.instant", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.footer", "search.share", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.471ce7a9.min.js"></script>
       
     
   </body>
