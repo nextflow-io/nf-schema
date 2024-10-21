@@ -19,16 +19,10 @@ import nextflow.Nextflow
 @CompileStatic
 class SamplesheetConverter {
 
-    private static Path samplesheetFile
-    private static Path schemaFile
     private static ValidationConfig config
-    private static Map options
 
-    SamplesheetConverter(Path samplesheetFile, Path schemaFile, ValidationConfig config, Map options) {
-        this.samplesheetFile = samplesheetFile
-        this.schemaFile = schemaFile
+    SamplesheetConverter(ValidationConfig config) {
         this.config = config
-        this.options = options
     }
 
     private static List<Map> rows = []
@@ -67,34 +61,38 @@ class SamplesheetConverter {
     /*
     Convert the samplesheet to a list of entries based on a schema
     */
-    public static List validateAndConvertToList() {
+    public static List validateAndConvertToList(
+        Path samplesheetFile,
+        Path schemaFile,
+        Map options
+    ) {
 
         def colors = Utils.logColours(config.monochromeLogs)
 
         // Some checks before validating
-        if(!this.schemaFile.exists()) {
-            def msg = "${colors.red}JSON schema file ${this.schemaFile.toString()} does not exist\n${colors.reset}\n"
+        if(!schemaFile.exists()) {
+            def msg = "${colors.red}JSON schema file ${schemaFile.toString()} does not exist\n${colors.reset}\n"
             throw new SchemaValidationException(msg)
         }
 
-        if(!this.samplesheetFile.exists()) {
-            def msg = "${colors.red}Samplesheet file ${this.samplesheetFile.toString()} does not exist\n${colors.reset}\n"
+        if(!samplesheetFile.exists()) {
+            def msg = "${colors.red}Samplesheet file ${samplesheetFile.toString()} does not exist\n${colors.reset}\n"
             throw new SchemaValidationException(msg)
         }
 
         // Validate
         final validator = new JsonSchemaValidator(config)
-        def JSONArray samplesheet = Utils.fileToJsonArray(this.samplesheetFile, this.schemaFile)
-        def List<String> validationErrors = validator.validate(samplesheet, this.schemaFile.text)
+        def JSONArray samplesheet = Utils.fileToJsonArray(samplesheetFile, schemaFile)
+        def List<String> validationErrors = validator.validate(samplesheet, schemaFile.text)
         if (validationErrors) {
-            def msg = "${colors.red}The following errors have been detected in ${this.samplesheetFile.toString()}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
+            def msg = "${colors.red}The following errors have been detected in ${samplesheetFile.toString()}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
             log.error("Validation of samplesheet failed!")
             throw new SchemaValidationException(msg, validationErrors)
         }
 
         // Convert
-        def LinkedHashMap schemaMap = new JsonSlurper().parseText(this.schemaFile.text) as LinkedHashMap
-        def List samplesheetList = Utils.fileToList(this.samplesheetFile, this.schemaFile)
+        def LinkedHashMap schemaMap = new JsonSlurper().parseText(schemaFile.text) as LinkedHashMap
+        def List samplesheetList = Utils.fileToList(samplesheetFile, schemaFile)
 
         this.rows = []
 
@@ -110,7 +108,7 @@ class SamplesheetConverter {
             }
             return result
         }
-        logUnusedHeadersWarning(this.samplesheetFile.toString())
+        logUnusedHeadersWarning(samplesheetFile.toString())
         return channelFormat
     }
 

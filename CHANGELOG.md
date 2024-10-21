@@ -4,6 +4,8 @@
 
 ## Bug fixes
 
+1. Fixed a bug in `samplesheetToList` that caused output mixing when the function was used more than once in channel operators.
+
 ## Improvements
 
 # Version 2.1.2

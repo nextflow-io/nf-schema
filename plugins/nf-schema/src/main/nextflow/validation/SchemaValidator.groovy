@@ -224,8 +224,9 @@ class SchemaValidator extends PluginExtensionPoint {
         final Path schema,
         final Map options = null
     ) {
-        def SamplesheetConverter converter = new SamplesheetConverter(samplesheet, schema, config, options)
-        return converter.validateAndConvertToList()
+        def SamplesheetConverter converter = new SamplesheetConverter(config)
+        def List output = converter.validateAndConvertToList(samplesheet, schema, options)
+        return output
     }
 
     //
