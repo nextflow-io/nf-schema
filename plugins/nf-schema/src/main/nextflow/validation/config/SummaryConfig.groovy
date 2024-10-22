@@ -19,6 +19,7 @@ import groovy.transform.PackageScope
 class SummaryConfig {
     final public String beforeText
     final public String afterText
+    final public List<String> hideParams
 
     SummaryConfig(Map map, Boolean monochromeLogs) {
         def config = map ?: Collections.emptyMap()
@@ -29,5 +30,6 @@ class SummaryConfig {
             beforeText  = config.beforeText ?: ""
             afterText   = config.afterText  ?: ""
         }
+        this.hideParams = config.hideParams ?: []
     }
 }

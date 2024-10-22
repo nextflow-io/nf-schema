@@ -432,6 +432,19 @@ Please contact the pipeline maintainer(s) if you see this warning as a user.
         def Map paramsMap = Utils.paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
         for (group in paramsMap.keySet()) {
             def Map groupSummary = getSummaryMapFromParams(params, paramsMap.get(group) as Map)
+            config.summary.hideParams.each { hideParam ->
+                def List<String> hideParamList = hideParam.tokenize(".") as List<String>
+                def Integer indexCounter = 0
+                def Map nestedSummary = groupSummary
+                if(hideParamList.size() >= 2 ) {
+                    hideParamList[0..-2].each { it ->
+                        nestedSummary = nestedSummary?.get(it, null)
+                    }
+                }
+                if(nestedSummary != null ) {
+                    nestedSummary.remove(hideParamList[-1])
+                }
+            }
             paramsSummary.put(group, groupSummary)
         }
         paramsSummary.put('Core Nextflow options', workflowSummary)

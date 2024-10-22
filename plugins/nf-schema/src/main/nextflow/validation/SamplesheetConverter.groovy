@@ -44,17 +44,23 @@ class SamplesheetConverter {
         this.meta.size() > 0
     }
 
-    private static List unusedHeaders = []
+    private static List unrecognisedHeaders = []
 
-    private static addUnusedHeader (String header) {
-        this.unusedHeaders.add(header)
+    private static addUnrecognisedHeader (String header) {
+        this.unrecognisedHeaders.add(header)
     }
 
-    private static logUnusedHeadersWarning(String fileName) {
-        def Set unusedHeaders = this.unusedHeaders as Set
-        if(unusedHeaders.size() > 0) {
-            def String processedHeaders = unusedHeaders.collect { "\t- ${it}" }.join("\n")
-            log.warn("Found the following unidentified headers in ${fileName}:\n${processedHeaders}" as String)
+    private static logUnrecognisedHeaders(String fileName) {
+        log.info("HEADERS: ${this.unrecognisedHeaders}" as String)
+        def Set unrecognisedHeaders = this.unrecognisedHeaders as Set
+        if(unrecognisedHeaders.size() > 0) {
+            def String processedHeaders = unrecognisedHeaders.collect { "\t- ${it}" }.join("\n")
+            def String msg = "Found the following unidentified headers in ${fileName}:\n${processedHeaders}\n" as String
+            if( config.failUnrecognisedHeaders ) {
+                throw new SchemaValidationException(msg)
+            } else {
+                log.warn(msg)
+            }
         }
     }
 
@@ -108,8 +114,11 @@ class SamplesheetConverter {
             }
             return result
         }
-        logUnusedHeadersWarning(samplesheetFile.toString())
+
+        logUnrecognisedHeaders(samplesheetFile.toString())
+
         return channelFormat
+
     }
 
     /*
@@ -127,7 +136,7 @@ class SamplesheetConverter {
             def Set unusedKeys = input.keySet() - properties.keySet()
             
             // Check for properties in the samplesheet that have not been defined in the schema
-            unusedKeys.each{addUnusedHeader("${headerPrefix}${it}" as String)}
+            unusedKeys.each{addUnrecognisedHeader("${headerPrefix}${it}" as String)}
 
             // Loop over every property to maintain the correct order
             properties.each { property, schemaValues ->
@@ -236,7 +245,7 @@ class SamplesheetConverter {
             def Set unusedKeys = input.keySet() - properties.keySet()
             
             // Check for properties in the samplesheet that have not been defined in the schema
-            unusedKeys.each{addUnusedHeader("${headerPrefix}${it}" as String)}
+            unusedKeys.each{addUnrecognisedHeader("${headerPrefix}${it}" as String)}
 
             // Loop over every property to maintain the correct order
             properties.each { property, schemaValues ->

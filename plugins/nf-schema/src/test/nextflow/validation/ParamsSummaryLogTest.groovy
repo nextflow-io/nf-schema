@@ -184,4 +184,96 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         stdout.size() == 13
         stdout ==~ /.*\[0;34moutdir     : .\[0;32moutDir.*/
     }
+
+    def 'should print params summary - nested parameters - hide params' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath().toString()
+        def  SCRIPT = """
+            params.this.is.so.deep = "changed_value"
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            
+            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+            log.info summary_params
+        """
+
+        when:
+        def config = [
+            "params": [
+                "this": [
+                    "is": [
+                        "so": [
+                            "deep": true
+                        ]
+                    ]
+                ]
+            ],
+            "validation": [
+                "summary": [
+                    "hideParams": ["params.this.is.so.deep"]
+                ]
+            ]
+        ]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    it.contains('Core Nextflow options') ||
+                    it.contains('runName') ||
+                    it.contains('launchDir') ||
+                    it.contains('workDir') ||
+                    it.contains('projectDir') ||
+                    it.contains('userName') ||
+                    it.contains('profile') ||
+                    it.contains('configFiles') ||
+                    it.contains('Nested Parameters') ||
+                    it.contains('this.is.so.deep ') 
+                    ? it : null }
+        
+        then:
+        noExceptionThrown()
+        stdout.size() == 10
+        stdout !=~ /.*\[0;34mthis.is.so.deep: .\[0;32mchanged_value.*/
+    }
+
+    def 'should print params summary - hide params' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def  SCRIPT = """
+            params.outdir = "outDir"
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            
+            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+            log.info summary_params
+        """
+
+        when:
+        def config = [
+            "validation": [
+                "summary": [
+                    "hideParams": ["outdir"]
+                ]
+            ]
+        ]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    it.contains('Core Nextflow options') ||
+                    it.contains('runName') ||
+                    it.contains('launchDir') ||
+                    it.contains('workDir') ||
+                    it.contains('projectDir') ||
+                    it.contains('userName') ||
+                    it.contains('profile') ||
+                    it.contains('configFiles') ||
+                    it.contains('outdir ') 
+                    ? it : null }
+        
+        then:
+        noExceptionThrown()
+        stdout.size() == 9
+        stdout !=~ /.*\[0;34moutdir     : .\[0;32moutDir.*/
+    }
 }

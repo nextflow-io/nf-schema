@@ -11,6 +11,7 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
+import test.MockScriptRunner
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -337,7 +338,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
 
     def 'extra field' () {
         given:
-        def SCRIPT_TEXT = '''
+        def SCRIPT = '''
             include { samplesheetToList } from 'plugin/nf-schema'
 
             params.input = "src/testResources/extraFields.csv"
@@ -350,7 +351,8 @@ class SamplesheetConverterTest extends Dsl2Spec{
         '''
 
         when:
-        dsl_eval(SCRIPT_TEXT)
+        def config = [:]
+        new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
@@ -366,6 +368,35 @@ class SamplesheetConverterTest extends Dsl2Spec{
         stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25, false, [], [], [], [], [], itDoesExist]")
         stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, [], unique3, 1, itDoesExist]" as String)
+    }
+
+    def 'extra field - fail' () {
+        given:
+        def SCRIPT = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            params.input = "src/testResources/extraFields.csv"
+            params.schema = "src/testResources/schema_input.json"
+
+            workflow {
+                Channel.fromList(samplesheetToList(params.input, params.schema))
+                    .view()
+            }
+        '''
+
+        when:
+        def config = [
+            "validation": [
+                "failUnrecognisedHeaders": true
+            ]
+        ]
+        new MockScriptRunner(config).setScript(SCRIPT).execute()
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message == """Found the following unidentified headers in ${getRootString()}/src/testResources/extraFields.csv:
+\t- extraField
+""" as String
     }
 
     def 'no meta' () {

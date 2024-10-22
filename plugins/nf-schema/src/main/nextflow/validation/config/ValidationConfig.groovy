@@ -21,6 +21,7 @@ class ValidationConfig {
     final public Boolean lenientMode
     final public Boolean monochromeLogs
     final public Boolean failUnrecognisedParams
+    final public Boolean failUnrecognisedHeaders
     final public String  parametersSchema
     final public Boolean showHiddenParams
     final public HelpConfig help
@@ -30,10 +31,11 @@ class ValidationConfig {
 
     ValidationConfig(Map map, Map params){
         def config = map ?: Collections.emptyMap()
-        lenientMode             = config.lenientMode            ?: false
-        monochromeLogs          = config.monochromeLogs         ?: false
-        failUnrecognisedParams  = config.failUnrecognisedParams ?: false
-        showHiddenParams        = config.showHiddenParams       ?: false
+        lenientMode             = config.lenientMode                ?: false
+        monochromeLogs          = config.monochromeLogs             ?: false
+        failUnrecognisedParams  = config.failUnrecognisedParams     ?: false
+        failUnrecognisedHeaders = config.failUnrecognisedHeaders    ?: false
+        showHiddenParams        = config.showHiddenParams           ?: false
         if(config.containsKey("showHiddenParams")) {
             log.warn("configuration option `validation.showHiddenParams` is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead")
         }

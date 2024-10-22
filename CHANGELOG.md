@@ -2,6 +2,11 @@
 
 # Version 2.2.0-dev
 
+## New features
+
+1. Added a new configuration option `validation.failUnrecognisedHeaders`. This is the analogue to `failUnrecognisedParams`, but for samplesheet headers. The default is `false` which means that unrecognized headers throw a warning instead of an error.
+2. Added a new configuration option `validation.summary.hideParams`. This option takes a list of parameter names to hide from the parameters summary created by `paramsSummaryMap()` and `paramsSummaryLog()`
+
 ## Bug fixes
 
 1. Fixed a bug in `samplesheetToList` that caused output mixing when the function was used more than once in channel operators.
