@@ -38,7 +38,7 @@ import org.yaml.snakeyaml.Yaml
 
 @Slf4j
 @CompileStatic
-class SchemaValidator extends PluginExtensionPoint {
+class ValidationExtension extends PluginExtensionPoint {
 
     final List<String> NF_OPTIONS = [
             // Options for base `nextflow` command
@@ -152,24 +152,6 @@ class SchemaValidator extends PluginExtensionPoint {
         // Help message logic
         def Map params = (Map)session.params ?: [:]
         config = new ValidationConfig(session?.config?.navigate('validation') as Map, params)
-        def Boolean containsFullParameter = params.containsKey(config.help.fullParameter) && params[config.help.fullParameter]
-        def Boolean containsShortParameter = params.containsKey(config.help.shortParameter) && params[config.help.shortParameter]
-        if (config.help.enabled && (containsFullParameter || containsShortParameter)) {
-            def String help = ""
-            def HelpMessage helpMessage = new HelpMessage(config, session)
-            help += helpMessage.getBeforeText()
-            if (containsFullParameter) {
-                log.debug("Printing out the full help message")
-                help += helpMessage.getFullHelpMessage()
-            } else if (containsShortParameter) {
-                log.debug("Printing out the short help message")
-                def paramValue = params.get(config.help.shortParameter)
-                help += helpMessage.getShortHelpMessage(paramValue instanceof String ? paramValue : "")
-            }
-            help += helpMessage.getAfterText()
-            log.info(help)
-            System.exit(0)
-        }
 
     }
 
