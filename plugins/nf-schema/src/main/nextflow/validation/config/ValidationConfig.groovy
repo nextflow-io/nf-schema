@@ -1,8 +1,8 @@
-package nextflow.validation
+package nextflow.validation.config
 
 import groovy.util.logging.Slf4j
-import groovy.transform.PackageScope
 
+import nextflow.validation.SchemaValidationException
 
 /**
  * This class allows model an specific configuration, extracting values from a map and converting
@@ -15,7 +15,6 @@ import groovy.transform.PackageScope
  */
 
 @Slf4j
-@PackageScope
 class ValidationConfig {
 
     final public Boolean lenientMode

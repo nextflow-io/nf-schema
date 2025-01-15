@@ -6,7 +6,7 @@ import java.nio.file.Path
 
 import nextflow.Session
 
-import nextflow.validation.ValidationConfig
+import nextflow.validation.config.ValidationConfig
 import nextflow.validation.Utils
 
 /**

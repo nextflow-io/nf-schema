@@ -14,6 +14,8 @@ import dev.harrel.jsonschema.providers.OrgJsonNode
 import java.util.regex.Pattern
 import java.util.regex.Matcher
 
+import nextflow.validation.config.ValidationConfig
+
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */

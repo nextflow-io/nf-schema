@@ -9,6 +9,8 @@ import org.json.JSONArray
 
 import nextflow.Nextflow
 
+import nextflow.validation.config.ValidationConfig
+
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>

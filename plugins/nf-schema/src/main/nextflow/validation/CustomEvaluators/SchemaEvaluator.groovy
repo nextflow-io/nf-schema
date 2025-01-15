@@ -12,6 +12,8 @@ import groovy.util.logging.Slf4j
 import java.nio.file.Path
 import java.nio.file.Files
 
+import nextflow.validation.config.ValidationConfig
+
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */

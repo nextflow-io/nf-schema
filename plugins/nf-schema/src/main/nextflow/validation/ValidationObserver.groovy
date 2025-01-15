@@ -8,6 +8,7 @@ import nextflow.trace.TraceRecord
 import nextflow.Session
 
 import nextflow.validation.help.HelpMessage
+import nextflow.validation.config.ValidationConfig
 
 @Slf4j
 class ValidationObserver implements TraceObserver {

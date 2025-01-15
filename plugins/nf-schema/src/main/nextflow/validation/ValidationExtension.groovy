@@ -30,6 +30,7 @@ import org.json.JSONObject
 import org.json.JSONTokener
 import org.yaml.snakeyaml.Yaml
 
+import nextflow.validation.config.ValidationConfig
 import nextflow.validation.help.HelpMessage
 
 /**
