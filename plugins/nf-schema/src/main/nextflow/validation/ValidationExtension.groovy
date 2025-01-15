@@ -30,6 +30,8 @@ import org.json.JSONObject
 import org.json.JSONTokener
 import org.yaml.snakeyaml.Yaml
 
+import nextflow.validation.help.HelpMessage
+
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>

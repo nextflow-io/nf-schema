@@ -15,6 +15,9 @@ import org.junit.Rule
 import test.Dsl2Spec
 import test.OutputCapture
 
+import nextflow.validation.ValidationConfig
+import nextflow.validation.help.HelpMessage
+
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */

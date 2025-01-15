@@ -1,10 +1,13 @@
-package nextflow.validation
+package nextflow.validation.help
 
 import groovy.util.logging.Slf4j
 
 import java.nio.file.Path
 
 import nextflow.Session
+
+import nextflow.validation.ValidationConfig
+import nextflow.validation.Utils
 
 /**
  * This class contains methods to write a help message
