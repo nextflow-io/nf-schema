@@ -2,7 +2,7 @@ package nextflow.validation.config
 
 import groovy.util.logging.Slf4j
 
-import nextflow.validation.SchemaValidationException
+import nextflow.validation.exceptions.SchemaValidationException
 
 /**
  * This class allows model an specific configuration, extracting values from a map and converting

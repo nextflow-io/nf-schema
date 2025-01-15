@@ -10,6 +10,7 @@ import org.json.JSONArray
 import nextflow.Nextflow
 
 import nextflow.validation.config.ValidationConfig
+import nextflow.validation.exceptions.SchemaValidationException
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>

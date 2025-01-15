@@ -31,6 +31,7 @@ import org.json.JSONTokener
 import org.yaml.snakeyaml.Yaml
 
 import nextflow.validation.config.ValidationConfig
+import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.help.HelpMessage
 
 /**

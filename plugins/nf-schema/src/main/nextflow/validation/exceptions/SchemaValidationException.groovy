@@ -1,4 +1,4 @@
-package nextflow.validation
+package nextflow.validation.exceptions
 
 import groovy.transform.CompileStatic
 import nextflow.exception.AbortOperationException

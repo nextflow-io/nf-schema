@@ -15,6 +15,7 @@ import java.util.regex.Pattern
 import java.util.regex.Matcher
 
 import nextflow.validation.config.ValidationConfig
+import nextflow.validation.exceptions.SchemaValidationException
 
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>

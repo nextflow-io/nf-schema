@@ -13,6 +13,8 @@ import test.Dsl2Spec
 import test.OutputCapture
 import test.MockScriptRunner
 
+import nextflow.validation.exceptions.SchemaValidationException
+
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>

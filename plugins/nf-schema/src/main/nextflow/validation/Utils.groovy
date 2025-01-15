@@ -12,6 +12,8 @@ import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
 
+import nextflow.validation.exceptions.SchemaValidationException
+
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
