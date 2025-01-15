@@ -1,4 +1,4 @@
-package nextflow.validation
+package nextflow.validation.validators.evaluators
 
 import dev.harrel.jsonschema.Evaluator
 import dev.harrel.jsonschema.EvaluationContext

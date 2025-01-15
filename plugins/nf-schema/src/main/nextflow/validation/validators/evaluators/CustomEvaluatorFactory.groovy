@@ -1,4 +1,4 @@
-package nextflow.validation
+package nextflow.validation.validators.evaluators
 
 import nextflow.Global
 import nextflow.Session

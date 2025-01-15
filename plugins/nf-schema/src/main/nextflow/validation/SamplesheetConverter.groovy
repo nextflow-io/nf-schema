@@ -11,6 +11,7 @@ import nextflow.Nextflow
 
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
+import nextflow.validation.validators.JsonSchemaValidator
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>

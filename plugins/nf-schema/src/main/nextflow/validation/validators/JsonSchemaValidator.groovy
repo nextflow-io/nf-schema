@@ -1,4 +1,4 @@
-package nextflow.validation
+package nextflow.validation.validators
 
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
@@ -14,8 +14,10 @@ import dev.harrel.jsonschema.providers.OrgJsonNode
 import java.util.regex.Pattern
 import java.util.regex.Matcher
 
+import nextflow.validation.Utils
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
+import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
 
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>

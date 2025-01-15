@@ -1,4 +1,4 @@
-package nextflow.validation
+package nextflow.validation.validators.evaluators
 
 import dev.harrel.jsonschema.Evaluator
 import dev.harrel.jsonschema.EvaluationContext
@@ -13,8 +13,8 @@ import java.nio.file.Path
  */
 
 @Slf4j
-class FormatFilePathEvaluator implements Evaluator {
-    // The string should be a file
+class FormatDirectoryPathEvaluator implements Evaluator {
+    // The string should be a directory
   
     @Override
     public Evaluator.Result evaluate(EvaluationContext ctx, JsonNode node) {
@@ -25,19 +25,19 @@ class FormatFilePathEvaluator implements Evaluator {
 
         def String value = node.asString()
 
-        // Skip validation of S3 paths for now
+        // Skip validation of blob storage paths
         if (value.startsWith('s3://') || value.startsWith('az://') || value.startsWith('gs://')) {
-            log.debug("S3 paths are not supported by 'FormatFilePathEvaluator': '${value}'")
+            log.debug("Cloud blob storage paths are not supported by 'FormatDirectoryPathEvaluator': '${value}'")
             return Evaluator.Result.success()
         }
        
         // Actual validation logic
         def Path file = Nextflow.file(value) as Path
         if (file instanceof List) {
-            return Evaluator.Result.failure("'${value}' is not a file, but a file path pattern" as String)
+            return Evaluator.Result.failure("'${value}' is not a directory, but a file path pattern" as String)
         }
-        if (file.exists() && file.isDirectory()) {
-            return Evaluator.Result.failure("'${value}' is not a file, but a directory" as String)
+        if (file.exists() && !file.isDirectory()) {
+            return Evaluator.Result.failure("'${value}' is not a directory, but a file" as String)
         }
         return Evaluator.Result.success()
     }

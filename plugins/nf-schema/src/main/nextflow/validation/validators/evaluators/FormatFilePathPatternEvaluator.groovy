@@ -1,4 +1,4 @@
-package nextflow.validation
+package nextflow.validation.validators.evaluators
 
 import dev.harrel.jsonschema.Evaluator
 import dev.harrel.jsonschema.EvaluationContext
@@ -13,8 +13,8 @@ import java.nio.file.Path
  */
 
 @Slf4j
-class FormatDirectoryPathEvaluator implements Evaluator {
-    // The string should be a directory
+class FormatFilePathPatternEvaluator implements Evaluator {
+    // The string should be a path pattern
   
     @Override
     public Evaluator.Result evaluate(EvaluationContext ctx, JsonNode node) {
@@ -25,19 +25,26 @@ class FormatDirectoryPathEvaluator implements Evaluator {
 
         def String value = node.asString()
 
-        // Skip validation of blob storage paths
+        // Skip validation of S3 paths for now
         if (value.startsWith('s3://') || value.startsWith('az://') || value.startsWith('gs://')) {
-            log.debug("Cloud blob storage paths are not supported by 'FormatDirectoryPathEvaluator': '${value}'")
+            log.debug("S3 paths are not supported by 'FormatFilePathPatternEvaluator': '${value}'")
             return Evaluator.Result.success()
         }
-       
+
         // Actual validation logic
-        def Path file = Nextflow.file(value) as Path
-        if (file instanceof List) {
-            return Evaluator.Result.failure("'${value}' is not a directory, but a file path pattern" as String)
+        def List<Path> files = Nextflow.files(value)
+        def List<String> errors = []
+
+        if(files.size() == 0) {
+            return Evaluator.Result.failure("No files were found using the glob pattern '${value}'" as String)
         }
-        if (file.exists() && !file.isDirectory()) {
-            return Evaluator.Result.failure("'${value}' is not a directory, but a file" as String)
+        for( file : files ) {
+            if (file.isDirectory()) {
+                errors.add("'${file.toString()}' is not a file, but a directory" as String)
+            }
+        }
+        if(errors.size() > 0) {
+            return Evaluator.Result.failure(errors.join('\n'))
         }
         return Evaluator.Result.success()
     }

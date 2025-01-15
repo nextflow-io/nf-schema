@@ -1,4 +1,4 @@
-package nextflow.validation
+package nextflow.validation.validators.evaluators
 
 import dev.harrel.jsonschema.Evaluator
 import dev.harrel.jsonschema.EvaluationContext
@@ -12,7 +12,9 @@ import groovy.util.logging.Slf4j
 import java.nio.file.Path
 import java.nio.file.Files
 
+import nextflow.validation.Utils
 import nextflow.validation.config.ValidationConfig
+import nextflow.validation.validators.JsonSchemaValidator
 
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>

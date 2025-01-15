@@ -33,6 +33,7 @@ import org.yaml.snakeyaml.Yaml
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.help.HelpMessage
+import nextflow.validation.validators.JsonSchemaValidator
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
