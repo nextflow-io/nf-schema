@@ -1,4 +1,4 @@
-package nextflow.validation
+package nextflow.validation.samplesheet
 
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
@@ -9,6 +9,7 @@ import org.json.JSONArray
 
 import nextflow.Nextflow
 
+import nextflow.validation.Utils
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator

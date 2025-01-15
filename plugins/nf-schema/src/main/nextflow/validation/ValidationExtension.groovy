@@ -34,6 +34,7 @@ import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.help.HelpMessage
 import nextflow.validation.validators.JsonSchemaValidator
+import nextflow.validation.samplesheet.SamplesheetConverter
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
