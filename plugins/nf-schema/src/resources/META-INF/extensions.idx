@@ -1,2 +1,2 @@
 nextflow.validation.ValidationExtension
-nextflow.validation.help.HelpObserverFactory
+nextflow.validation.ValidationObserverFactory
