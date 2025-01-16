@@ -64,4 +64,12 @@ public class Common {
     public static Integer longestStringLength( List<String> strings ) {
         return strings ? Collections.max(strings.collect { it.size() }) : 0
     }
+
+    //
+    // Find a value in a nested map
+    //
+    public static Object findDeep(Map m, String key) {
+        if (m.containsKey(key)) return m[key]
+        m.findResult { k, v -> v instanceof Map ? findDeep(v, key) : null }
+    }
 }
