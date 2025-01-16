@@ -10,7 +10,7 @@ import nextflow.script.WorkflowMetadata
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
-import nextflow.validation.help.HelpMessage
+import nextflow.validation.help.HelpMessageCreator
 import nextflow.validation.samplesheet.SamplesheetConverter
 import nextflow.validation.summary.SummaryCreator
 import nextflow.validation.parameters.ParameterValidator
@@ -170,16 +170,16 @@ Please contact the pipeline maintainer(s) if you see this warning as a user.
         validationConfig.parametersSchema = options.containsKey('parameters_schema') ? options.parameters_schema as String : validationConfig.parametersSchema
         validationConfig.help = (Map)(validationConfig.help ?: [:]) + [command: command, beforeText: "", afterText: ""]
         def ValidationConfig copyConfig = new ValidationConfig(validationConfig, params)
-        def HelpMessage helpMessage = new HelpMessage(copyConfig, session)
-        def String help = helpMessage.getBeforeText()
-        def List<String> helpBodyLines = helpMessage.getShortHelpMessage(params.help && params.help instanceof String ? params.help : "").readLines()
+        def HelpMessageCreator helpCreator = new HelpMessageCreator(copyConfig, session)
+        def String help = helpCreator.getBeforeText()
+        def List<String> helpBodyLines = helpCreator.getShortMessage(params.help && params.help instanceof String ? params.help : "").readLines()
         help += helpBodyLines.findAll {
             // Remove added ungrouped help parameters
             !it.startsWith("--${copyConfig.help.shortParameter}") && 
             !it.startsWith("--${copyConfig.help.fullParameter}") && 
             !it.startsWith("--${copyConfig.help.showHiddenParameter}")
         }.join("\n")
-        help += helpMessage.getAfterText()
+        help += helpCreator.getAfterText()
         return help
     }
 

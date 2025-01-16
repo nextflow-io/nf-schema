@@ -21,7 +21,7 @@ import static nextflow.validation.utils.Common.paramsMaxChars
  */
 
 @Slf4j
-class HelpMessage {
+class HelpMessageCreator {
 
     private final ValidationConfig config
     private final Map colors
@@ -31,14 +31,14 @@ class HelpMessage {
     // The length of the terminal
     private Integer terminalLength = System.getenv("COLUMNS")?.toInteger() ?: 100
 
-    HelpMessage(ValidationConfig inputConfig, Session session) {
+    HelpMessageCreator(ValidationConfig inputConfig, Session session) {
         config = inputConfig
         colors = logColors(config.monochromeLogs)
         paramsMap = paramsLoad( Path.of(getSchemaPath(session.baseDir.toString(), config.parametersSchema)) )
         addHelpParameters()
     }
 
-    public String getShortHelpMessage(String param) {
+    public String getShortMessage(String param) {
         def String helpMessage = ""
         if (param) {
             def List<String> paramNames = param.tokenize(".") as List<String>
@@ -67,7 +67,7 @@ class HelpMessage {
         return helpMessage
     }
 
-    public String getFullHelpMessage() {
+    public String getFullMessage() {
         return getGroupHelpString(true)
     }
 

@@ -16,12 +16,12 @@ import test.Dsl2Spec
 import test.OutputCapture
 
 import nextflow.validation.config.ValidationConfig
-import nextflow.validation.help.HelpMessage
+import nextflow.validation.help.HelpMessageCreator
 
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
-class HelpMessageTest extends Specification{
+class HelpMessageCreatorTest extends Specification{
 
     @Rule
     OutputCapture capture = new OutputCapture()
@@ -50,10 +50,10 @@ class HelpMessageTest extends Specification{
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getShortHelpMessage("")
+        def help = helpCreator.getShortMessage("")
 
         then:
         noExceptionThrown()
@@ -95,10 +95,10 @@ Reference genome options
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getShortHelpMessage("")
+        def help = helpCreator.getShortMessage("")
 
         then:
         noExceptionThrown()
@@ -172,10 +172,10 @@ copyNoFollow, move) [default: copy]
             showMeThoseHiddenParams:true
         ]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getShortHelpMessage("")
+        def help = helpCreator.getShortMessage("")
 
         then:
         noExceptionThrown()
@@ -246,10 +246,10 @@ copyNoFollow, move) [default: copy]
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getFullHelpMessage()
+        def help = helpCreator.getFullMessage()
 
         then:
         noExceptionThrown()
@@ -282,10 +282,10 @@ Nested Parameters
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getShortHelpMessage("this")
+        def help = helpCreator.getShortMessage("this")
 
         then:
         noExceptionThrown()
@@ -314,10 +314,10 @@ Nested Parameters
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getShortHelpMessage("input")
+        def help = helpCreator.getShortMessage("input")
 
         then:
         noExceptionThrown()
@@ -356,10 +356,10 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getBeforeText()
+        def help = helpCreator.getBeforeText()
 
         then:
         noExceptionThrown()
@@ -392,10 +392,10 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getBeforeText()
+        def help = helpCreator.getBeforeText()
 
         then:
         noExceptionThrown()
@@ -425,10 +425,10 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getAfterText()
+        def help = helpCreator.getAfterText()
 
         then:
         noExceptionThrown()
@@ -456,10 +456,10 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
         ]
         def params = [:]
         def config = new ValidationConfig(validationConfig, params)
-        def helpMessage = new HelpMessage(config, session)
+        def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpMessage.getShortHelpMessage("") + helpMessage.getAfterText()
+        def help = helpCreator.getShortMessage("") + helpCreator.getAfterText()
 
         then:
         noExceptionThrown()
