@@ -106,29 +106,6 @@ class ValidationExtension extends PluginExtensionPoint {
         return output
     }
 
-    //
-    // Initialise expected params if not present
-    //
-    private Map initialiseExpectedParams(Map params) {
-        addExpectedParams().each { param ->
-            params[param] = false
-        }
-        return params
-    }
-
-    //
-    // Add expected params
-    //
-    private List addExpectedParams() {
-        def List expectedParams = [
-            config.help.shortParameter,
-            config.help.fullParameter,
-            config.help.showHiddenParameter
-        ]
-
-        return expectedParams
-    }
-
     /*
     * Function to loop over all parameters defined in schema and check
     * whether the given parameters adhere to the specifications
@@ -137,13 +114,11 @@ class ValidationExtension extends PluginExtensionPoint {
     void validateParameters(
         Map options = null
     ) {
-        def Map params = initialiseExpectedParams(session.params)
         def ParameterValidator validator = new ParameterValidator(config)
         validator.validateParametersMap(
             options,
-            params,
-            session.baseDir.toString(),
-            addExpectedParams()
+            session.params,
+            session.baseDir.toString()
         )
     }
 

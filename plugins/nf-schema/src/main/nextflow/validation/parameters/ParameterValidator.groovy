@@ -119,11 +119,10 @@ class ParameterValidator {
 
     public validateParametersMap(
         Map options = null,
-        Map params = [:],
-        String baseDir,
-        List expectedDefaultParams
+        Map inputParams = [:],
+        String baseDir
     ) {
-        
+        def Map params = initialiseExpectedParams(inputParams)
         def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
         log.debug "Starting parameters validation"
 
@@ -142,7 +141,7 @@ class ParameterValidator {
 
         // Collect expected parameters from the schema
         def enumsTuple = collectEnums(schemaParams)
-        def List expectedParams = (List) enumsTuple[0] + expectedDefaultParams
+        def List expectedParams = (List) enumsTuple[0] + getExpectedParams()
         def Map enums = (Map) enumsTuple[1]
         // Collect expected parameters from the schema when parameters are specified outside of "$defs"
         if (parsed.containsKey('properties')) {
@@ -251,5 +250,28 @@ class ParameterValidator {
             }
         }
         return new_params
+    }
+
+    //
+    // Initialise expected params if not present
+    //
+    private Map initialiseExpectedParams(Map params) {
+        getExpectedParams().each { param ->
+            params[param] = false
+        }
+        return params
+    }
+
+    //
+    // Add expected params
+    //
+    private List getExpectedParams() {
+        def List expectedParams = [
+            config.help.shortParameter,
+            config.help.fullParameter,
+            config.help.showHiddenParameter
+        ]
+
+        return expectedParams
     }
 }
