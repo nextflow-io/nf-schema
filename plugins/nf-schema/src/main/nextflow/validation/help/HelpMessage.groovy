@@ -7,7 +7,11 @@ import java.nio.file.Path
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
-import nextflow.validation.Utils
+import static nextflow.validation.utils.Colors.logColors
+import static nextflow.validation.utils.Files.paramsLoad
+import static nextflow.validation.utils.Common.getSchemaPath
+import static nextflow.validation.utils.Common.longestStringLength
+import static nextflow.validation.utils.Common.paramsMaxChars
 
 /**
  * This class contains methods to write a help message
@@ -29,8 +33,8 @@ class HelpMessage {
 
     HelpMessage(ValidationConfig inputConfig, Session session) {
         config = inputConfig
-        colors = Utils.logColours(config.monochromeLogs)
-        paramsMap = Utils.paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), config.parametersSchema)) )
+        colors = logColors(config.monochromeLogs)
+        paramsMap = paramsLoad( Path.of(getSchemaPath(session.baseDir.toString(), config.parametersSchema)) )
         addHelpParameters()
     }
 
@@ -91,7 +95,7 @@ class HelpMessage {
     //
     private String getDetailedHelpString(String paramName, Map paramOptions) {
         def String helpMessage = "${colors.underlined}${colors.bold}--${paramName}${colors.reset}\n"
-        def Integer optionMaxChars = Utils.longestStringLength(paramOptions.keySet().collect { it == "properties" ? "options" : it } as List<String>)
+        def Integer optionMaxChars = longestStringLength(paramOptions.keySet().collect { it == "properties" ? "options" : it } as List<String>)
         for (option in paramOptions) {
             def String key = option.key
             if (key == "fa_icon" || (key == "type" && option.value == "object")) {
@@ -102,7 +106,7 @@ class HelpMessage {
                 flattenNestedSchemaMap(option.value as Map).each { String subParam, Map value ->
                     subParamsOptions.put("${paramName}.${subParam}" as String, value)
                 }
-                def Integer maxChars = Utils.longestStringLength(subParamsOptions.keySet() as List<String>) + 1
+                def Integer maxChars = longestStringLength(subParamsOptions.keySet() as List<String>) + 1
                 def String subParamsHelpString = getHelpListParams(subParamsOptions, maxChars, paramName)
                     .collect {
                         "      --" + it[4..it.length()-1]
@@ -127,7 +131,7 @@ class HelpMessage {
         def String helpMessage = ""
         def Map<String,Map> visibleParamsMap = paramsMap.collectEntries { key, Map value -> [key, removeHidden(value)]}
         def Map<String,Map> parsedParams = showNested ? visibleParamsMap.collectEntries { key, Map value -> [key, flattenNestedSchemaMap(value)] } : visibleParamsMap
-        def Integer maxChars = Utils.paramsMaxChars(parsedParams) + 1
+        def Integer maxChars = paramsMaxChars(parsedParams) + 1
         if (parsedParams.containsKey("Other parameters")) {
             def Map ungroupedParams = parsedParams["Other parameters"]
             parsedParams.remove("Other parameters")
@@ -168,7 +172,7 @@ class HelpMessage {
     //
     private List<String> getHelpListParams(Map<String,Map> params, Integer maxChars, String parentParameter = "") {
         def List helpMessage = []
-        def Integer typeMaxChars = Utils.longestStringLength(params.collect { key, value -> value.type instanceof String ? "[${value.type}]" : value.type as String})
+        def Integer typeMaxChars = longestStringLength(params.collect { key, value -> value.type instanceof String ? "[${value.type}]" : value.type as String})
         for (String paramName in params.keySet()) {
             def Map paramOptions = params.get(paramName) as Map 
             def String type = paramOptions.type instanceof String ? '[' + paramOptions.type + ']' : paramOptions.type as String

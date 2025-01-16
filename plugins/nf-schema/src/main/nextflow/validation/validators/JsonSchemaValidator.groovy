@@ -14,7 +14,8 @@ import dev.harrel.jsonschema.providers.OrgJsonNode
 import java.util.regex.Pattern
 import java.util.regex.Matcher
 
-import nextflow.validation.Utils
+import static nextflow.validation.utils.Common.getValueFromJson
+import static nextflow.validation.utils.Types.isInteger
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
@@ -41,7 +42,7 @@ public class JsonSchemaValidator {
 
     private List<String> validateObject(JsonNode input, String validationType, Object rawJson, String schemaString) {
         def JSONObject schema = new JSONObject(schemaString)
-        def String draft = Utils.getValueFromJson("#/\$schema", schema)
+        def String draft = getValueFromJson("#/\$schema", schema)
         if(draft != "https://json-schema.org/draft/2020-12/schema") {
             log.error("""Failed to load the meta schema:
     The used schema draft (${draft}) is not correct, please use \"https://json-schema.org/draft/2020-12/schema\" instead.
@@ -63,13 +64,13 @@ public class JsonSchemaValidator {
             }
 
             def String instanceLocation = error.getInstanceLocation()
-            def String value = Utils.getValueFromJson(instanceLocation, rawJson)
+            def String value = getValueFromJson(instanceLocation, rawJson)
 
             // Get the custom errorMessage if there is one and the validation errors are not about the content of the file
             def String schemaLocation = error.getSchemaLocation().replaceFirst(/^[^#]+/, "")
             def String customError = ""
             if (!errorString.startsWith("Validation of file failed:")) {
-                customError = Utils.getValueFromJson("${schemaLocation}/errorMessage", schema) as String
+                customError = getValueFromJson("${schemaLocation}/errorMessage", schema) as String
             }
 
             // Change some error messages to make them more clear
@@ -83,7 +84,7 @@ public class JsonSchemaValidator {
             def List<String> locationList = instanceLocation.split("/").findAll { it != "" } as List
 
             def String printableError = "${validationType == 'field' ? '->' : '*'} ${errorString}" as String
-            if (locationList.size() > 0 && Utils.isInteger(locationList[0]) && validationType == "field") {
+            if (locationList.size() > 0 && isInteger(locationList[0]) && validationType == "field") {
                 def Integer entryInteger = locationList[0] as Integer
                 def String entryString = "Entry ${entryInteger + 1}" as String
                 def String fieldError = "${errorString}" as String

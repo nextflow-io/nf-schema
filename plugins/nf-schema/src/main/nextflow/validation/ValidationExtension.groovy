@@ -35,6 +35,10 @@ import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.help.HelpMessage
 import nextflow.validation.validators.JsonSchemaValidator
 import nextflow.validation.samplesheet.SamplesheetConverter
+import static nextflow.validation.utils.Colors.logColors
+import static nextflow.validation.utils.Files.paramsLoad
+import static nextflow.validation.utils.Common.getSchemaPath
+import static nextflow.validation.utils.Common.paramsMaxChars
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -191,7 +195,7 @@ class ValidationExtension extends PluginExtensionPoint {
         final CharSequence schema,
         final Map options = null
     ) {
-        def String fullPathSchema = Utils.getSchemaPath(session.baseDir.toString(), schema as String)
+        def String fullPathSchema = getSchemaPath(session.baseDir.toString(), schema as String)
         def Path schemaFile = Nextflow.file(fullPathSchema) as Path
         return samplesheetToList(samplesheet, schemaFile, options)
     }
@@ -263,7 +267,7 @@ class ValidationExtension extends PluginExtensionPoint {
         //=====================================================================//
         // Check for nextflow core params and unexpected params
         def slurper = new JsonSlurper()
-        def Map parsed = (Map) slurper.parse( Path.of(Utils.getSchemaPath(baseDir, schemaFilename)) )
+        def Map parsed = (Map) slurper.parse( Path.of(getSchemaPath(baseDir, schemaFilename)) )
         // $defs is the adviced keyword for definitions. Keeping defs in for backwards compatibility
         def Map schemaParams = (Map) (parsed.get('$defs') ?: parsed.get("defs"))
         def specifiedParamKeys = params.keySet()
@@ -303,7 +307,7 @@ class ValidationExtension extends PluginExtensionPoint {
 
         //=====================================================================//
         // Validate parameters against the schema
-        def String schema_string = Files.readString( Path.of(Utils.getSchemaPath(baseDir, schemaFilename)) )
+        def String schema_string = Files.readString( Path.of(getSchemaPath(baseDir, schemaFilename)) )
         def validator = new JsonSchemaValidator(config)
 
         // check for warnings
@@ -313,7 +317,7 @@ class ValidationExtension extends PluginExtensionPoint {
         }
 
         // Colors
-        def colors = Utils.logColours(config.monochromeLogs)
+        def colors = logColors(config.monochromeLogs)
 
         // Validate
         List<String> validationErrors = validator.validate(paramsJSON, schema_string)
@@ -421,7 +425,7 @@ Please contact the pipeline maintainer(s) if you see this warning as a user.
 
         // Get pipeline parameters defined in JSON Schema
         def Map paramsSummary = [:]
-        def Map paramsMap = Utils.paramsLoad( Path.of(Utils.getSchemaPath(session.baseDir.toString(), schemaFilename)) )
+        def Map paramsMap = paramsLoad( Path.of(getSchemaPath(session.baseDir.toString(), schemaFilename)) )
         for (group in paramsMap.keySet()) {
             def Map groupSummary = getSummaryMapFromParams(params, paramsMap.get(group) as Map)
             config.summary.hideParams.each { hideParam ->
@@ -505,14 +509,14 @@ Please contact the pipeline maintainer(s) if you see this warning as a user.
 
         def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
 
-        def colors = Utils.logColours(config.monochromeLogs)
+        def colors = logColors(config.monochromeLogs)
         String output  = ''
         output += config.summary.beforeText
         def Map paramsMap = paramsSummaryMap(workflow, parameters_schema: schemaFilename)
         paramsMap.each { key, value ->
             paramsMap[key] = flattenNestedParamsMap(value as Map)
         }
-        def maxChars  = Utils.paramsMaxChars(paramsMap)
+        def maxChars  = paramsMaxChars(paramsMap)
         for (group in paramsMap.keySet()) {
             def Map group_params = paramsMap.get(group) as Map // This gets the parameters of that particular group
             if (group_params) {

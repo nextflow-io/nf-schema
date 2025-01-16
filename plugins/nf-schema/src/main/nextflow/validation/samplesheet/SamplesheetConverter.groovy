@@ -9,7 +9,9 @@ import org.json.JSONArray
 
 import nextflow.Nextflow
 
-import nextflow.validation.Utils
+import static nextflow.validation.utils.Colors.logColors
+import static nextflow.validation.utils.Files.fileToJson
+import static nextflow.validation.utils.Files.fileToObject
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
@@ -77,7 +79,7 @@ class SamplesheetConverter {
         Map options
     ) {
 
-        def colors = Utils.logColours(config.monochromeLogs)
+        def colors = logColors(config.monochromeLogs)
 
         // Some checks before validating
         if(!schemaFile.exists()) {
@@ -99,7 +101,7 @@ class SamplesheetConverter {
 
         // Validate
         final validator = new JsonSchemaValidator(config)
-        def JSONArray samplesheet = Utils.fileToJson(samplesheetFile, schemaFile) as JSONArray
+        def JSONArray samplesheet = fileToJson(samplesheetFile, schemaFile) as JSONArray
         def List<String> validationErrors = validator.validate(samplesheet, schemaFile.text)
         if (validationErrors) {
             def msg = "${colors.red}The following errors have been detected in ${samplesheetFile.toString()}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
@@ -108,7 +110,7 @@ class SamplesheetConverter {
         }
 
         // Convert
-        def List samplesheetList = Utils.fileToObject(samplesheetFile, schemaFile) as List
+        def List samplesheetList = fileToObject(samplesheetFile, schemaFile) as List
 
         this.rows = []
 
