@@ -1,18 +1,9 @@
 package nextflow.validation.utils
 
-import org.yaml.snakeyaml.Yaml
-import org.json.JSONArray
-import org.json.JSONObject
 import org.json.JSONPointer
 import org.json.JSONPointerException
-import nextflow.Global
-
-import groovy.json.JsonGenerator
-import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
-
-import nextflow.validation.exceptions.SchemaValidationException
 
 /**
  * A collection of commonly used functions

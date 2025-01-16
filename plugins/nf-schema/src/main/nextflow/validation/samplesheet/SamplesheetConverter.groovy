@@ -1,7 +1,6 @@
 package nextflow.validation.samplesheet
 
 import groovy.json.JsonSlurper
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
 
@@ -23,7 +22,6 @@ import nextflow.validation.validators.JsonSchemaValidator
  */
 
 @Slf4j
-@CompileStatic
 class SamplesheetConverter {
 
     private ValidationConfig config

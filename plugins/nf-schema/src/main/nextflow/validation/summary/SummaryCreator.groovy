@@ -1,46 +1,14 @@
 package nextflow.validation.summary
 
-import groovy.json.JsonBuilder
-import groovy.json.JsonSlurper
-import groovy.json.JsonGenerator
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import groovyx.gpars.dataflow.DataflowWriteChannel
-import groovyx.gpars.dataflow.DataflowReadChannel
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-import nextflow.extension.CH
-import nextflow.extension.DataflowHelper
-import nextflow.Channel
-import nextflow.Global
 import nextflow.Nextflow
-import nextflow.plugin.extension.Operator
-import nextflow.plugin.extension.Function
-import nextflow.plugin.extension.PluginExtensionPoint
 import nextflow.script.WorkflowMetadata
-import nextflow.Session
-import nextflow.util.Duration
-import nextflow.util.MemoryUnit
-import nextflow.config.ConfigMap
-import org.json.JSONException
-import org.json.JSONArray
-import org.json.JSONObject
-import org.json.JSONTokener
-import org.yaml.snakeyaml.Yaml
 
 import nextflow.validation.config.ValidationConfig
-import nextflow.validation.exceptions.SchemaValidationException
-import nextflow.validation.help.HelpMessage
-import nextflow.validation.validators.JsonSchemaValidator
-import nextflow.validation.samplesheet.SamplesheetConverter
-import nextflow.validation.parameters.ParameterValidator
-import static nextflow.validation.utils.Colors.logColors
 import static nextflow.validation.utils.Files.paramsLoad
 import static nextflow.validation.utils.Common.getSchemaPath
-import static nextflow.validation.utils.Common.paramsMaxChars
-import static nextflow.validation.utils.Common.findDeep
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>

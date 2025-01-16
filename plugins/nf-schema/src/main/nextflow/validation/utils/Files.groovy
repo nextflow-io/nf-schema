@@ -4,8 +4,6 @@ import org.yaml.snakeyaml.Yaml
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONPointer
-import org.json.JSONPointerException
-import nextflow.Global
 
 import groovy.json.JsonGenerator
 import groovy.json.JsonSlurper

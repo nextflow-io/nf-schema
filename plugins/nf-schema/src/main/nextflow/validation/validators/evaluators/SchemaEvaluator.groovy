@@ -4,9 +4,6 @@ import dev.harrel.jsonschema.Evaluator
 import dev.harrel.jsonschema.EvaluationContext
 import dev.harrel.jsonschema.JsonNode
 import nextflow.Nextflow
-import nextflow.Global
-import org.json.JSONArray
-import org.json.JSONObject
 
 import groovy.util.logging.Slf4j
 import java.nio.file.Path

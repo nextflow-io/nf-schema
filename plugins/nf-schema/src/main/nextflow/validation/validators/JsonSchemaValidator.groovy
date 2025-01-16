@@ -1,7 +1,6 @@
 package nextflow.validation.validators
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileStatic
 import org.json.JSONObject
 import org.json.JSONArray
 import dev.harrel.jsonschema.ValidatorFactory
@@ -25,7 +24,6 @@ import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
  */
 
 @Slf4j
-@CompileStatic
 public class JsonSchemaValidator {
 
     private ValidatorFactory validator

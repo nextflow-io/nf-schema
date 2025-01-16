@@ -3,10 +3,8 @@ package nextflow.validation.validators.evaluators
 import dev.harrel.jsonschema.Evaluator
 import dev.harrel.jsonschema.EvaluationContext
 import dev.harrel.jsonschema.JsonNode
-import nextflow.Nextflow
 
 import groovy.util.logging.Slf4j
-import java.nio.file.Path
 
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
