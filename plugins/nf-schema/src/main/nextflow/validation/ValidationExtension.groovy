@@ -10,8 +10,10 @@ import nextflow.script.WorkflowMetadata
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
+import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.help.HelpMessageCreator
 import nextflow.validation.samplesheet.SamplesheetConverter
+import nextflow.validation.samplesheet.ListConverter
 import nextflow.validation.summary.SummaryCreator
 import nextflow.validation.parameters.ParameterValidator
 import static nextflow.validation.utils.Colors.getLogColors
@@ -104,6 +106,37 @@ class ValidationExtension extends PluginExtensionPoint {
         def SamplesheetConverter converter = new SamplesheetConverter(config)
         def List output = converter.validateAndConvertToList(samplesheet, schema, options)
         return output
+    }
+
+    @Function
+    public void listToSamplesheet(
+        final List inputList,
+        final CharSequence samplesheet,
+        final Object schema = null
+    ) {
+        def Path samplesheetFile = Nextflow.file(samplesheet) as Path
+        listToSamplesheet(inputList, samplesheetFile, schemaFile)
+    }
+
+    @Function
+    public void listToSamplesheet(
+        final List inputList,
+        final Path samplesheet,
+        final Object schema = null
+    ) {
+        def Path schemaFile = null
+        if(schema) {
+            if(schema instanceof String) {
+                schemaFile = Nextflow.file(getBasePath(session.baseDir.toString(), schema as String)) as Path
+            } else if (schema instanceof Path) {
+                schemaFile = schema
+            } else {
+                def String msg = "Schema parameter to `listToSamplesheet` is not a string or path object"
+                throw new SchemaValidationException(msg)
+            }
+        }
+        def ListConverter converter = new ListConverter(config)
+        converter.validateAndConvertToSamplesheet(inputList, samplesheet, schemaFile)
     }
 
     /*
