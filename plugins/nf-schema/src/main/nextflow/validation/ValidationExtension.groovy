@@ -39,6 +39,7 @@ import static nextflow.validation.utils.Colors.logColors
 import static nextflow.validation.utils.Files.paramsLoad
 import static nextflow.validation.utils.Common.getSchemaPath
 import static nextflow.validation.utils.Common.paramsMaxChars
+import static nextflow.validation.utils.Common.findDeep
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
