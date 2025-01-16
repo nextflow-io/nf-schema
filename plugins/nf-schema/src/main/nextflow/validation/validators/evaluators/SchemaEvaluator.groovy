@@ -9,7 +9,7 @@ import groovy.util.logging.Slf4j
 import java.nio.file.Path
 import java.nio.file.Files
 
-import static nextflow.validation.utils.Common.getSchemaPath
+import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Files.fileToJson
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.validators.JsonSchemaValidator
@@ -51,7 +51,7 @@ class SchemaEvaluator implements Evaluator {
 
         log.debug("Started validating ${file.toString()}")
 
-        def String schemaFull = getSchemaPath(this.baseDir, this.schema)
+        def String schemaFull = getBasePath(this.baseDir, this.schema)
         def Object json = fileToJson(file, Path.of(schemaFull))
         def String schemaContents = Files.readString( Path.of(schemaFull) )
         def validator = new JsonSchemaValidator(config)

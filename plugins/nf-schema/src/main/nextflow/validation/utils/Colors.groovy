@@ -16,7 +16,7 @@ public class Colors {
     //
     // ANSII Colours used for terminal logging
     //
-    public static Map logColors(Boolean monochrome_logs) {
+    public static Map getLogColors(Boolean monochrome_logs) {
         Map colorcodes = [:]
 
         // Reset / Meta
@@ -87,7 +87,7 @@ public class Colors {
     public static String removeColors(String input) {
         if (!input) {return input}
         String output = input
-        List colors = logColors(false).collect { it.value }
+        List colors = getLogColors(false).collect { it.value }
         colors.each { color ->
             output = output.replace(color, "")
         }

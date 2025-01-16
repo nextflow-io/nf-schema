@@ -14,9 +14,9 @@ import nextflow.validation.help.HelpMessageCreator
 import nextflow.validation.samplesheet.SamplesheetConverter
 import nextflow.validation.summary.SummaryCreator
 import nextflow.validation.parameters.ParameterValidator
-import static nextflow.validation.utils.Colors.logColors
-import static nextflow.validation.utils.Common.getSchemaPath
-import static nextflow.validation.utils.Common.paramsMaxChars
+import static nextflow.validation.utils.Colors.getLogColors
+import static nextflow.validation.utils.Common.getBasePath
+import static nextflow.validation.utils.Common.getLongestKeyLength
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -80,7 +80,7 @@ class ValidationExtension extends PluginExtensionPoint {
         final CharSequence schema,
         final Map options = null
     ) {
-        def String fullPathSchema = getSchemaPath(session.baseDir.toString(), schema as String)
+        def String fullPathSchema = getBasePath(session.baseDir.toString(), schema as String)
         def Path schemaFile = Nextflow.file(fullPathSchema) as Path
         return samplesheetToList(samplesheet, schemaFile, options)
     }
@@ -192,7 +192,7 @@ Please contact the pipeline maintainer(s) if you see this warning as a user.
         WorkflowMetadata workflow
         ) {
         def SummaryCreator creator = new SummaryCreator(config)
-        return creator.createSummaryMap(
+        return creator.getSummaryMap(
             options,
             workflow,
             session.baseDir.toString(),
@@ -213,14 +213,14 @@ Please contact the pipeline maintainer(s) if you see this warning as a user.
 
         def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
 
-        def colors = logColors(config.monochromeLogs)
+        def colors = getLogColors(config.monochromeLogs)
         String output  = ''
         output += config.summary.beforeText
         def Map paramsMap = paramsSummaryMap(workflow, parameters_schema: schemaFilename)
         paramsMap.each { key, value ->
             paramsMap[key] = flattenNestedParamsMap(value as Map)
         }
-        def maxChars  = paramsMaxChars(paramsMap)
+        def maxChars  = getLongestKeyLength(paramsMap)
         for (group in paramsMap.keySet()) {
             def Map group_params = paramsMap.get(group) as Map // This gets the parameters of that particular group
             if (group_params) {

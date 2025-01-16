@@ -17,9 +17,9 @@ import java.nio.file.Path
 public class Common {
 
     //
-    // Resolve Schema path relative to main workflow directory
+    // Get full path based on the base directory of the pipeline run
     //
-    public static String getSchemaPath(String baseDir, String schemaFilename) {
+    public static String getBasePath(String baseDir, String schemaFilename) {
         if (Path.of(schemaFilename).exists()) {
             return schemaFilename
         } else {
@@ -30,7 +30,7 @@ public class Common {
     //
     // Function to get the value from a JSON pointer
     //
-    public static Object getValueFromJson(String jsonPointer, Object json) {
+    public static Object getValueFromJsonPointer(String jsonPointer, Object json) {
         def JSONPointer schemaPointer = new JSONPointer(jsonPointer)
         try {
             return schemaPointer.queryFrom(json) ?: ""
@@ -40,10 +40,10 @@ public class Common {
     }
 
     //
-    // Get maximum number of characters across all parameter names
+    // Get the amount of character of the largest key in a map
     //
-    public static Integer paramsMaxChars( Map paramsMap ) {
-        return Collections.max(paramsMap.collect { _, val -> 
+    public static Integer getLongestKeyLength( Map input ) {
+        return Collections.max(input.collect { _, val -> 
             def Map groupParams = val as Map
             longestStringLength(groupParams.keySet() as List<String> )
         })

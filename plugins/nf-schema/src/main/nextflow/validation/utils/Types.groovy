@@ -18,14 +18,14 @@ public class Types {
     //
     // Cast a value to the provided type in a Strict mode
     //
-    public static Object castToType(Object input) {
+    public static Object inferType(Object input) {
         def Set<String> validBooleanValues = ['true', 'false'] as Set
 
         if (input instanceof Map) {
             // Cast all values in the map
             def Map output = [:]
             input.each { k, v ->
-                output[k] = castToType(v)
+                output[k] = inferType(v)
             }
             return output
         }
@@ -33,7 +33,7 @@ public class Types {
             // Cast all values in the list
             def List output = []
             for( entry : input ) {
-                output.add(castToType(entry))
+                output.add(inferType(entry))
             }
             return output
         } else if (input instanceof String) {

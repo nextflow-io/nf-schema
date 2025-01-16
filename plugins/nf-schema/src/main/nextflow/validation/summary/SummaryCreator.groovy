@@ -8,7 +8,7 @@ import nextflow.script.WorkflowMetadata
 
 import nextflow.validation.config.ValidationConfig
 import static nextflow.validation.utils.Files.paramsLoad
-import static nextflow.validation.utils.Common.getSchemaPath
+import static nextflow.validation.utils.Common.getBasePath
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -25,7 +25,7 @@ class SummaryCreator {
         this.config = config
     }
 
-    public Map createSummaryMap(
+    public Map getSummaryMap(
         Map options,
         WorkflowMetadata workflow,
         String baseDir,
@@ -55,7 +55,7 @@ class SummaryCreator {
 
         // Get pipeline parameters defined in JSON Schema
         def Map paramsSummary = [:]
-        def Map paramsMap = paramsLoad( Path.of(getSchemaPath(baseDir, schemaFilename)) )
+        def Map paramsMap = paramsLoad( Path.of(getBasePath(baseDir, schemaFilename)) )
         for (group in paramsMap.keySet()) {
             def Map groupSummary = getSummaryMapFromParams(params, paramsMap.get(group) as Map)
             config.summary.hideParams.each { hideParam ->

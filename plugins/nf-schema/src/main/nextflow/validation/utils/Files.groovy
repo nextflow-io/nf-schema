@@ -11,8 +11,8 @@ import groovy.util.logging.Slf4j
 import java.nio.file.Path
 
 import nextflow.validation.exceptions.SchemaValidationException
-import static nextflow.validation.utils.Common.getValueFromJson
-import static nextflow.validation.utils.Types.castToType
+import static nextflow.validation.utils.Common.getValueFromJsonPointer
+import static nextflow.validation.utils.Types.inferType
 
 /**
  * A collection of functions used to get data from files
@@ -34,7 +34,7 @@ public class Files {
             return extension == "yml" ? "yaml" : extension
         }
 
-        def String header = getHeader(file)
+        def String header = getFileHeader(file)
 
         def Integer commaCount = header.count(",")
         def Integer tabCount = header.count("\t")
@@ -53,7 +53,7 @@ public class Files {
     //
     // Function to get the header from a CSV or TSV file
     //
-    public static String getHeader(Path file) {
+    public static String getFileHeader(Path file) {
         def String header
         file.withReader { header = it.readLine() }
         return header
@@ -66,7 +66,7 @@ public class Files {
         def String fileType = getFileType(file)
         def String delimiter = fileType == "csv" ? "," : fileType == "tsv" ? "\t" : null
         def Map schemaMap = (Map) new JsonSlurper().parse( schema )
-        def Map types = variableTypes(schema)
+        def Map types = getSchemaTypes(schema)
 
         if (schemaMap.type == "object" && fileType in ["csv", "tsv"]) {
             def msg = "CSV or TSV files are not supported. Use a JSON or YAML file instead of ${file.toString()}. (Expected a non-list data structure, which is not supported in CSV or TSV)"
@@ -86,14 +86,14 @@ public class Files {
             return new JsonSlurper().parseText(file.text)
         }
         else {
-            def Boolean header = getValueFromJson("#/items/properties", new JSONObject(schema.text)) ? true : false
+            def Boolean header = getValueFromJsonPointer("#/items/properties", new JSONObject(schema.text)) ? true : false
             def List fileContent = file.splitCsv(header:header, strip:true, sep:delimiter, quote:'\"')
             if (!header) {
                 // Flatten no header inputs if they contain one value
                 fileContent = fileContent.collect { it instanceof List && it.size() == 1 ? it[0] : it }
             }
 
-            return castToType(fileContent)
+            return inferType(fileContent)
         }
     }
 
@@ -119,8 +119,8 @@ public class Files {
     //
     // Get a map that contains the type for each key in a JSON schema file
     //
-    public static Map variableTypes(Path schema) {
-        def Map variableTypes = [:]
+    public static Map getSchemaTypes(Path schema) {
+        def Map types = [:]
         def String type = ''
 
         // Read the schema
@@ -139,14 +139,14 @@ public class Files {
                 else {
                     type = property['type']
                 }
-                variableTypes[key] = type
+                types[key] = type
             }
             else {
-                variableTypes[key] = 'string' // If there isn't a type specified, return 'string' to avoid having a null value
+                types[key] = 'string' // If there isn't a type specified, return 'string' to avoid having a null value
             }
         }
 
-        return variableTypes
+        return types
     }
 
     //

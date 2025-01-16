@@ -7,11 +7,11 @@ import java.nio.file.Path
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
-import static nextflow.validation.utils.Colors.logColors
+import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Files.paramsLoad
-import static nextflow.validation.utils.Common.getSchemaPath
+import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.longestStringLength
-import static nextflow.validation.utils.Common.paramsMaxChars
+import static nextflow.validation.utils.Common.getLongestKeyLength
 
 /**
  * This class contains methods to write a help message
@@ -33,8 +33,8 @@ class HelpMessageCreator {
 
     HelpMessageCreator(ValidationConfig inputConfig, Session session) {
         config = inputConfig
-        colors = logColors(config.monochromeLogs)
-        paramsMap = paramsLoad( Path.of(getSchemaPath(session.baseDir.toString(), config.parametersSchema)) )
+        colors = getLogColors(config.monochromeLogs)
+        paramsMap = paramsLoad( Path.of(getBasePath(session.baseDir.toString(), config.parametersSchema)) )
         addHelpParameters()
     }
 
@@ -131,7 +131,7 @@ class HelpMessageCreator {
         def String helpMessage = ""
         def Map<String,Map> visibleParamsMap = paramsMap.collectEntries { key, Map value -> [key, removeHidden(value)]}
         def Map<String,Map> parsedParams = showNested ? visibleParamsMap.collectEntries { key, Map value -> [key, flattenNestedSchemaMap(value)] } : visibleParamsMap
-        def Integer maxChars = paramsMaxChars(parsedParams) + 1
+        def Integer maxChars = getLongestKeyLength(parsedParams) + 1
         if (parsedParams.containsKey("Other parameters")) {
             def Map ungroupedParams = parsedParams["Other parameters"]
             parsedParams.remove("Other parameters")

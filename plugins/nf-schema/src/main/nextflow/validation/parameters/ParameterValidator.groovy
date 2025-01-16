@@ -13,8 +13,8 @@ import org.json.JSONObject
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
-import static nextflow.validation.utils.Colors.logColors
-import static nextflow.validation.utils.Common.getSchemaPath
+import static nextflow.validation.utils.Colors.getLogColors
+import static nextflow.validation.utils.Common.getBasePath
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -135,7 +135,7 @@ class ParameterValidator {
         //=====================================================================//
         // Check for nextflow core params and unexpected params
         def slurper = new JsonSlurper()
-        def Map parsed = (Map) slurper.parse( Path.of(getSchemaPath(baseDir, schemaFilename)) )
+        def Map parsed = (Map) slurper.parse( Path.of(getBasePath(baseDir, schemaFilename)) )
         // $defs is the adviced keyword for definitions. Keeping defs in for backwards compatibility
         def Map schemaParams = (Map) (parsed.get('$defs') ?: parsed.get("defs"))
         def specifiedParamKeys = params.keySet()
@@ -175,7 +175,7 @@ class ParameterValidator {
 
         //=====================================================================//
         // Validate parameters against the schema
-        def String schema_string = Files.readString( Path.of(getSchemaPath(baseDir, schemaFilename)) )
+        def String schema_string = Files.readString( Path.of(getBasePath(baseDir, schemaFilename)) )
         def validator = new JsonSchemaValidator(config)
 
         // check for warnings
@@ -185,7 +185,7 @@ class ParameterValidator {
         }
 
         // Colors
-        def colors = logColors(config.monochromeLogs)
+        def colors = getLogColors(config.monochromeLogs)
 
         // Validate
         List<String> validationErrors = validator.validate(paramsJSON, schema_string)
