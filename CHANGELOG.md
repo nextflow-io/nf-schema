@@ -2,6 +2,10 @@
 
 # Version 2.4.0dev
 
+## Changes
+
+1. Refactored the whole codebase to make future development easier
+
 # Version 2.3.0 - Hakodate
 
 ## Bug fixes
