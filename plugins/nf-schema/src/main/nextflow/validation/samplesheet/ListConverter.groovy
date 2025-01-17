@@ -35,6 +35,8 @@ class ListConverter {
             throw new SamplesheetCreationException(msg)
         }
 
+        // TODO implement validation
+
         def List<Map> convertedList = convertNonStandardValues(inputList)
 
         switch(fileType) {
@@ -122,6 +124,7 @@ class ListConverter {
         }
 
         if(unconvertedObject instanceof Path) {
+            // TODO figure out a way to get the paths to published files instead
             return unconvertedObject.toAbsolutePath().toUri().toString().replace("file:///", "/")
         }
 
