@@ -2,6 +2,8 @@ package nextflow.validation.samplesheet
 
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
+import org.yaml.snakeyaml.Yaml
+import groovy.json.JsonOutput
 
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SamplesheetCreationException
@@ -32,13 +34,19 @@ class ListConverter {
             throw new SamplesheetCreationException(msg)
         }
 
+        def List<Map> convertedList = convertNonStandardValues(inputList)
+
         switch(fileType) {
             case "csv":
-                createSeparatedValueFile(inputList, samplesheet, ",")
+                createSeparatedValueFile(convertedList, samplesheet, ",")
                 break
             case "tsv":
-                createSeparatedValueFile(inputList, samplesheet, "\t")
+                createSeparatedValueFile(convertedList, samplesheet, "\t")
                 break
+            case "yaml":
+                samplesheet.text = new Yaml().dump(convertedList)
+            case "json":
+                samplesheet.text = JsonOutput.prettyPrint(JsonOutput.toJson(convertedList))
         }
     }
 
@@ -84,5 +92,35 @@ class ListConverter {
             content.add(entryContent.join(delimiter))
         }
         samplesheet.text = content.join("\n")
+    }
+
+    private Object convertNonStandardValues(Object unconvertedObject) {
+        if(
+            unconvertedObject instanceof String ||
+            unconvertedObject instanceof Integer ||
+            unconvertedObject instanceof Float ||
+            unconvertedObject instanceof Double ||
+            unconvertedObject instanceof Boolean
+        ) {
+            return unconvertedObject
+        }
+
+        if(unconvertedObject instanceof List) {
+            return unconvertedObject.collect { element ->
+                convertNonStandardValues(element)
+            }
+        }
+
+        if(unconvertedObject instanceof Map) {
+            return unconvertedObject.collectEntries { key, element ->
+                [convertNonStandardValues(key), convertNonStandardValues(element)]
+            }
+        }
+
+        if(unconvertedObject instanceof Path) {
+            return unconvertedObject.toAbsolutePath()
+        }
+
+        return unconvertedObject.toString()
     }
 }
