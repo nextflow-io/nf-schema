@@ -9,6 +9,7 @@ import groovy.json.JsonGenerator
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
+import java.nio.file.NoSuchFileException
 
 import nextflow.validation.exceptions.SchemaValidationException
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
@@ -34,13 +35,18 @@ public class Files {
             return extension == "yml" ? "yaml" : extension
         }
 
-        def String header = getFileHeader(file)
-
-        def Integer commaCount = header.count(",")
-        def Integer tabCount = header.count("\t")
+        def Integer commaCount = 0
+        def Integer tabCount = 0
+        try {
+            def String header = getFileHeader(file)
+            commaCount = header.count(",")
+            tabCount = header.count("\t")
+        } catch (NoSuchFileException e) {
+            log.debug("${file.toString()} does not exist, cannot infer file type from file content.")
+        }
 
         if ( commaCount == tabCount ){
-            log.error("Could not derive file type from ${file}. Please specify the file extension (CSV, TSV, YML, YAML and JSON are supported).".toString())
+            throw new SchemaValidationException("Could not derive file type from ${file}. Please specify the file extension (CSV, TSV, YML, YAML and JSON are supported).".toString())
         }
         if ( commaCount > tabCount ){
             return "csv"

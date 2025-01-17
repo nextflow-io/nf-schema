@@ -110,21 +110,21 @@ class ValidationExtension extends PluginExtensionPoint {
 
     @Function
     public void listToSamplesheet(
-        final List inputList,
+        final List<Map> inputList,
         final CharSequence samplesheet,
         final Object schema = null
     ) {
         def Path samplesheetFile = Nextflow.file(samplesheet) as Path
-        listToSamplesheet(inputList, samplesheetFile, schemaFile)
+        listToSamplesheet(inputList, samplesheetFile, schema)
     }
 
     @Function
     public void listToSamplesheet(
-        final List inputList,
+        final List<Map> inputList,
         final Path samplesheet,
         final Object schema = null
     ) {
-        def Path schemaFile = null
+        def Path schemaFile
         if(schema) {
             if(schema instanceof String) {
                 schemaFile = Nextflow.file(getBasePath(session.baseDir.toString(), schema as String)) as Path
