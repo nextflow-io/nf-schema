@@ -3,6 +3,7 @@ package nextflow.validation.samplesheet
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.DumperOptions.FlowStyle
 import groovy.json.JsonOutput
 
 import nextflow.validation.config.ValidationConfig
@@ -44,9 +45,11 @@ class ListConverter {
                 createSeparatedValueFile(convertedList, samplesheet, "\t")
                 break
             case "yaml":
-                samplesheet.text = new Yaml().dump(convertedList)
+                samplesheet.text = new Yaml().dumpAs(convertedList, null, FlowStyle.BLOCK)
+                break
             case "json":
                 samplesheet.text = JsonOutput.prettyPrint(JsonOutput.toJson(convertedList))
+                break
         }
     }
 
@@ -100,6 +103,7 @@ class ListConverter {
             unconvertedObject instanceof Integer ||
             unconvertedObject instanceof Float ||
             unconvertedObject instanceof Double ||
+            unconvertedObject instanceof BigDecimal ||
             unconvertedObject instanceof Boolean
         ) {
             return unconvertedObject
@@ -118,7 +122,7 @@ class ListConverter {
         }
 
         if(unconvertedObject instanceof Path) {
-            return unconvertedObject.toAbsolutePath()
+            return unconvertedObject.toAbsolutePath().toUri().toString().replace("file:///", "/")
         }
 
         return unconvertedObject.toString()
