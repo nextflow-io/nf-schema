@@ -2,6 +2,10 @@
 
 # Version 2.4.0dev
 
+## Bug fixes
+
+1. Move the unpinned version check to an observer. This makes sure the warning is always shown and not only when importing a function.
+
 ## Changes
 
 1. Refactored the whole codebase to make future development easier
