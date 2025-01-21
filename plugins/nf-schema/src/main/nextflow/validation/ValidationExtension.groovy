@@ -35,27 +35,6 @@ class ValidationExtension extends PluginExtensionPoint {
 
     @Override
     protected void init(Session session) {
-        def plugins = session?.config?.navigate("plugins") as ArrayList
-        // TODO move the warning to an observer
-        if(plugins?.contains("nf-schema")) {
-            log.warn("""
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!                                                                 !
-!                            WARNING!                             !
-!                                                                 !
-!                You just entered the danger zone!                !
-!         Please pin the nf-schema version in your config!        !
-!   Not pinning your version can't guarantee the reproducibility  !
-!       and the functionality of this pipeline in the future      !
-!                                                                 !
-!                    plugins {                                    !
-!                        id "nf-schema@<version>"                 !
-!                    }                                            !
-!                                                                 !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            """)
-        }
-
         this.session = session
 
         // Help message logic
