@@ -34,7 +34,7 @@ class UniqueEntriesEvaluator implements Evaluator {
             if(!nodeEntry.isObject()) {
                 return Evaluator.Result.success()
             }
-            def List filteredNodes = new ArrayList(nodeEntry.asObject().subMap(uniqueEntries).values())
+            def List filteredNodes = nodeEntry.asObject().subMap(uniqueEntries).collect{k, v -> v.asString()}
             def Tuple nodeTup = filteredNodes ? Tuple.tuple(*filteredNodes) : Tuple.tuple()
             if(nodeTup && nodeTup in uniques) {
                 return Evaluator.Result.failure("Entry ${count}: Detected duplicate entries: ${filteredNodes}" as String)
