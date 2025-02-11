@@ -2,70 +2,70 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/background/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/migration_guide/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/configuration/configuration/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/contributing/setup/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/nextflow_schema/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/nextflow_schema/create_schema/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/nextflow_schema/nextflow_schema_examples/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/nextflow_schema/nextflow_schema_specification/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/nextflow_schema/sample_sheet_schema_examples/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/nextflow_schema/sample_sheet_schema_specification/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/parameters/help_text/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/parameters/summary_log/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/parameters/validation/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/samplesheets/examples/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/samplesheets/samplesheetToList/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
     <url>
          <loc>https://nextflow-io.github.io/nf-schema/latest/2.3/samplesheets/validate_sample_sheet/</loc>
-         <lastmod>2025-02-06</lastmod>
+         <lastmod>2025-02-11</lastmod>
     </url>
 </urlset>
