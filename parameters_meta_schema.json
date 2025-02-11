@@ -102,7 +102,7 @@
                 "properties": {
                     "$ref": {
                         "type": "string",
-                        "pattern": "^#/$defs/"
+                        "pattern": "^#/\\$defs/[^/]+$"
                     }
                 }
             }
