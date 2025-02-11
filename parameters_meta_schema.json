@@ -181,7 +181,7 @@
                     },
                     "properties": {
                         "type": {
-                            "description": "The type of the parameter value. Can be one or more of these: ['integer', 'boolean', 'number', 'string', 'null']",
+                            "description": "The type of the parameter value. Can be one or more of these: `['integer', 'boolean', 'number', 'string', 'null']`",
                             "anyOf": [
                                 {
                                     "$ref": "#/$defs/typeAnnotation"
@@ -213,11 +213,6 @@
                         "exists": {
                             "type": "boolean",
                             "description": "NON STANDARD OPTION: Check if a file exists. This parameter value needs to be a 'string' type with one of these formats: ['path', 'file-path', 'directory-path', 'file-path-pattern']"
-                        },
-                        "mimetype": {
-                            "type": "string",
-                            "pattern": ".+/.+",
-                            "description": "NON STANDARD OPTION: The mime type of the parameter value"
                         },
                         "pattern": {
                             "type": "string",
