@@ -19,82 +19,91 @@ import nextflow.Nextflow
 @CompileStatic
 class SamplesheetConverter {
 
-    private static Path samplesheetFile
-    private static Path schemaFile
-    private static ValidationConfig config
-    private static Map options
+    private ValidationConfig config
 
-    SamplesheetConverter(Path samplesheetFile, Path schemaFile, ValidationConfig config, Map options) {
-        this.samplesheetFile = samplesheetFile
-        this.schemaFile = schemaFile
+    SamplesheetConverter(ValidationConfig config) {
         this.config = config
-        this.options = options
     }
 
-    private static List<Map> rows = []
-    private static Map meta = [:]
+    private List<Map> rows = []
+    private Map meta = [:]
 
-    private static Map getMeta() {
+    private Map getMeta() {
         this.meta
     }
 
-    private static Map resetMeta() {
+    private Map resetMeta() {
         this.meta = [:]
     }
 
-    private static addMeta(Map newEntries) {
+    private addMeta(Map newEntries) {
         this.meta = this.meta + newEntries
     }
 
-    private static Boolean isMeta() {
+    private Boolean isMeta() {
         this.meta.size() > 0
     }
 
-    private static List unusedHeaders = []
+    private List unrecognisedHeaders = []
 
-    private static addUnusedHeader (String header) {
-        this.unusedHeaders.add(header)
+    private addUnrecognisedHeader (String header) {
+        this.unrecognisedHeaders.add(header)
     }
 
-    private static logUnusedHeadersWarning(String fileName) {
-        def Set unusedHeaders = this.unusedHeaders as Set
-        if(unusedHeaders.size() > 0) {
-            def String processedHeaders = unusedHeaders.collect { "\t- ${it}" }.join("\n")
-            log.warn("Found the following unidentified headers in ${fileName}:\n${processedHeaders}" as String)
+    private logUnrecognisedHeaders(String fileName) {
+        def Set unrecognisedHeaders = this.unrecognisedHeaders as Set
+        if(unrecognisedHeaders.size() > 0) {
+            def String processedHeaders = unrecognisedHeaders.collect { "\t- ${it}" }.join("\n")
+            def String msg = "Found the following unidentified headers in ${fileName}:\n${processedHeaders}\n" as String
+            if( config.failUnrecognisedHeaders ) {
+                throw new SchemaValidationException(msg)
+            } else {
+                log.warn(msg)
+            }
         }
     }
 
     /*
     Convert the samplesheet to a list of entries based on a schema
     */
-    public static List validateAndConvertToList() {
+    public List validateAndConvertToList(
+        Path samplesheetFile,
+        Path schemaFile,
+        Map options
+    ) {
 
         def colors = Utils.logColours(config.monochromeLogs)
 
         // Some checks before validating
-        if(!this.schemaFile.exists()) {
-            def msg = "${colors.red}JSON schema file ${this.schemaFile.toString()} does not exist\n${colors.reset}\n"
+        if(!schemaFile.exists()) {
+            def msg = "${colors.red}JSON schema file ${schemaFile.toString()} does not exist\n${colors.reset}\n"
             throw new SchemaValidationException(msg)
         }
 
-        if(!this.samplesheetFile.exists()) {
-            def msg = "${colors.red}Samplesheet file ${this.samplesheetFile.toString()} does not exist\n${colors.reset}\n"
+        def LinkedHashMap schemaMap = new JsonSlurper().parseText(schemaFile.text) as LinkedHashMap
+        def List<String> schemaKeys = schemaMap.keySet() as List<String>
+        if(schemaKeys.contains("properties") || !schemaKeys.contains("items")) {
+            def msg = "${colors.red}The schema for '${samplesheetFile.toString()}' (${schemaFile.toString()}) is not valid. Please make sure that 'items' is the top level keyword and not 'properties'\n${colors.reset}\n"
+            throw new SchemaValidationException(msg)
+        }
+
+        if(!samplesheetFile.exists()) {
+            def msg = "${colors.red}Samplesheet file ${samplesheetFile.toString()} does not exist\n${colors.reset}\n"
             throw new SchemaValidationException(msg)
         }
 
         // Validate
         final validator = new JsonSchemaValidator(config)
-        def JSONArray samplesheet = Utils.fileToJsonArray(this.samplesheetFile, this.schemaFile)
-        def List<String> validationErrors = validator.validate(samplesheet, this.schemaFile.text)
+        def JSONArray samplesheet = Utils.fileToJson(samplesheetFile, schemaFile) as JSONArray
+        def List<String> validationErrors = validator.validate(samplesheet, schemaFile.text)
         if (validationErrors) {
-            def msg = "${colors.red}The following errors have been detected in ${this.samplesheetFile.toString()}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
+            def msg = "${colors.red}The following errors have been detected in ${samplesheetFile.toString()}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
             log.error("Validation of samplesheet failed!")
             throw new SchemaValidationException(msg, validationErrors)
         }
 
         // Convert
-        def LinkedHashMap schemaMap = new JsonSlurper().parseText(this.schemaFile.text) as LinkedHashMap
-        def List samplesheetList = Utils.fileToList(this.samplesheetFile, this.schemaFile)
+        def List samplesheetList = Utils.fileToObject(samplesheetFile, schemaFile) as List
 
         this.rows = []
 
@@ -110,26 +119,29 @@ class SamplesheetConverter {
             }
             return result
         }
-        logUnusedHeadersWarning(this.samplesheetFile.toString())
+
+        logUnrecognisedHeaders(samplesheetFile.toString())
+
         return channelFormat
+
     }
 
     /*
     This function processes an input value based on a schema. 
     The output will be created for addition to the output channel.
     */
-    private static Object formatEntry(Object input, LinkedHashMap schema, String headerPrefix = "") {
+    private Object formatEntry(Object input, LinkedHashMap schema, String headerPrefix = "") {
 
         // Add default values for missing entries
         input = input != null ? input : schema.containsKey("default") ? schema.default : []
 
         if (input instanceof Map) {
             def List result = []
-            def LinkedHashMap properties = schema["properties"]
+            def Map properties = schema["properties"] as Map
             def Set unusedKeys = input.keySet() - properties.keySet()
             
             // Check for properties in the samplesheet that have not been defined in the schema
-            unusedKeys.each{addUnusedHeader("${headerPrefix}${it}" as String)}
+            unusedKeys.each{addUnrecognisedHeader("${headerPrefix}${it}" as String)}
 
             // Loop over every property to maintain the correct order
             properties.each { property, schemaValues ->
@@ -166,15 +178,15 @@ class SamplesheetConverter {
 
     }
 
-    private static List validPathFormats = ["file-path", "path", "directory-path", "file-path-pattern"]
-    private static List schemaOptions = ["anyOf", "oneOf", "allOf"]
+    private List validPathFormats = ["file-path", "path", "directory-path", "file-path-pattern"]
+    private List schemaOptions = ["anyOf", "oneOf", "allOf"]
 
     /*
     This function processes a value that's not a map or list and casts it to a file type if necessary.
     When there is uncertainty if the value should be a path, some simple logic is applied that tries
     to guess if it should be a file type
     */
-    private static Object processValue(Object value, Map schemaEntry) {
+    private Object processValue(Object value, Map schemaEntry) {
         if(!(value instanceof String)) {
             return value
         }
@@ -228,17 +240,17 @@ class SamplesheetConverter {
     This function processes an input value based on a schema. 
     The output will be created for addition to the meta map.
     */
-    private static Object processMeta(Object input, LinkedHashMap schema, String headerPrefix) {
+    private Object processMeta(Object input, LinkedHashMap schema, String headerPrefix) {
         // Add default values for missing entries
         input = input != null ? input : schema.containsKey("default") ? schema.default : []
 
         if (input instanceof Map) {
             def Map result = [:]
-            def LinkedHashMap properties = schema["properties"]
+            def Map properties = schema["properties"] as Map
             def Set unusedKeys = input.keySet() - properties.keySet()
             
             // Check for properties in the samplesheet that have not been defined in the schema
-            unusedKeys.each{addUnusedHeader("${headerPrefix}${it}" as String)}
+            unusedKeys.each{addUnrecognisedHeader("${headerPrefix}${it}" as String)}
 
             // Loop over every property to maintain the correct order
             properties.each { property, schemaValues ->

@@ -4,7 +4,7 @@
     "title": "nf-core/testpipeline pipeline parameters",
     "description": "this is a test",
     "type": "object",
-    "defs": {
+    "$defs": {
         "input_output_options": {
             "title": "Input/output options",
             "type": "object",
@@ -21,7 +21,7 @@
     },
     "allOf": [
         {
-            "$ref": "#/defs/input_output_options"
+            "$ref": "#/$defs/input_output_options"
         }
     ]
 }

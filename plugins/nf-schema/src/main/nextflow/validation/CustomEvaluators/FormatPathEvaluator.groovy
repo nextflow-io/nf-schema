@@ -33,6 +33,9 @@ class FormatPathEvaluator implements Evaluator {
        
         // Actual validation logic
         def Path file = Nextflow.file(value) as Path
+        if (file instanceof List) {
+            return Evaluator.Result.failure("'${value}' is not a path, but a file path pattern" as String)
+        }
         return Evaluator.Result.success()
     }
 }

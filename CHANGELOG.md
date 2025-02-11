@@ -1,5 +1,92 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.3.0 - Hakodate
+
+## Bug fixes
+
+1. The help message will now also be printed out when no functions of the plugin get included in the pipeline.
+2. JSON and YAML files that are not a list of values should now also be validated correctly. (Mind that samplesheets always have to be a list of values to work with `samplesheetToList`)
+
+# Version 2.2.1
+
+## Bug fixes
+
+1. Fixed a bug in `paramsSummaryMap()` related to the processing of workflow config files.
+2. Fixed a bug where `validation.defaultIgnoreParams` and `validation.ignoreParams` would not actually ignore the parameter validation.
+
+# Version 2.2.0 - Kitakata
+
+## New features
+
+1. Added a new configuration option `validation.failUnrecognisedHeaders`. This is the analogue to `failUnrecognisedParams`, but for samplesheet headers. The default is `false` which means that unrecognized headers throw a warning instead of an error.
+2. Added a new configuration option `validation.summary.hideParams`. This option takes a list of parameter names to hide from the parameters summary created by `paramsSummaryMap()` and `paramsSummaryLog()`
+
+## Bug fixes
+
+1. Fixed a bug in `samplesheetToList` that caused output mixing when the function was used more than once in channel operators.
+2. Added a missing depencency for email format validation.
+3. All path formats (with exception to `file-path-pattern`) will now give a proper error message when a `file-path-pattern` has been used.
+
+## Improvements
+
+1. Improved the `exists` keyword documentation with a warning about an edge case.
+2. Updated the error messages. Custom error messages provided in the JSON schema will now be appended to the original error messages instead of overwriting them.
+
+# Version 2.1.2
+
+## Bug fixes
+
+1. The directory `nf_test_output` is now an ignored parameter during validation to support use of both `nf_test` and `nf_schema`.
+2. `uniqueEntries` will now skip unique checks when all values in the requested array properties are empty. This had to be implemented to allow optional values to work with the `uniqueEntries` check. Partially filled in array properties will still fail (and that's how it's meant to be). Be sure to use `oneOf` to properly configure all possible combinations in case this causes some issues.
+3. Improved the error messages produced by `uniqueEntries`.
+
+## Documentation
+
+1. Fix some faults in the docs
+
+# Version 2.1.1
+
+## Bug fixes
+
+1. The help parameters are now no longer unexpected parameters when validating parameters.
+2. Fixed a typo in the docs
+3. Added a URL to the help message migration docs to the `paramsHelp()` deprecation message
+4. The old `validation.showHiddenParams` config option works again to ensure backwards compatibility. Using `validation.help.showHidden` is still preffered and the old option will emit a deprecation message.
+5. Resolved an issue where the UniqueEntriesEvaluator did not correctly detect non-unique combinations.
+
+# Version 2.1.0 - Tantanmen
+
+## Breaking changes
+
+1. The minimum supported Nextflow version is now `23.10.0` instead of `22.10.0`
+
+## New features
+
+1. The plugin now fully supports nested parameters!
+2. Added a config option `validation.parametersSchema` which can be used to set the parameters JSON schema in a config file. The default is `nextflow_schema.json`
+3. The parameter summary log will now automatically show nested parameters.
+4. Added two new configuration options: `validation.summary.beforeText` and `validation.summary.afterText` to automatically add some text before and after the output of the `paramsSummaryLog()` function. The colors from these texts will be automatically filtered out if `validation.monochromeLogs` is set to `true`.
+
+## Help message changes
+
+1. The use of the `paramsHelp()` function has now been deprecated in favor of a new built-in help message functionality. `paramsHelp()` has been updated to use the reworked help message creator. If you still want to use `paramsHelp()` for some reason in your pipeline, please add the `hideWarning:true` option to it to make sure the deprecation warning will not be shown.
+2. Added new configuration values to support the new help message functionality:
+   - `validation.help.enabled`: Enables the checker for the help message parameters. The plugin will automatically show the help message when one of these parameters have been given and exit the pipeline. Default = `false`
+   - `validation.help.shortParameter`: The parameter to use for the compact help message. This help message will only contain top level parameters. Default = `help`
+   - `validation.help.fullParameter`: The parameter to use for the expanded help message. This help message will show all parameters no matter how deeply nested they are. Default = `helpFull`
+   - `validation.help.showHiddenParameter`: The parameter to use to also show all parameters with the `hidden: true` keyword in the schema. Default = `showHidden`
+   - `validation.help.showHidden`: Set this to `true` to show hidden parameters by default. This configuration option is overwritten by the value supplied to the parameter in `validation.help.showHiddenParameter`. Default = `false`
+   - `validation.help.beforeText`: Some custom text to add before the help message. The colors from this text will be automatically filtered out if `validation.monochromeLogs` is set to `true`.
+   - `validation.help.afterText`: Some custom text to add after the help message. The colors from this text will be automatically filtered out if `validation.monochromeLogs` is set to `true`.
+   - `validation.help.command`: An example command to add to the top of the help message. The colors from this text will be automatically filtered out if `validation.monochromeLogs` is set to `true`.
+3. Added support for nested parameters to the help message. A detailed help message using `--help <parameter>` will now also contain all nested parameters. The parameter supplied to `--help` can be a nested parameter too (e.g. `--help top_parameter.nested_parameter.deeper_parameter`)
+4. The help message now won't show empty parameter groups.
+5. The help message will now automatically contain the three parameters used to get help messages.
+
+## JSON schema fixes
+
+1. The `defs` keyword is now deprecated in favor of the `$defs` keyword. This to follow the JSON schema guidelines. We will continue supporting `defs` for backwards compatibility.
+
 # Version 2.0.1 - Tsukemen
 
 ## Vulnerability fix

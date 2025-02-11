@@ -1,1 +1,2 @@
-nextflow.validation.SchemaValidator
+nextflow.validation.ValidationExtension
+nextflow.validation.ValidationObserverFactory

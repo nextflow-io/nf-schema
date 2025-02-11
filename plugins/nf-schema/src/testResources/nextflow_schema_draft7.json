@@ -4,7 +4,7 @@
     "title": "nf-core/testpipeline pipeline parameters",
     "description": "this is a test",
     "type": "object",
-    "defs": {
+    "$defs": {
         "file_patterns": {
             "title": "Input/output options",
             "type": "object",
@@ -19,7 +19,7 @@
     },
     "allOf": [
         {
-            "$ref": "#/defs/file_patterns"
+            "$ref": "#/$defs/file_patterns"
         }
     ]
 }

@@ -33,6 +33,9 @@ class FormatDirectoryPathEvaluator implements Evaluator {
        
         // Actual validation logic
         def Path file = Nextflow.file(value) as Path
+        if (file instanceof List) {
+            return Evaluator.Result.failure("'${value}' is not a directory, but a file path pattern" as String)
+        }
         if (file.exists() && !file.isDirectory()) {
             return Evaluator.Result.failure("'${value}' is not a directory, but a file" as String)
         }

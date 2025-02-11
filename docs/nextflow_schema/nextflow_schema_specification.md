@@ -30,14 +30,14 @@ You can find more information about JSON Schema here:
 
 ## Definitions
 
-A slightly strange use of a JSON schema standard that we use for Nextflow schema is `defs`.
+A slightly strange use of a JSON schema standard that we use for Nextflow schema is `$defs`.
 
 JSON schema can group variables together in an `object`, but then the validation expects this structure to exist in the data that it is validating.
 In reality, we have a very long "flat" list of parameters, all at the top level of `params.foo`.
 
-In order to give some structure to log outputs, documentation and so on, we group parameters into `defs`.
+In order to give some structure to log outputs, documentation and so on, we group parameters into `$defs`.
 Each `def` is an object with a title, description and so on.
-However, as they are under `defs` scope they are effectively ignored by the validation and so their nested nature is not a problem.
+However, as they are under `$defs` scope they are effectively ignored by the validation and so their nested nature is not a problem.
 We then bring the contents of each definition object back to the "flat" top level for validation using a series of `allOf` statements at the end of the schema,
 which reference the specific definition keys.
 
@@ -47,7 +47,7 @@ which reference the specific definition keys.
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   // Definition groups
-  "defs": { // (1)!
+  "$defs": { // (1)!
     "my_group_of_params": { // (2)!
       "title": "A virtual grouping used for docs and pretty-printing",
       "type": "object",
@@ -64,7 +64,7 @@ which reference the specific definition keys.
   },
   // Contents of each definition group brought into main schema for validation
   "allOf": [
-    { "$ref": "#/defs/my_group_of_params" } // (6)!
+    { "$ref": "#/$defs/my_group_of_params" } // (6)!
   ]
 }
 ```
@@ -77,14 +77,12 @@ which reference the specific definition keys.
 5. Shortened here for the example, see below for full parameter specification.
 6. A `$ref` line like this needs to be added for every definition group
 
-Parameters can be described outside of the `defs` scope, in the regular JSON Schema top-level `properties` scope.
+Parameters can be described outside of the `$defs` scope, in the regular JSON Schema top-level `properties` scope.
 However, they will be displayed as ungrouped in tools working off the schema.
 
 ## Nested parameters
 
-!!! warning "Warning (TLDR;)"
-
-    Although the JSON Schema allows schema objects (eg.` params.foo.bar = "baz"`) or arrays, this is not supported by this plugin.
+!!! example "New feature in v2.1.0"
 
 Nextflow config allows parameters to be nested as objects, for example:
 
@@ -102,12 +100,28 @@ or on the CLI:
 nextflow run <pipeline> --foo.bar "baz"
 ```
 
-But - the current implementations of the Nextflow _schema_ do not (for now).
+Nested parameters can be specified in the schema by adding a `properties` keyword to the root parameters:
 
-This was done as a conscious decision when the code was first written, to try to reduce complexity.
+```json
+{
+  "type": "object",
+  "properties": {
+    "thisIsNested": {
+      // Annotation for the --thisIsNested parameter
+      "type": "object", // Parameters that contain subparameters need to have the "object" type
+      "properties": {
+        // Add other parameters in here
+        "deep": {
+          // Annotation for the --thisIsNested.deep parameter
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+```
 
-It would be great to implement this at some point - there is a GitHub issue to track the feature request here:
-[`nf-core/tools#1554`](https://github.com/nf-core/tools/issues/1554). Contributions welcome!
+There is no limit to how deeply nested parameters can be. Mind however that deeply nested parameters are not that user friendly and will create some very ugly help messages. It's advised to not go deeper than two levels of nesting.
 
 ## Required parameters
 
@@ -217,7 +231,7 @@ If validation fails, an error message is printed to the terminal, so that the en
 However, these messages are not always very clear - especially to newcomers.
 
 To improve this experience, pipeline developers can set a custom `errorMessage` for a given parameter in a the schema.
-If validation fails, this `errorMessage` is printed instead, and the raw JSON schema validation message goes to the Nextflow debug log output.
+If validation fails, this `errorMessage` is printed after the original error message to guide the pipeline users to an easier solution.
 
 For example, instead of printing:
 
@@ -238,7 +252,7 @@ We can set
 and get:
 
 ```
-* --input (samples.yml): File name must end in '.csv' cannot contain spaces
+* --input (samples.yml): "samples.yml" does not match regular expression [^\S+\.csv$] (File name must end in '.csv' cannot contain spaces)
 ```
 
 ### `deprecated`
@@ -375,7 +389,11 @@ Example usage is as follows:
 
 !!! note
 
-    If the parameter is an S3 URL path, this validation is ignored.
+    If the parameter is an S3, Azure or Google Cloud URI path, this validation is ignored.
+
+!!! warning
+
+    Make sure to only use the `exists` keyword in combination with any file path format. Using `exists` on a normal string will assume that it's a file and will probably fail unexpectedly.
 
 ### `mimetype`
 
@@ -470,9 +488,9 @@ The combination of all values in the given keys should be unique. For this key t
 ```json
 {
   "type": "array",
+  "uniqueEntries": ["foo", "bar"],
   "items": {
     "type": "object",
-    "uniqueEntries": ["foo", "bar"],
     "properties": {
       "foo": { "type": "string" },
       "bar": { "type": "string" }

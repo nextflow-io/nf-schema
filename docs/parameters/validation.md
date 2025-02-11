@@ -66,6 +66,10 @@ The function causes Nextflow to exit immediately with an error.
     --8<-- "examples/validateParameters/pipeline/nextflow_schema.json"
     ```
 
+## Ignoring Parameters
+
+Users can turn off validation for specific parameters using `validation.ignoreParams`, which accepts a list of parameter names.
+
 ## Failing for unrecognized parameters
 
 When parameters which are not specified in the JSON Schema are provided, the parameter validation function returns a `WARNING`.

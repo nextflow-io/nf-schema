@@ -52,13 +52,19 @@ public class Utils {
     }
 
     // Converts a given file to a List
-    public static List fileToList(Path file, Path schema) {
+    public static Object fileToObject(Path file, Path schema) {
         def String fileType = Utils.getFileType(file)
         def String delimiter = fileType == "csv" ? "," : fileType == "tsv" ? "\t" : null
+        def Map schemaMap = (Map) new JsonSlurper().parse( schema )
         def Map types = variableTypes(schema)
 
-        if (types.find{ it.value == "array" } as Boolean && fileType in ["csv", "tsv"]){
-            def msg = "Using \"type\": \"array\" in schema with a \".$fileType\" samplesheet is not supported\n"
+        if (schemaMap.type == "object" && fileType in ["csv", "tsv"]) {
+            def msg = "CSV or TSV files are not supported. Use a JSON or YAML file instead of ${file.toString()}. (Expected a non-list data structure, which is not supported in CSV or TSV)"
+            throw new SchemaValidationException(msg, [])
+        }
+
+        if ((types.find{ it.value == "array" || it.value == "object" } as Boolean) && fileType in ["csv", "tsv"]){
+            def msg = "Using \"type\": \"array\" or \"type\": \"object\" in schema with a \".$fileType\" samplesheet is not supported\n"
             log.error("ERROR: Validation of pipeline parameters failed!")
             throw new SchemaValidationException(msg, [])
         }
@@ -67,7 +73,7 @@ public class Utils {
             return new Yaml().load((file.text))
         }
         else if(fileType == "json"){
-            return new JsonSlurper().parseText(file.text) as List
+            return new JsonSlurper().parseText(file.text)
         }
         else {
             def Boolean header = getValueFromJson("#/items/properties", new JSONObject(schema.text)) ? true : false
@@ -82,13 +88,21 @@ public class Utils {
     }
 
     // Converts a given file to a JSONArray
-    public static JSONArray fileToJsonArray(Path file, Path schema) {
+    public static Object fileToJson(Path file, Path schema) {
         // Remove all null values from JSON object
         // and convert the groovy object to a JSONArray
         def jsonGenerator = new JsonGenerator.Options()
             .excludeNulls()
             .build()
-        return new JSONArray(jsonGenerator.toJson(fileToList(file, schema)))
+        def Object obj = fileToObject(file, schema)
+        if (obj instanceof List) {
+            return new JSONArray(jsonGenerator.toJson(obj))
+        } else if (obj instanceof Map) {
+            return new JSONObject(jsonGenerator.toJson(obj))
+        } else {
+            def msg = "Could not determine if the file is a list or map of values"
+            throw new SchemaValidationException(msg, [])
+        }
     }
 
     //
@@ -123,7 +137,7 @@ public class Utils {
     }
 
     // Resolve Schema path relative to main workflow directory
-    public static String getSchemaPath(String baseDir, String schemaFilename='nextflow_schema.json') {
+    public static String getSchemaPath(String baseDir, String schemaFilename) {
         if (Path.of(schemaFilename).exists()) {
             return schemaFilename
         } else {
@@ -141,7 +155,7 @@ public class Utils {
         def Map parsed = (Map) slurper.parse( schema )
 
         // Obtain the type of each variable in the schema
-        def Map properties = (Map) parsed['items']['properties']
+        def Map properties = (Map) parsed['items'] ? parsed['items']['properties'] : parsed["properties"]
         for (p in properties) {
             def String key = (String) p.key
             def Map property = properties[key] as Map
@@ -268,5 +282,110 @@ public class Utils {
         colorcodes['biwhite']    = monochrome_logs ? '' : "\033[1;97m"
 
         return colorcodes
+    }
+
+    public static String removeColors(String input) {
+        if (!input) {return input}
+        String output = input
+        List colors = logColours(false).collect { it.value }
+        colors.each { color ->
+            output = output.replace(color, "")
+        }
+        return output
+    }
+
+    //
+    // This function tries to read a JSON params file
+    //
+    public static Map paramsLoad(Path json_schema) {
+        def paramsMap = [:]
+        try {
+            paramsMap = paramsRead(json_schema)
+        } catch (Exception e) {
+            println "Could not read parameters settings from JSON. $e"
+        }
+        return paramsMap
+    }
+
+    //
+    // Method to actually read in JSON file using Groovy.
+    // Group (as Key), values are all parameters
+    //    - Parameter1 as Key, Description as Value
+    //    - Parameter2 as Key, Description as Value
+    //    ....
+    // Group
+    //    -
+    private static Map paramsRead(Path json_schema) throws Exception {
+        def slurper = new JsonSlurper()
+        def Map schema = (Map) slurper.parse( json_schema )
+        // $defs is the adviced keyword for definitions. Keeping defs in for backwards compatibility
+        def Map schema_defs = (Map) (schema.get('$defs') ?: schema.get("defs"))
+        def Map schema_properties = (Map) schema.get('properties')
+        /* Tree looks like this in nf-core schema
+        * $defs <- this is what the first get('$defs') gets us
+                group 1
+                    title
+                    description
+                        properties
+                        parameter 1
+                            type
+                            description
+                        parameter 2
+                            type
+                            description
+                group 2
+                    title
+                    description
+                        properties
+                        parameter 1
+                            type
+                            description
+        * properties <- parameters can also be ungrouped, outside of $defs
+                parameter 1
+                    type
+                    description
+        */
+
+        def paramsMap = [:]
+        // Grouped params
+        if (schema_defs) {
+            schema_defs.each { String name, Map group ->
+                def Map group_property = (Map) group.get('properties') // Gets the property object of the group
+                def String title = (String) group.get('title') ?: name
+                def sub_params = [:]
+                group_property.each { innerkey, value ->
+                    sub_params.put(innerkey, value)
+                }
+                paramsMap.put(title, sub_params)
+            }
+        }
+
+        // Ungrouped params
+        if (schema_properties) {
+            def ungrouped_params = [:]
+            schema_properties.each { innerkey, value ->
+                ungrouped_params.put(innerkey, value)
+            }
+            paramsMap.put("Other parameters", ungrouped_params)
+        }
+
+        return paramsMap
+    }
+
+    //
+    // Get maximum number of characters across all parameter names
+    //
+    public static Integer paramsMaxChars( Map paramsMap ) {
+        return Collections.max(paramsMap.collect { _, val -> 
+            def Map groupParams = val as Map
+            longestStringLength(groupParams.keySet() as List<String> )
+        })
+    }
+
+    //
+    // Get the size of the longest string value in a list of strings
+    //
+    public static Integer longestStringLength( List<String> strings ) {
+        return strings ? Collections.max(strings.collect { it.size() }) : 0
     }
 }

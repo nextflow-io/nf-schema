@@ -1,0 +1,6 @@
+sample,fastq_1,fastq_2,strandedness
+test_1,test1_fastq1.fastq.gz,test1_fastq2.fastq.gz,forward
+test_2,,,unstranded
+test_3,test2_fastq1.fastq.gz,,forward
+,,,forward
+,,,unstranded

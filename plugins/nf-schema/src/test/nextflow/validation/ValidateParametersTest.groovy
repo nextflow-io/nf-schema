@@ -238,12 +238,12 @@ class ValidateParametersTest extends Dsl2Spec{
         errorMessages[0] == "\033[0;31mThe following invalid input values have been detected:"
         errorMessages[1] == ""
         errorMessages[2] == "* --input (src/testResources/wrong.csv): Validation of file failed:"
-        errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'"
+        errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
         errorMessages[4] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$]"
         errorMessages[5] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" is longer than 0 characters"
-        errorMessages[6] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+        errorMessages[6] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): Value does not match against any of the schemas (FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz')"
         errorMessages[7] == "\t-> Entry 1: Missing required field(s): sample"
-        errorMessages[8] == "\t-> Entry 2: Error for field 'sample' (test 2): Sample name must be provided and cannot contain spaces"
+        errorMessages[8] == "\t-> Entry 2: Error for field 'sample' (test 2): \"test 2\" does not match regular expression [^\\S+\$] (Sample name must be provided and cannot contain spaces)"
         !stdout
     }
 
@@ -272,12 +272,12 @@ class ValidateParametersTest extends Dsl2Spec{
         errorMessages[0] == "\033[0;31mThe following invalid input values have been detected:"
         errorMessages[1] == ""
         errorMessages[2] == "* --input (src/testResources/wrong.tsv): Validation of file failed:"
-        errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'"
+        errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
         errorMessages[4] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$]"
         errorMessages[5] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" is longer than 0 characters"
-        errorMessages[6] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+        errorMessages[6] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): Value does not match against any of the schemas (FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz')"
         errorMessages[7] == "\t-> Entry 1: Missing required field(s): sample"
-        errorMessages[8] == "\t-> Entry 2: Error for field 'sample' (test 2): Sample name must be provided and cannot contain spaces"
+        errorMessages[8] == "\t-> Entry 2: Error for field 'sample' (test 2): \"test 2\" does not match regular expression [^\\S+\$] (Sample name must be provided and cannot contain spaces)"
         !stdout
     }
 
@@ -306,12 +306,12 @@ class ValidateParametersTest extends Dsl2Spec{
         errorMessages[0] == "\033[0;31mThe following invalid input values have been detected:"
         errorMessages[1] == ""
         errorMessages[2] == "* --input (src/testResources/wrong.yaml): Validation of file failed:"
-        errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'"
+        errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
         errorMessages[4] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$]"
         errorMessages[5] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" is longer than 0 characters"
-        errorMessages[6] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+        errorMessages[6] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): Value does not match against any of the schemas (FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz')"
         errorMessages[7] == "\t-> Entry 1: Missing required field(s): sample"
-        errorMessages[8] == "\t-> Entry 2: Error for field 'sample' (test 2): Sample name must be provided and cannot contain spaces"
+        errorMessages[8] == "\t-> Entry 2: Error for field 'sample' (test 2): \"test 2\" does not match regular expression [^\\S+\$] (Sample name must be provided and cannot contain spaces)"
         !stdout
     }
 
@@ -340,12 +340,12 @@ class ValidateParametersTest extends Dsl2Spec{
         errorMessages[0] == "\033[0;31mThe following invalid input values have been detected:"
         errorMessages[1] == ""
         errorMessages[2] == "* --input (src/testResources/wrong.json): Validation of file failed:"
-        errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'"
+        errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
         errorMessages[4] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$]"
         errorMessages[5] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" is longer than 0 characters"
-        errorMessages[6] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+        errorMessages[6] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): Value does not match against any of the schemas (FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz')"
         errorMessages[7] == "\t-> Entry 1: Missing required field(s): sample"
-        errorMessages[8] == "\t-> Entry 2: Error for field 'sample' (test 2): Sample name must be provided and cannot contain spaces"
+        errorMessages[8] == "\t-> Entry 2: Error for field 'sample' (test 2): \"test 2\" does not match regular expression [^\\S+\$] (Sample name must be provided and cannot contain spaces)"
         !stdout
     }
 
@@ -429,6 +429,31 @@ class ValidateParametersTest extends Dsl2Spec{
         !stdout
     }
 
+    def 'should ignore nf_test_output param' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.input = 'src/testResources/correct.csv'
+            params.outdir = 'src/testResources/testDir'
+            params.nf_test_output = '/some/path'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
     def 'should ignore default unexpected param' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
@@ -446,6 +471,33 @@ class ValidateParametersTest extends Dsl2Spec{
         def config = ["validation": [
             "ignoreParams": ['abc'],
             "defaultIgnoreParams": ['xyz']
+        ]]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should ignore wrong expected params' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.input = 1
+            params.outdir = 2
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = ["validation": [
+            "ignoreParams": ['input'],
+            "defaultIgnoreParams": ['outdir']
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
@@ -843,13 +895,11 @@ class ValidateParametersTest extends Dsl2Spec{
 
         then:
         def error = thrown(SchemaValidationException)
-        error.message == """The following invalid input values have been detected:
-
-* --input (src/testResources/samplesheet_wrong_pattern.csv): Validation of file failed:
-\t-> Entry 1: Error for field 'fastq_1' (test1_fastq1.txt): FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
-\t-> Entry 2: Error for field 'fastq_1' (test2_fastq1.txt): FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
-
-"""
+        def errorMessage = error.message.tokenize("\n")
+        errorMessage[0] == "The following invalid input values have been detected:"
+        errorMessage[1] == "* --input (src/testResources/samplesheet_wrong_pattern.csv): Validation of file failed:"
+        errorMessage[2] == "\t-> Entry 1: Error for field 'fastq_1' (test1_fastq1.txt): \"test1_fastq1.txt\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$] (FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz')"
+        errorMessage[3] == "\t-> Entry 2: Error for field 'fastq_1' (test2_fastq1.txt): \"test2_fastq1.txt\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$] (FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz')"
         !stdout
     }
 
@@ -965,9 +1015,310 @@ class ValidateParametersTest extends Dsl2Spec{
         error.message == '''The following invalid input values have been detected:
 
 * --input (src/testResources/samplesheet_non_unique.csv): Validation of file failed:
-	-> Entry 3: Detected non-unique combination of the following fields: [sample, fastq_1]
+	-> Entry 3: Detected duplicate entries: [fastq_1:test2_fastq1.fastq.gz, sample:test_2]
 
 '''
+        !stdout
+    }
+
+    def 'should not fail because of non-unique empty entries' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet_uniqueEntries.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.input = "src/testResources/samplesheet_non_unique_empty.csv"
+            include { validateParameters } from 'plugin/nf-schema'
+
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = ["validation": [
+            "monochromeLogs": true
+        ]]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should validate nested params - pass' () {
+        given:
+        def SCRIPT = """
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+        """
+
+        when:
+        def config = [
+            "validation": [
+                "monochromeLogs": true
+            ],
+            "params": [
+                "this": [
+                    "is": [
+                        "so": [
+                            "deep": true
+                        ]
+                    ]
+                ]
+            ]
+        ]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should validate nested params - fail' () {
+        given:
+        def SCRIPT = """
+            params.this.is.so.deep = "this shouldn't be a string"
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+        """
+
+        when:
+        def config = [
+            "validation": [
+                "monochromeLogs": true
+            ],
+            "params": [
+                "this": [
+                    "is": [
+                        "so": [
+                            "deep": true
+                        ]
+                    ]
+                ]
+            ]
+        ]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message == """The following invalid input values have been detected:
+
+* --this.is.so.deep (this shouldn't be a string): Value is [string] but should be [boolean]
+
+"""
+        !stdout
+    }
+
+    def 'should validate an email' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.input = 'src/testResources/samplesheet.csv'
+            params.outdir = 'src/testResources/testDir'
+            params.email = "test@domain.com"
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should validate an email - failure' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.input = 'src/testResources/samplesheet.csv'
+            params.outdir = 'src/testResources/testDir'
+            params.email = "thisisnotanemail"
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message.contains("* --email (thisisnotanemail): \"thisisnotanemail\" is not a valid email address")
+        !stdout
+    }
+
+    def 'should give an error when a file-path-pattern is used with a file-path format' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.input = 'src/testResources/*.csv'
+            params.outdir = 'src/testResources/testDir'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message.contains("* --input (src/testResources/*.csv): 'src/testResources/*.csv' is not a file, but a file path pattern")
+        !stdout
+    }
+
+    def 'should give an error when a file-path-pattern is used with a directory-path format' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.input = 'src/testResources/samplesheet.csv'
+            params.outdir = 'src/testResources/testDi*'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message.contains("* --outdir (src/testResources/testDi*): 'src/testResources/testDi*' is not a directory, but a file path pattern")
+        !stdout
+    }
+
+    def 'should validate a map file - yaml' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.map_file = 'src/testResources/map_file.yaml'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should validate a map file - json' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.map_file = 'src/testResources/map_file.json'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should give an error when a map file is wrong - yaml' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.map_file = 'src/testResources/map_file_wrong.yaml'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message.contains("* --map_file (src/testResources/map_file_wrong.yaml): Validation of file failed:")
+        error.message.contains("	* --this.is.deep (hello): Value is [string] but should be [integer]")
+        !stdout
+    }
+
+    def 'should give an error when a map file is wrong - json' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.map_file = 'src/testResources/map_file_wrong.json'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message.contains("* --map_file (src/testResources/map_file_wrong.json): Validation of file failed:")
+        error.message.contains("	* --this.is.deep (hello): Value is [string] but should be [integer]")
         !stdout
     }
 

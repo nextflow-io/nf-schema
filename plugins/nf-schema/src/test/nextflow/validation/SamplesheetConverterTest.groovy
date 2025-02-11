@@ -11,6 +11,7 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
+import test.MockScriptRunner
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -337,7 +338,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
 
     def 'extra field' () {
         given:
-        def SCRIPT_TEXT = '''
+        def SCRIPT = '''
             include { samplesheetToList } from 'plugin/nf-schema'
 
             params.input = "src/testResources/extraFields.csv"
@@ -350,12 +351,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         '''
 
         when:
-        dsl_eval(SCRIPT_TEXT)
+        def config = [:]
+        new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
                 .collect {
-                    it.split("nextflow.validation.SamplesheetConverter - ")[-1]
+                    it.split("nextflow.validation.SamplesheetConverter -- ")[-1]
                 }
 
         then:
@@ -366,6 +368,35 @@ class SamplesheetConverterTest extends Dsl2Spec{
         stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25, false, [], [], [], [], [], itDoesExist]")
         stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, [], unique3, 1, itDoesExist]" as String)
+    }
+
+    def 'extra field - fail' () {
+        given:
+        def SCRIPT = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            params.input = "src/testResources/extraFields.csv"
+            params.schema = "src/testResources/schema_input.json"
+
+            workflow {
+                Channel.fromList(samplesheetToList(params.input, params.schema))
+                    .view()
+            }
+        '''
+
+        when:
+        def config = [
+            "validation": [
+                "failUnrecognisedHeaders": true
+            ]
+        ]
+        new MockScriptRunner(config).setScript(SCRIPT).execute()
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message == """Found the following unidentified headers in ${getRootString()}/src/testResources/extraFields.csv:
+\t- extraField
+""" as String
     }
 
     def 'no meta' () {
@@ -536,5 +567,43 @@ class SamplesheetConverterTest extends Dsl2Spec{
         stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
         stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
+    }
+
+    def 'samplesheetToList - usage in channels' () {
+        given:
+        def SCRIPT_TEXT = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            Channel.of("src/testResources/correct.csv")
+                .flatMap { it -> 
+                    samplesheetToList(it, "src/testResources/schema_input.json")
+                }
+                .map { it -> println("first: ${it}") }
+
+            Channel.of("src/testResources/correct_arrays.json")
+                .flatMap { it -> 
+                    samplesheetToList(it, "src/testResources/schema_input_with_arrays.json")
+                }
+                .map { it -> println("second: ${it}") }
+
+        '''
+
+        when:
+        dsl_eval(SCRIPT_TEXT)
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.startsWith('first') || it.startsWith('second') ? it : null }
+
+        then:
+        noExceptionThrown()
+        stdout.contains("first: [[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
+        stdout.contains("first: [[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
+        stdout.contains("first: [[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains("first: [[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
+        stdout.contains("second: [[array_meta:[]], [${getRootString()}/src/testResources/testDir/testFile.txt, ${getRootString()}/src/testResources/testDir2/testFile2.txt], [${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir2], [${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir2/testFile2.txt], [string1, string2], [25, 26], [25, 26.5], [false, true], [1, 2, 3], [true], [${getRootString()}/src/testResources/testDir/testFile.txt], [[${getRootString()}/src/testResources/testDir/testFile.txt]]]" as String)
+        stdout.contains("second: [[array_meta:[look, an, array, in, meta]], [], [], [], [string1, string2], [25, 26], [25, 26.5], [], [1, 2, 3], [false, true, false], [${getRootString()}/src/testResources/testDir/testFile.txt], [[${getRootString()}/src/testResources/testDir/testFile.txt]]]" as String)
+        stdout.contains("second: [[array_meta:[]], [], [], [], [string1, string2], [25, 26], [25, 26.5], [], [1, 2, 3], [false, true, false], [${getRootString()}/src/testResources/testDir/testFile.txt], [[${getRootString()}/src/testResources/testDir/testFile.txt], [${getRootString()}/src/testResources/testDir/testFile.txt, ${getRootString()}/src/testResources/testDir2/testFile2.txt]]]" as String)
+
     }
 }

@@ -105,14 +105,16 @@ class ParamsHelpTest extends Dsl2Spec{
 
         when:
         def config = ["validation": [
-            "showHiddenParams": true
+            "help": [
+                "showHidden": true
+            ]
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
                 .findResults {it.contains('publish_dir_mode') && 
-                    it.contains('(accepted: symlink, rellink, link, copy, copyNoFollow') 
+                    it.contains('(accepted: symlink, rellink') 
                     ? it : null }
 
         then:
@@ -134,7 +136,7 @@ class ParamsHelpTest extends Dsl2Spec{
         """
 
         when:
-        def result = new MockScriptRunner([:]).setScript(SCRIPT).execute()
+        def result = new MockScriptRunner([validation:[monochromeLogs:true]]).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
@@ -175,7 +177,36 @@ class ParamsHelpTest extends Dsl2Spec{
 
         then:
         def error = thrown(Exception)
-        error.message == "Specified param 'no_exist' does not exist in JSON schema."
+        error.message == "Unable to create help message: Specified param 'no_exist' does not exist in JSON schema."
         !stdout
+    }
+
+    def 'should print a help message of nested parameter' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            include { paramsHelp } from 'plugin/nf-schema'
+            params.help = 'this.is'
+
+            def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
+            
+            def help_msg = paramsHelp(command, parameters_schema: '$schema')
+            log.info help_msg
+        """
+
+        when:
+        def result = new MockScriptRunner([validation:[monochromeLogs:true]]).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.startsWith('--this.is') ||
+                    it.contains('description:') ||
+                    it.contains('options    :') ||
+                    it.contains('this.is.so.deep')
+                    ? it : null }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 4
     }
 }

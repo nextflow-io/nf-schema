@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/test/test/master/assets/schema_input.json",
+    "title": "Test schema for samplesheets",
+    "description": "Schema for the file provided with params.input",
+    "type": "object",
+    "properties": {
+        "test": {
+            "type": "string"
+        },
+        "this": {
+            "type": "object",
+            "properties": {
+                "is": {
+                    "type": "object",
+                    "properties": {
+                        "deep": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

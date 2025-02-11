@@ -22,9 +22,9 @@ import java.util.regex.Matcher
 @CompileStatic
 public class JsonSchemaValidator {
 
-    private static ValidatorFactory validator
-    private static Pattern uriPattern = Pattern.compile('^#/(\\d*)?/?(.*)$')
-    private static ValidationConfig config
+    private ValidatorFactory validator
+    private Pattern uriPattern = Pattern.compile('^#/(\\d*)?/?(.*)$')
+    private ValidationConfig config
 
     JsonSchemaValidator(ValidationConfig config) {
         this.validator = new ValidatorFactory()
@@ -34,14 +34,14 @@ public class JsonSchemaValidator {
         this.config = config
     }
 
-    private static List<String> validateObject(JsonNode input, String validationType, Object rawJson, String schemaString) {
+    private List<String> validateObject(JsonNode input, String validationType, Object rawJson, String schemaString) {
         def JSONObject schema = new JSONObject(schemaString)
         def String draft = Utils.getValueFromJson("#/\$schema", schema)
         if(draft != "https://json-schema.org/draft/2020-12/schema") {
             log.error("""Failed to load the meta schema:
     The used schema draft (${draft}) is not correct, please use \"https://json-schema.org/draft/2020-12/schema\" instead.
         - If you are a pipeline developer, check our migration guide for more information: https://nextflow-io.github.io/nf-schema/latest/migration_guide/
-        - If you are a pipeline user, pin the previous version of the plugin (1.1.3) to avoid this error: https://www.nextflow.io/docs/latest/plugins.html#using-plugins, i.e. set `plugins {
+        - If you are a pipeline user, revert back to nf-validation to avoid this error: https://www.nextflow.io/docs/latest/plugins.html#using-plugins, i.e. set `plugins {
     id 'nf-validation@1.1.3'
 }` in your `nextflow.config` file
             """)
@@ -50,11 +50,11 @@ public class JsonSchemaValidator {
         
         def Validator.Result result = this.validator.validate(schema, input)
         def List<String> errors = []
-        for (error : result.getErrors()) {
+        result.getErrors().each { error ->
             def String errorString = error.getError()
             // Skip double error in the parameter schema
             if (errorString.startsWith("Value does not match against the schemas at indexes") && validationType == "parameter") {
-                continue
+                return
             }
 
             def String instanceLocation = error.getInstanceLocation()
@@ -68,48 +68,47 @@ public class JsonSchemaValidator {
             }
 
             // Change some error messages to make them more clear
-            if (customError == "") {
-                def String keyword = error.getKeyword()
-                if (keyword == "required") {
-                    def Matcher matcher = errorString =~ ~/\[\[([^\[\]]*)\]\]$/
-                    def String missingKeywords = matcher.findAll().flatten().last()
-                    customError = "Missing required ${validationType}(s): ${missingKeywords}"
-                }
+            def String keyword = error.getKeyword()
+            if (keyword == "required") {
+                def Matcher matcher = errorString =~ ~/\[\[([^\[\]]*)\]\]$/
+                def String missingKeywords = matcher.findAll().flatten().last()
+                errorString = "Missing required ${validationType}(s): ${missingKeywords}"
             }
 
-            def String[] locationList = instanceLocation.split("/").findAll { it != "" }
+            def List<String> locationList = instanceLocation.split("/").findAll { it != "" } as List
 
+            def String printableError = "${validationType == 'field' ? '->' : '*'} ${errorString}" as String
             if (locationList.size() > 0 && Utils.isInteger(locationList[0]) && validationType == "field") {
                 def Integer entryInteger = locationList[0] as Integer
                 def String entryString = "Entry ${entryInteger + 1}" as String
-                def String fieldError = ""
+                def String fieldError = "${errorString}" as String
                 if(locationList.size() > 1) {
-                    fieldError = "Error for ${validationType} '${locationList[1..-1].join("/")}' (${value}): ${customError ?: errorString}"
-                } else {
-                    fieldError = "${customError ?: errorString}" as String
+                    fieldError = "Error for ${validationType} '${locationList[1..-1].join("/")}' (${value}): ${errorString}"
                 }
-                errors.add("-> ${entryString}: ${fieldError}" as String)
+                printableError = "-> ${entryString}: ${fieldError}" as String
             } else if (validationType == "parameter") {
-                def String fieldName = locationList.join("/")
+                def String fieldName = locationList.join(".")
                 if(fieldName != "") {
-                    errors.add("* --${fieldName} (${value}): ${customError ?: errorString}" as String)
-                } else {
-                    errors.add("* ${customError ?: errorString}" as String)
+                    printableError = "* --${fieldName} (${value}): ${errorString}" as String
                 }
-            } else {
-                errors.add("-> ${customError ?: errorString}" as String)
             }
+
+            if(customError != "") {
+                printableError = printableError + " (${customError})"
+            }
+
+            errors.add(printableError)
 
         }
         return errors
     }
 
-    public static List<String> validate(JSONArray input, String schemaString) {
+    public List<String> validate(JSONArray input, String schemaString) {
         def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
         return this.validateObject(jsonInput, "field", input, schemaString)
     }
 
-    public static List<String> validate(JSONObject input, String schemaString) {
+    public List<String> validate(JSONObject input, String schemaString) {
         def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
         return this.validateObject(jsonInput, "parameter", input, schemaString)
     }

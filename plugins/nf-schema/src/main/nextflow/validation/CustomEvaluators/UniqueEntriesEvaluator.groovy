@@ -40,11 +40,11 @@ class UniqueEntriesEvaluator implements Evaluator {
             }
             def Map<String,JsonNode> filteredNodes = nodeEntry
                 .asObject()
-                .dropWhile { k,v -> !uniqueEntries.contains(k) }
+                .findAll { k,v -> uniqueEntries.contains(k) }
                 .collectEntries { k,v -> [k, v.asString()] }
             for (uniqueNode : uniques) {
-                if(filteredNodes.equals(uniqueNode)) {
-                    return Evaluator.Result.failure("Entry ${count}: Detected non-unique combination of the following fields: ${uniqueEntries}" as String)
+                if(filteredNodes.equals(uniqueNode) && filteredNodes != [:]) {
+                    return Evaluator.Result.failure("Entry ${count}: Detected duplicate entries: ${filteredNodes}" as String)
                 }
             }
             uniques.add(filteredNodes)

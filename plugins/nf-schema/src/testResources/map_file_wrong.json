@@ -1,0 +1,8 @@
+{
+    "test": "hello",
+    "this": {
+        "is": {
+            "deep": "hello"
+        }
+    }
+}

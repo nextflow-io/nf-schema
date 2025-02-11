@@ -30,7 +30,7 @@
             "type": "string",
             "const": "object"
         },
-        "defs": {
+        "$defs": {
             "title": "Parameter groups",
             "type": "object",
             "patternProperties": {
@@ -102,7 +102,7 @@
                 "properties": {
                     "$ref": {
                         "type": "string",
-                        "pattern": "^#/defs/"
+                        "pattern": "^#/$defs/"
                     }
                 }
             }

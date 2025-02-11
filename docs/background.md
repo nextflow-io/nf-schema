@@ -1,6 +1,6 @@
 ---
 title: Background
-description: Get up and running with nf-schema
+description: Background information about nf-schema
 hide:
   - toc
 ---

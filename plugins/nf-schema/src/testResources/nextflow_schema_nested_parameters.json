@@ -1,0 +1,43 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/testpipeline/master/nextflow_schema.json",
+    "title": "nf-core/testpipeline pipeline parameters",
+    "description": "this is a test",
+    "type": "object",
+    "$defs": {
+        "nested_parameters": {
+            "title": "Nested Parameters",
+            "required": ["this"],
+            "properties": {
+                "this": {
+                    "description": "this is this",
+                    "type": "object",
+                    "properties": {
+                        "is":{
+                            "description": "is this is?",
+                            "type": "object",
+                            "properties": {
+                                "so": {
+                                    "description": "so so so",
+                                    "type": "object",
+                                    "properties": {
+                                        "deep": {
+                                            "description": "so deep",
+                                            "type": "boolean",
+                                            "default": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/$defs/nested_parameters"
+        }
+    ]
+}
