@@ -1,0 +1,44 @@
+name: Test Meta Schema
+
+on:
+  push:
+    paths:
+      - '**.json'
+      - '.github/workflows/schema-validation.yml'
+      - 'validate.sh'
+  pull_request:
+    paths:
+      - '**.json'
+      - '.github/workflows/schema-validation.yml'
+      - 'validate.sh'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          
+      - name: Install check-jsonschema
+        run: pip install check-jsonschema
+        
+      - name: Validate JSON Schemas
+        run: |
+          # First validate the meta-schema itself against JSON Schema draft
+          check-jsonschema --schemafile https://json-schema.org/draft/2020-12/schema parameters_meta_schema.json
+          
+          # Then validate test schemas against our meta-schema
+          for schema in test_schemas/*.json; do
+            echo "Testing $schema:"
+            if check-jsonschema --schemafile parameters_meta_schema.json "$schema"; then
+              echo "✓ Valid"
+            else
+              echo "✗ Invalid"
+              exit 1
+            fi
+            echo
+          done 

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Invalid Schema",
+  "description": "This schema is missing required fields",
+  "type": "wrong_type",
+  "$defs": {
+    "main_options": {
+      "title": "Main Options",
+      "type": "object",
+      "properties": {
+        "bad_property": {
+          "type": ["string", "object"],
+          "format": "invalid_format"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/main_options"
+    }
+  ]
+} 

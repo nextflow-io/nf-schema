@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mytools.org/schemas/invalid",
+  "title": "Invalid for Meta Schema",
+  "description": "This schema is valid JSON Schema but invalid for our meta-schema",
+  "type": "object",
+  "$defs": {
+    "main_options": {
+      "title": "Main Options",
+      "type": "object",
+      "properties": {
+        "my_param": {
+          "type": "string",
+          "contentMediaType": "application/json",
+          "contentEncoding": "base64",
+          "writeOnly": true,
+          "deprecated": false
+        },
+        "another_param": {
+          "type": "number",
+          "title": "Not Allowed Title",
+          "id": "legacy-id",
+          "$comment": "Comments not allowed"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/main_options"
+    }
+  ]
+} 

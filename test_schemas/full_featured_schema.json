@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mytools.org/schemas/full",
+  "title": "Full Featured Schema",
+  "description": "Tests all features of the meta-schema",
+  "type": "object",
+  "$defs": {
+    "input_group": {
+      "title": "Input Parameters",
+      "type": "object",
+      "fa_icon": "fa-input",
+      "description": "Input parameters group",
+      "required": ["input_file"],
+      "properties": {
+        "input_file": {
+          "type": "string",
+          "format": "file-path",
+          "exists": true,
+          "description": "Input file path"
+        }
+      }
+    },
+    "main_options": {
+      "title": "Main Options",
+      "type": "object",
+      "properties": {
+        "input_file": {
+          "type": "string",
+          "format": "file-path",
+          "exists": true,
+          "schema": "schemas/input_schema.json",
+          "description": "Input file to process",
+          "help_text": "Detailed help about the input file format",
+          "fa_icon": "fa-file"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/input_group"
+    },
+    {
+      "$ref": "#/$defs/main_options"
+    }
+  ]
+} 

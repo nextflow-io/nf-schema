@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mytools.org/schemas/minimal",
+  "title": "Minimal Schema",
+  "description": "A minimal valid schema",
+  "type": "object",
+  "$defs": {
+    "main_options": {
+      "title": "Main Options",
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/main_options"
+    }
+  ]
+} 
