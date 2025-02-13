@@ -124,6 +124,7 @@
             { "$ref": "#/$defs/standardKeywords" },
             { "$ref": "#/$defs/customKeywords" }
           ],
+          "required": ["type", "description"],
           "unevaluatedProperties": false
         }
       }
