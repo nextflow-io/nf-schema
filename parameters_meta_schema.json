@@ -1,311 +1,286 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://nextflow.io",
-    "title": "Nextflow Schema Meta-schema",
-    "description": "Meta-schema to validate Nextflow parameter schema files",
-    "type": "object",
-    "properties": {
-        "$schema": {
-            "title": "schema",
-            "type": "string",
-            "minLength": 1
-        },
-        "$id": {
-            "title": "ID URI",
-            "type": "string",
-            "minLength": 1
-        },
-        "title": {
-            "title": "Title",
-            "type": "string",
-            "minLength": 1
-        },
-        "description": {
-            "title": "Description",
-            "type": "string",
-            "minLength": 1
-        },
-        "type": {
-            "title": "Top level type",
-            "type": "string",
-            "const": "object"
-        },
-        "$defs": {
-            "title": "Parameter groups",
-            "type": "object",
-            "patternProperties": {
-                "^.*$": {
-                    "type": "object",
-                    "required": [
-                        "title",
-                        "type",
-                        "properties"
-                    ],
-                    "properties": {
-                        "title": {
-                            "type": "string",
-                            "minLength": 1
-                        },
-                        "type": {
-                            "const": "object"
-                        },
-                        "fa_icon": {
-                            "type": "string",
-                            "pattern": "^fa"
-                        },
-                        "description": {
-                            "type": "string"
-                        },
-                        "required": {
-                            "type": "array"
-                        },
-                        "properties": {
-                            "$ref": "#/$defs/parameterOptions"
-                        },
-                        "dependentRequired": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                },
-                                "uniqueItems": true,
-                                "default": []
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "properties": {
-            "$ref": "#/$defs/parameterOptions"
-        },
-        "dependentRequired": {
-            "type": "object",
-            "additionalProperties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nextflow.io",
+  "title": "Nextflow Schema Meta-schema",
+  "description": "Meta-schema to validate Nextflow parameter schema files",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "title": "schema",
+      "type": "string",
+      "minLength": 1
+    },
+    "$id": {
+      "title": "ID URI",
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "title": "Title",
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "title": "Description",
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "title": "Top level type",
+      "type": "string",
+      "const": "object"
+    },
+    "$defs": {
+      "title": "Parameter groups",
+      "type": "object",
+      "patternProperties": {
+        "^.*$": {
+          "type": "object",
+          "required": ["title", "type", "properties"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": {
+              "const": "object"
+            },
+            "fa_icon": {
+              "type": "string",
+              "pattern": "^fa"
+            },
+            "description": {
+              "type": "string"
+            },
+            "required": {
+              "type": "array"
+            },
+            "properties": {
+              "$ref": "#/$defs/parameterOptions"
+            },
+            "dependentRequired": {
+              "type": "object",
+              "additionalProperties": {
                 "type": "array",
                 "items": {
-                    "type": "string"
+                  "type": "string"
                 },
                 "uniqueItems": true,
                 "default": []
+              }
             }
-        },
-        "allOf": {
-            "title": "Combine definition groups",
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "$ref"
-                ],
-                "properties": {
-                    "$ref": {
-                        "type": "string",
-                        "pattern": "^#/\\$defs/[^/]+$"
-                    }
-                }
-            }
+          }
         }
+      }
     },
-    "required": [
-        "$schema",
-        "$id",
-        "title",
-        "description",
-        "type"
-    ],
-    "$defs": {
-        "typeAnnotation": {
+    "properties": {
+      "$ref": "#/$defs/parameterOptions"
+    },
+    "dependentRequired": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "uniqueItems": true,
+        "default": []
+      }
+    },
+    "allOf": {
+      "title": "Combine definition groups",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["$ref"],
+        "properties": {
+          "$ref": {
             "type": "string",
-            "enum": [
-                "string",
-                "boolean",
-                "integer",
-                "number",
-                "null"
-            ]
-        },
-        "allTypes": {
-            "type": [
-                "integer",
-                "boolean",
-                "number",
-                "string",
-                "null"
-            ]
-        },
-        "nonNegativeInteger": {
-            "type": "integer",
-            "minimum": 0
-        },
-        "parameterOptions": {
-            "type": "object",
-            "patternProperties": {
-                "^.*$": {
-                    "type": "object",
-                    "required": [
-                        "type"
-                    ],
-                    "dependentSchemas": {
-                        "exists": {
-                            "$comment": "This checks if the type is a 'string' and the format corresponds to a file or directory when 'exists' is used.",
-                            "properties": {
-                                "type": {
-                                    "const": "string"
-                                },
-                                "format": {
-                                    "enum": [
-                                        "path",
-                                        "file-path",
-                                        "file-path-pattern",
-                                        "directory-path"
-                                    ]
-                                }
-                            }
-                        },
-                        "schema": {
-                            "$comment": "This checks if the type is a 'string' and the format is 'path' or 'file-path'",
-                            "properties": {
-                                "type": {
-                                    "const": "string"
-                                },
-                                "format": {
-                                    "enum": [
-                                        "path",
-                                        "file-path"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "properties": {
-                        "type": {
-                            "description": "The type of the parameter value. Can be one or more of these: `['integer', 'boolean', 'number', 'string', 'null']`",
-                            "anyOf": [
-                                {
-                                    "$ref": "#/$defs/typeAnnotation"
-                                },
-                                {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/$defs/typeAnnotation"
-                                    }
-                                }
-                            ]
-                        },
-                        "format": {
-                            "type": "string",
-                            "description": "The format of a parameter value with the 'string' type. This is used for additional validation on the structure of the value.",
-                            "enum": [
-                                "file-path",
-                                "directory-path",
-                                "path",
-                                "file-path-pattern",
-                                "date-time",
-                                "date",
-                                "time",
-                                "email",
-                                "uri",
-                                "regex"
-                            ]
-                        },
-                        "exists": {
-                            "type": "boolean",
-                            "description": "NON STANDARD OPTION: Check if a file exists. This parameter value needs to be a 'string' type with one of these formats: ['path', 'file-path', 'directory-path', 'file-path-pattern']"
-                        },
-                        "pattern": {
-                            "type": "string",
-                            "format": "regex",
-                            "minLength": 1,
-                            "description": "Check a parameter value of 'string' type against a regex pattern"
-                        },
-                        "schema": {
-                            "type": "string",
-                            "minLength": 1,
-                            "pattern": "\\.json$",
-                            "description": "NON STANDARD OPTION: Check the given file against a schema passed to this keyword. Will only work when type is 'string' and format is 'path' or 'file-path'"
-                        },
-                        "description": {
-                            "type": "string",
-                            "description": "NON STANDARD OPTION: The description of the currrent parameter"
-                        },
-                        "help_text": {
-                            "type": "string",
-                            "description": "NON STANDARD OPTION: A more detailed help text"
-                        },
-                        "fa_icon": {
-                            "type": "string",
-                            "pattern": "^fa",
-                            "description": "NON STANDARD OPTION: A font awesome icon to use in the nf-core parameter documentation"
-                        },
-                        "errorMessage": {
-                            "type": "string",
-                            "minLength": 1,
-                            "description": "NON STANDARD OPTION: The custom error message to display in case validation against this parameter fails. Can also be used as a deprecation message if 'deprecated' is true"
-                        },
-                        "default": {
-                            "$ref": "#/$defs/allTypes",
-                            "description": "Specifies a default value to use for this parameter"
-                        },
-                        "examples": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/$defs/allTypes"
-                            },
-                            "description": "A list of examples for the current parameter"
-                        },
-                        "deprecated": {
-                            "type": "boolean",
-                            "description": "States that the parameter is deprecated. Please provide a nice deprecation message using 'errorMessage'"
-                        },
-                        "hidden": {
-                            "type": "boolean",
-                            "description": "NON STANDARD OPTION: Hide this parameter from the help message and documentation"
-                        },
-                        "minLength": {
-                            "$ref": "#/$defs/nonNegativeInteger",
-                            "description": "The minimum length a 'string' parameter value should be"
-                        },
-                        "maxLength": {
-                            "$ref": "#/$defs/nonNegativeInteger",
-                            "description": "The maximum length a 'string' parameter value should be"
-                        },
-                        "minimum": {
-                            "type": "number",
-                            "description": "The mimimum value an 'integer' or 'number' parameter value should be"
-                        },
-                        "exclusiveMinimum": {
-                            "type": "number",
-                            "description": "The exclusive mimimum value an 'integer' or 'number' parameter value should be"
-                        },
-                        "maximum": {
-                            "type": "number",
-                            "description": "The maximum value an 'integer' or 'number' parameter value should be"
-                        },
-                        "exclusiveMaximum": {
-                            "type": "number",
-                            "description": "The exclusive maximum value an 'integer' or 'number' parameter value should be"
-                        },
-                        "multipleOf": {
-                            "type": "number",
-                            "description": "The 'integer' or 'number' parameter value should be a multiple of this value"
-                        },
-                        "enum": {
-                            "type": "array",
-                            "uniqueItems": true,
-                            "items": {
-                                "$ref": "#/$defs/allTypes"
-                            },
-                            "description": "The parameter value should be one of the values specified in this enum array"
-                        },
-                        "const": {
-                            "$ref": "#/$defs/allTypes",
-                            "description": "The parameter value should be equal to this value"
-                        }
-                    }
-                }
-            }
+            "pattern": "^#/\\$defs/[^/]+$"
+          }
         }
+      }
     }
+  },
+  "required": ["$schema", "$id", "title", "description", "type"],
+  "$defs": {
+    "typeAnnotation": {
+      "type": "string",
+      "enum": ["string", "boolean", "integer", "number", "null"]
+    },
+    "allTypes": {
+      "type": ["integer", "boolean", "string", "number", "null"]
+    },
+    "nonNegativeInteger": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "parameterOptions": {
+      "type": "object",
+      "patternProperties": {
+        "^.*$": {
+          "allOf": [
+            { "$ref": "#/$defs/standardKeywords" },
+            { "$ref": "#/$defs/customKeywords" }
+          ],
+          "dependentSchemas": {
+            "exists": {
+              "$comment": "This checks if the type is a 'string' and the format corresponds to a file or directory when 'exists' is used.",
+              "properties": {
+                "type": { "const": "string" },
+                "format": {
+                  "enum": [
+                    "path",
+                    "file-path",
+                    "file-path-pattern",
+                    "directory-path"
+                  ]
+                }
+              }
+            },
+            "schema": {
+              "$comment": "This checks if the type is a 'string' and the format is 'path' or 'file-path'",
+              "properties": {
+                "type": { "const": "string" },
+                "format": {
+                  "enum": ["path", "file-path"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "standardKeywords": {
+      "type": "object",
+      "description": "Allowed standard JSON Schema properties.",
+      "properties": {
+        "type": {
+          "description": "The type of the parameter value. Can be one or more of these: `['integer', 'boolean', 'number', 'string', 'null']`",
+          "anyOf": [
+            { "$ref": "#/$defs/typeAnnotation" },
+            {
+              "type": "array",
+              "items": { "$ref": "#/$defs/typeAnnotation" }
+            }
+          ]
+        },
+        "format": {
+          "type": "string",
+          "description": "The format of a parameter value with the 'string' type. This is used for additional validation on the structure of the value.",
+          "enum": [
+            "file-path",
+            "directory-path",
+            "path",
+            "file-path-pattern",
+            "date-time",
+            "date",
+            "time",
+            "email",
+            "uri",
+            "regex"
+          ]
+        },
+        "pattern": {
+          "type": "string",
+          "format": "regex",
+          "minLength": 1,
+          "description": "Check a parameter value of 'string' type against a regex pattern"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the current parameter"
+        },
+        "default": {
+          "$ref": "#/$defs/allTypes",
+          "description": "Specifies a default value to use for this parameter"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/allTypes"
+          },
+          "description": "A list of examples for the current parameter"
+        },
+        "deprecated": {
+          "type": "boolean",
+          "description": "States that the parameter is deprecated. Please provide a nice deprecation message using 'errorMessage'"
+        },
+        "minLength": {
+          "$ref": "#/$defs/nonNegativeInteger",
+          "description": "The minimum length a 'string' parameter value should be"
+        },
+        "maxLength": {
+          "$ref": "#/$defs/nonNegativeInteger",
+          "description": "The maximum length a 'string' parameter value should be"
+        },
+        "minimum": {
+          "type": "number",
+          "description": "The mimimum value an 'integer' or 'number' parameter value should be"
+        },
+        "exclusiveMinimum": {
+          "type": "number",
+          "description": "The exclusive mimimum value an 'integer' or 'number' parameter value should be"
+        },
+        "maximum": {
+          "type": "number",
+          "description": "The maximum value an 'integer' or 'number' parameter value should be"
+        },
+        "exclusiveMaximum": {
+          "type": "number",
+          "description": "The exclusive maximum value an 'integer' or 'number' parameter value should be"
+        },
+        "multipleOf": {
+          "type": "number",
+          "description": "The 'integer' or 'number' parameter value should be a multiple of this value"
+        },
+        "enum": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/allTypes"
+          },
+          "description": "The parameter value should be one of the values specified in this enum array"
+        },
+        "const": {
+          "$ref": "#/$defs/allTypes",
+          "description": "The parameter value should be equal to this value"
+        }
+      }
+    },
+    "customKeywords": {
+      "type": "object",
+      "description": "Additional custom JSON Schema properties.",
+      "properties": {
+        "errorMessage": {
+          "type": "string",
+          "minLength": 1,
+          "description": "NON STANDARD OPTION: The custom error message to display in case validation against this parameter fails. Can also be used as a deprecation message if 'deprecated' is true"
+        },
+        "exists": {
+          "type": "boolean",
+          "description": "NON STANDARD OPTION: Check if a file exists. This parameter value needs to be a `string` type with one of these formats: `['path', 'file-path', 'directory-path', 'file-path-pattern']`"
+        },
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\.json$",
+          "description": "NON STANDARD OPTION: Check the given file against a schema passed to this keyword. Will only work when type is `string` and format is `path` or `file-path`"
+        },
+        "help_text": {
+          "type": "string",
+          "description": "NON STANDARD OPTION: A more detailed help text"
+        },
+        "fa_icon": {
+          "type": "string",
+          "pattern": "^fa",
+          "description": "NON STANDARD OPTION: A font awesome icon to use in the nf-core parameter documentation"
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "NON STANDARD OPTION: Hide this parameter from the help message and documentation"
+        }
+      }
+    }
+  }
 }
