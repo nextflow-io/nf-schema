@@ -137,6 +137,15 @@
                   ]
                 }
               }
+            },
+            "schema": {
+              "$comment": "This checks if the type is a 'string' and the format is 'path' or 'file-path'",
+              "properties": {
+                "type": { "const": "string" },
+                "format": {
+                  "enum": ["path", "file-path"]
+                }
+              }
             }
           }
         }
@@ -236,11 +245,6 @@
         "const": {
           "$ref": "#/$defs/allTypes",
           "description": "The parameter value should be equal to this value"
-        },
-        "$ref": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Reference to an external schema that the file contents should validate against"
         }
       }
     },
@@ -256,6 +260,12 @@
         "exists": {
           "type": "boolean",
           "description": "NON STANDARD OPTION: Check if a file exists. This parameter value needs to be a `string` type with one of these formats: `['path', 'file-path', 'directory-path', 'file-path-pattern']`"
+        },
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\.json$",
+          "description": "NON STANDARD OPTION: Check the given file against a schema passed to this keyword. Will only work when type is `string` and format is `path` or `file-path`"
         },
         "help_text": {
           "type": "string",
