@@ -257,6 +257,12 @@
         "hidden": {
           "type": "boolean",
           "description": "NON STANDARD OPTION: Hide this parameter from the help message and documentation"
+        },
+        "mimetype": {
+          "type": "string",
+          "description": "NON STANDARD OPTION: The MIME type of the parameter value",
+          "deprecated": true,
+          "errorMessage": "The 'mimetype' keyword is deprecated. Use 'pattern' or 'format' instead."
         }
       },
       "dependentSchemas": {
