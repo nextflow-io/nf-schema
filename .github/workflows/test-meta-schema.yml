@@ -35,10 +35,18 @@ jobs:
           for schema in test_schemas/*.json; do
             echo "Testing $schema:"
             if check-jsonschema --schemafile parameters_meta_schema.json "$schema"; then
-              echo "✓ Valid"
+              # If $schema doesn't start with "test_schemas/invalid*" then it is a success
+              if [[ "$schema" != test_schemas/invalid* ]]; then
+                echo "✓ Valid"
+              else
+                exit 1
+              fi
             else
-              echo "✗ Invalid"
-              exit 1
+              if [[ "$schema" == test_schemas/invalid* ]]; then
+                echo "✓ Invalid"
+              else
+                exit 1
+              fi
             fi
             echo
           done 
