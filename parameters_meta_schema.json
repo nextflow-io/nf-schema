@@ -154,6 +154,7 @@
     "standardKeywords": {
       "type": "object",
       "description": "Allowed standard JSON Schema properties.",
+      "additionalProperties": false,
       "properties": {
         "type": {
           "description": "The type of the parameter value. Can be one or more of these: `['integer', 'boolean', 'number', 'string', 'null']`",
@@ -251,6 +252,7 @@
     "customKeywords": {
       "type": "object",
       "description": "Additional custom JSON Schema properties.",
+      "additionalProperties": false,
       "properties": {
         "errorMessage": {
           "type": "string",
