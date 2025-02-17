@@ -1,5 +1,9 @@
 package nextflow.validation
 
+import groovy.json.JsonBuilder
+import org.json.JSONObject
+import org.json.JSONArray
+
 import groovy.util.logging.Slf4j
 import java.nio.file.Files
 import java.nio.file.Path
@@ -10,10 +14,12 @@ import nextflow.script.WorkflowMetadata
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
+import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.help.HelpMessageCreator
 import nextflow.validation.samplesheet.SamplesheetConverter
 import nextflow.validation.summary.SummaryCreator
 import nextflow.validation.parameters.ParameterValidator
+import nextflow.validation.validators.JsonSchemaValidator
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.getLongestKeyLength
@@ -99,6 +105,45 @@ class ValidationExtension extends PluginExtensionPoint {
             session.params,
             session.baseDir.toString()
         )
+    }
+
+    /*
+    * Function to validate any value against a schema
+    */
+    @Function
+    List<String> validate(
+        final Map options = [:],
+        final Object input,
+        final Path schema
+    ) {
+        return validate(input, schema.toUri(), options)
+    }
+
+    @Function
+    List<String> validate(
+        final Map options = [:],
+        final Object input,
+        final String schema
+    ) {
+        def Boolean exitOnError = options?.containsKey("exitOnError") ? options.exitOnError : true
+
+        def JsonSchemaValidator validator = new JsonSchemaValidator(config)
+        def Object jsonObj = null
+        if(input instanceof List) {
+            jsonObj = new JSONArray(new JsonBuilder(input).toString())
+        } else if(input instanceof Map) {
+            jsonObj = new JSONObject(new JsonBuilder(input).toString())
+        } else {
+            jsonObj = input
+        }
+        def String schemaString = Files.readString( Path.of(getBasePath(session.baseDir.toString(), schema)) )
+        def List<String> errors = validator.validateObj(jsonObj, schemaString)[0]
+        if(exitOnError) {
+            def colors = getLogColors(config.monochromeLogs)
+            def String msg = "${colors.red}${errors.join('\n')}${colors.reset}\n"
+            throw new SchemaValidationException(msg)
+        } 
+        return errors
     }
 
     //

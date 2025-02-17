@@ -58,6 +58,7 @@ public class JsonSchemaValidator {
         def List<String> errors = []
         result.getErrors().each { error ->
             def String errorString = error.getError()
+
             // Skip double error in the parameter schema
             if (errorString.startsWith("Value does not match against the schemas at indexes") && validationType == "parameter") {
                 return
@@ -65,6 +66,12 @@ public class JsonSchemaValidator {
 
             def String instanceLocation = error.getInstanceLocation()
             def String value = getValueFromJsonPointer(instanceLocation, rawJson)
+
+            // Return a standard error message for object validation
+            if (validationType == "object") {
+                errors.add("${instanceLocation ? instanceLocation + ' ' : ''}(${value}): ${errorString}" as String)
+                return
+            }
 
             // Get the custom errorMessage if there is one and the validation errors are not about the content of the file
             def String schemaLocation = error.getSchemaLocation().replaceFirst(/^[^#]+/, "")
@@ -118,6 +125,11 @@ public class JsonSchemaValidator {
     public Tuple2<List<String>,List<String>> validate(JSONObject input, String schemaString) {
         def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
         return this.validateObject(jsonInput, "parameter", input, schemaString)
+    }
+
+    public Tuple2<List<String>,List<String>> validateObj(Object input, String schemaString) {
+        def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
+        return this.validateObject(jsonInput, "object", input, schemaString)
     }
 
     public static List<String> getUnevaluated(Validator.Result result, Object rawJson) {
