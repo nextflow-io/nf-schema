@@ -33,7 +33,7 @@ class ValidationConfig {
         failUnrecognisedParams  = config.failUnrecognisedParams                         ?: false
         failUnrecognisedHeaders = config.failUnrecognisedHeaders                        ?: false
         showHiddenParams        = config.showHiddenParams                               ?: false
-        maxValueLength          = config.maxValueLength && config.maxValueLength >= 0   ?: 150
+        maxValueLength          = config.maxValueLength && config.maxValueLength >= 0   ? config.maxValueLength : 150
         if(config.containsKey("showHiddenParams")) {
             log.warn("configuration option `validation.showHiddenParams` is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead")
         }
