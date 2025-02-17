@@ -95,6 +95,18 @@ This option does exactly the same as `validation.ignoreParams`, but provides pip
 validation.defaultIgnoreParams = ["param1", "param2"] // default: []
 ```
 
+## maxValueLength
+
+Configure the maximum characters of a value that may be shown in an error message. It takes a whole number above or equal to `0`. A value will be truncated when it goes over the maximum amount of characters. See the below example where the limit is to 20 characters:
+
+```
+* --test (abcdefghij...qrstuvwxyz): Value is [string] but should be [integer]
+```
+
+```groovy
+validation.maxValueLength = 100 // default: 150
+```
+
 ## help
 
 The `validation.help` config scope can be used to configure the creation of the help message.
