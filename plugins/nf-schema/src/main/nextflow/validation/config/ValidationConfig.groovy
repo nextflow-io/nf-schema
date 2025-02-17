@@ -28,12 +28,12 @@ class ValidationConfig {
 
     ValidationConfig(Map map, Map params){
         def config = map ?: Collections.emptyMap()
-        lenientMode             = config.lenientMode                ?: false
-        monochromeLogs          = config.monochromeLogs             ?: false
-        failUnrecognisedParams  = config.failUnrecognisedParams     ?: false
-        failUnrecognisedHeaders = config.failUnrecognisedHeaders    ?: false
-        showHiddenParams        = config.showHiddenParams           ?: false
-        maxValueLength          = config.maxValueLength             ?: 150
+        lenientMode             = config.lenientMode                                    ?: false
+        monochromeLogs          = config.monochromeLogs                                 ?: false
+        failUnrecognisedParams  = config.failUnrecognisedParams                         ?: false
+        failUnrecognisedHeaders = config.failUnrecognisedHeaders                        ?: false
+        showHiddenParams        = config.showHiddenParams                               ?: false
+        maxValueLength          = config.maxValueLength && config.maxValueLength >= 0   ?: 150
         if(config.containsKey("showHiddenParams")) {
             log.warn("configuration option `validation.showHiddenParams` is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead")
         }
