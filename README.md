@@ -65,7 +65,7 @@ validation {
 
 - Java 11 or later
 - <https://github.com/harrel56/json-schema>
-- Nextflow 23.10.0 or later
+- Nextflow 24.10.0 or later
 
 ## Slack channel
 

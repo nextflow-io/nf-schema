@@ -11,6 +11,11 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.jar.Manifest
+
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
@@ -37,6 +42,11 @@ class NfValidationTest extends Dsl2Spec{
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
                 return new TestPluginDescriptorFinder(){
                     @Override
+                    protected Manifest readManifestFromDirectory(Path pluginPath) {
+                        def manifestPath = getManifestPath(pluginPath)
+                        final input = Files.newInputStream(manifestPath)
+                        return new Manifest(input)
+                    }
                     protected Path getManifestPath(Path pluginPath) {
                         return pluginPath.resolve('build/resources/main/META-INF/MANIFEST.MF')
                     }
