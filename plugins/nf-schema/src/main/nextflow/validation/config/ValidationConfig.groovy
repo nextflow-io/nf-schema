@@ -20,7 +20,7 @@ class ValidationConfig {
     final public Boolean failUnrecognisedHeaders
     final public String  parametersSchema
     final public Boolean showHiddenParams
-    final public Integer maxErrValSize
+    final public Integer maxErrValSize = 150
     final public HelpConfig help
     final public SummaryConfig summary
 
@@ -33,7 +33,13 @@ class ValidationConfig {
         failUnrecognisedParams  = config.failUnrecognisedParams                         ?: false
         failUnrecognisedHeaders = config.failUnrecognisedHeaders                        ?: false
         showHiddenParams        = config.showHiddenParams                               ?: false
-        maxErrValSize           = config.maxErrValSize && config.maxErrValSize >= 1     ? config.maxErrValSize : 150
+        if(config.maxErrValSize != null) {
+            if(config.maxErrValSize >= 1 || config.maxErrValSize == -1) {
+                maxErrValSize = config.maxErrValSize
+            } else {
+                log.warn("`validation.maxErrValSize` needs to be a value above 0 or equal to -1, defaulting to ${maxErrValSize}")
+            }
+        }
         if(config.containsKey("showHiddenParams")) {
             log.warn("configuration option `validation.showHiddenParams` is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead")
         }
