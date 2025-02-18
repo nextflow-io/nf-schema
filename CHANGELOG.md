@@ -17,6 +17,7 @@
 ## Changes
 
 1. Refactored the whole codebase to make future development easier
+2. Bumped the minimal Nextflow version to `24.10.0`
 
 # Version 2.3.0 - Hakodate
 
