@@ -5,27 +5,25 @@ site_url: https://nextflow-io.github.io/nf-schema/latest/
 edit_uri: edit/master/docs/
 
 nav:
-  - Home:
-      - index.md
+  - Home: index.md
+  - Introduction:
       - background.md
-      - migration_guide.md
-  - Schema:
-      - nextflow_schema/index.md
-      - nextflow_schema/create_schema.md
-      - nextflow_schema/nextflow_schema_specification.md
-      - nextflow_schema/sample_sheet_schema_specification.md
+      - Schema: nextflow_schema/index.md
       - nextflow_schema/nextflow_schema_examples.md
       - nextflow_schema/sample_sheet_schema_examples.md
-  - Parameters:
-      - parameters/validation.md
-      - parameters/help_text.md
-      - parameters/summary_log.md
-  - Samplesheets:
-      - samplesheets/validate_sample_sheet.md
-      - samplesheets/samplesheetToList.md
-      - samplesheets/examples.md
-  - Configuration:
+  - Tutorials:
+      - nextflow_schema/create_schema.md
+      - migration_guide.md
+  - Reference:
+      - nextflow_schema/nextflow_schema_specification.md
+      - nextflow_schema/sample_sheet_schema_specification.md
       - configuration/configuration.md
+  - Usage:
+      - Parameter validation: parameters/validation.md
+      - Parameter help: parameters/help_text.md
+      - Parameter log: parameters/summary_log.md
+      - Samplesheet parsing: samplesheets/samplesheetToList.md
+      - Samplesheet examples: samplesheets/examples.md
   - Contributing:
       - contributing/setup.md
 
@@ -69,6 +67,7 @@ extra_css:
 
 markdown_extensions:
   - admonition
+  - attr_list
   - def_list
   - md_in_html
   - pymdownx.emoji:
