@@ -1409,4 +1409,30 @@ class ValidateParametersTest extends Dsl2Spec{
         !stdout
     }
 
+    def 'should truncate long values in errors' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.input = 'src/testResources/wrong_samplesheet_with_a_super_long_name.and_a_weird_extension'
+            params.outdir = 'src/testResources/testDir'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = ["validation": [
+            "maxErrValSize": 20
+        ]]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        def error = thrown(SchemaValidationException)
+        error.message.contains("* --input (src/testRe..._extension): \"src/testResources/wrong_samplesheet_with_a_super_long_name.and_a_weird_extension\" does not match regular expression [^\\S+\\.(csv|tsv|yaml|json)\$]")
+        !stdout
+    }
 }

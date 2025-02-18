@@ -66,6 +66,9 @@ public class JsonSchemaValidator {
 
             def String instanceLocation = error.getInstanceLocation()
             def String value = getValueFromJsonPointer(instanceLocation, rawJson)
+            if(config.maxErrValSize >= 1 && value.size() > config.maxErrValSize) {
+                value = "${value[0..(config.maxErrValSize/2-1)]}...${value[-config.maxErrValSize/2..-1]}" as String
+            }
 
             // Return a standard error message for object validation
             if (validationType == "object") {
