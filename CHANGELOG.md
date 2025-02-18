@@ -2,6 +2,11 @@
 
 # Version 2.4.0dev
 
+## New features
+
+1. Added a new configuration option: `validation.maxErrValSize` which sets the maximum length that a value in an error message can be. The default is set to 150 characters.
+2. Added a new function: `validate()` that can be used to validate any data structure using a JSON schema.
+
 ## Bug fixes
 
 1. Move the unpinned version check to an observer. This makes sure the warning is always shown and not only when importing a function.
@@ -12,7 +17,6 @@
 
 1. Slow uniqueness check (> 2hrs for 100k samples) made 400x faster by switching from `findAll` to a `subMap` for isolating the required unique fields.
 2. `patternProperties` now has greater support, with no warnings about invalid parameters which actually match a pattern
-3. Added a new configuration option: `validation.maxErrValSize` which sets the maximum length that a value in an error message can be. The default is set to 150 characters.
 
 ## Changes
 
