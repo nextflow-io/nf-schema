@@ -12,6 +12,7 @@
 
 1. Slow uniqueness check (> 2hrs for 100k samples) made 400x faster by switching from `findAll` to a `subMap` for isolating the required unique fields.
 2. `patternProperties` now has greater support, with no warnings about invalid parameters which actually match a pattern
+3. Added a new configuration option: `validation.maxErrValSize` which sets the maximum length that a value in an error message can be. The default is set to 150 characters.
 
 ## Changes
 

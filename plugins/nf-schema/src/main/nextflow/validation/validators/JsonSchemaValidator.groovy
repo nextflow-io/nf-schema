@@ -65,6 +65,9 @@ public class JsonSchemaValidator {
 
             def String instanceLocation = error.getInstanceLocation()
             def String value = getValueFromJsonPointer(instanceLocation, rawJson)
+            if(config.maxErrValSize >= 1 && value.size() > config.maxErrValSize) {
+                value = "${value[0..(config.maxErrValSize/2-1)]}...${value[-config.maxErrValSize/2..-1]}" as String
+            }
 
             // Get the custom errorMessage if there is one and the validation errors are not about the content of the file
             def String schemaLocation = error.getSchemaLocation().replaceFirst(/^[^#]+/, "")
