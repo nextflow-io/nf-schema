@@ -95,7 +95,7 @@ This option does exactly the same as `validation.ignoreParams`, but provides pip
 validation.defaultIgnoreParams = ["param1", "param2"] // default: []
 ```
 
-## maxValueLength
+## maxErrValSize
 
 Configure the maximum characters of a value that may be shown in an error message. It takes a whole number above or equal to `0`. A value will be truncated when it goes over the maximum amount of characters. See the below example where the limit is to 20 characters:
 
@@ -104,7 +104,7 @@ Configure the maximum characters of a value that may be shown in an error messag
 ```
 
 ```groovy
-validation.maxValueLength = 100 // default: 150
+validation.maxErrValSize = 100 // default: 150
 ```
 
 ## help

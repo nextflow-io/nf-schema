@@ -1413,7 +1413,7 @@ class ValidateParametersTest extends Dsl2Spec{
 
         when:
         def config = ["validation": [
-            "maxValueLength": 20
+            "maxErrValSize": 20
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
