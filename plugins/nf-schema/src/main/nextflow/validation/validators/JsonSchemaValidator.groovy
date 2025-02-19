@@ -9,7 +9,11 @@ import dev.harrel.jsonschema.EvaluatorFactory
 import dev.harrel.jsonschema.FormatEvaluatorFactory
 import dev.harrel.jsonschema.JsonNode
 import dev.harrel.jsonschema.providers.OrgJsonNode
+import dev.harrel.jsonschema.SchemaResolver
+import nextflow.Nextflow
 
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.regex.Pattern
 import java.util.regex.Matcher
 
@@ -28,33 +32,50 @@ import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
 @Slf4j
 public class JsonSchemaValidator {
 
-    private ValidatorFactory validator
-    private Pattern uriPattern = Pattern.compile('^#/(\\d*)?/?(.*)$')
     private ValidationConfig config
 
     JsonSchemaValidator(ValidationConfig config) {
-        this.validator = new ValidatorFactory()
-            .withJsonNodeFactory(new OrgJsonNode.Factory())
-            // .withDialect() // TODO define the dialect
-            .withEvaluatorFactory(EvaluatorFactory.compose(new CustomEvaluatorFactory(config), new FormatEvaluatorFactory()))
         this.config = config
     }
 
     private Tuple2<List<String>,List<String>> validateObject(JsonNode input, String validationType, Object rawJson, String schemaString) {
         def JSONObject schema = new JSONObject(schemaString)
         def String draft = getValueFromJsonPointer("#/\$schema", schema)
-        if(draft != "https://json-schema.org/draft/2020-12/schema") {
-            log.error("""Failed to load the meta schema:
-    The used schema draft (${draft}) is not correct, please use \"https://json-schema.org/draft/2020-12/schema\" instead.
+        def String draft2020_12 = "https://json-schema.org/draft/2020-12/schema"
+        if(config.mode == "limited") {
+            if(validationType == "parameter" && !draft.matches("https://github.com/nextflow-io/schema-spec/.*/parameters_meta_schema.json")) {
+                log.error("""Failed to load meta schema:
+    Using '${draft}' for parameter JSON schemas is not allowed in limited mode. Please use a schema that matches the following regex instead:
+    `https://github.com/nextflow-io/schema-spec/.*/parameters_meta_schema.json`
+                """)
+                throw new SchemaValidationException("", [])
+            } else if(validationType != "parameter" && draft != draft2020_12) {
+                log.error("""Failed to load the meta schema:
+    The used schema draft (${draft}) is not correct, please use \"${draft2020_12}\" instead.
         - If you are a pipeline developer, check our migration guide for more information: https://nextflow-io.github.io/nf-schema/latest/migration_guide/
         - If you are a pipeline user, revert back to nf-validation to avoid this error: https://www.nextflow.io/docs/latest/plugins.html#using-plugins, i.e. set `plugins {
     id 'nf-validation@1.1.3'
 }` in your `nextflow.config` file
-            """)
-            throw new SchemaValidationException("", [])
+                """)
+                throw new SchemaValidationException("", [])
+            }
         }
+
+        def SchemaResolver resolver = (String uri) -> {
+            switch(uri) {
+                // TODO Change the base URL once the meta schema has been officially released
+                case "https://github.com/nextflow-io/schema-spec/raw/refs/heads/main/parameters_meta_schema.json" ->
+                    SchemaResolver.Result.fromString(Nextflow.file(getClass().getResource("/schemas/parameters/1.0/parameters_meta_schema.json").getFile()).text)
+                default -> SchemaResolver.Result.empty()
+            }
+        }
+
+        def ValidatorFactory validator = new ValidatorFactory()
+            .withJsonNodeFactory(new OrgJsonNode.Factory())
+            .withSchemaResolver(resolver)
+            .withEvaluatorFactory(EvaluatorFactory.compose(new CustomEvaluatorFactory(config), new FormatEvaluatorFactory()))
         
-        def Validator.Result result = this.validator.validate(schema, input)
+        def Validator.Result result = validator.validate(schema, input)
         def List<String> errors = []
         result.getErrors().each { error ->
             def String errorString = error.getError()
