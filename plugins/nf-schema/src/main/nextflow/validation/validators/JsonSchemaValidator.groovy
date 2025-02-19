@@ -32,21 +32,37 @@ import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
 @Slf4j
 public class JsonSchemaValidator {
 
+    // TODO Change the base URL once the meta schema has been officially released
+    final private Map<String,String> supportedCustomParameterDrafts = [
+        "https://github.com/nextflow-io/schema-spec/raw/refs/heads/main/parameters_meta_schema.json": "/schemas/parameters/1.0/parameters_meta_schema.json"
+    ]
+
     private ValidationConfig config
+    private ValidatorFactory validator
 
     JsonSchemaValidator(ValidationConfig config) {
+        def SchemaResolver resolver = (String uri) -> {
+            if(supportedCustomParameterDrafts.containsKey(uri)) {
+                return SchemaResolver.Result.fromString(Nextflow.file(getClass().getResource(supportedCustomParameterDrafts[uri]).getFile()).text)
+            }
+            return SchemaResolver.Result.empty()
+        }
+
+        this.validator = new ValidatorFactory()
+            .withJsonNodeFactory(new OrgJsonNode.Factory())
+            .withSchemaResolver(resolver)
+            .withEvaluatorFactory(EvaluatorFactory.compose(new CustomEvaluatorFactory(config), new FormatEvaluatorFactory()))
         this.config = config
     }
-
     private Tuple2<List<String>,List<String>> validateObject(JsonNode input, String validationType, Object rawJson, String schemaString) {
         def JSONObject schema = new JSONObject(schemaString)
         def String draft = getValueFromJsonPointer("#/\$schema", schema)
         def String draft2020_12 = "https://json-schema.org/draft/2020-12/schema"
         if(config.mode == "limited") {
-            if(validationType == "parameter" && !draft.matches("https://github.com/nextflow-io/schema-spec/.*/parameters_meta_schema.json")) {
+            if(validationType == "parameter" && !supportedCustomParameterDrafts.containsKey(draft)) {
                 log.error("""Failed to load meta schema:
-    Using '${draft}' for parameter JSON schemas is not allowed in limited mode. Please use a schema that matches the following regex instead:
-    `https://github.com/nextflow-io/schema-spec/.*/parameters_meta_schema.json`
+    Using '${draft}' for parameter JSON schemas is not allowed in limited mode. Please use one the following meta schemas instead:
+${supportedCustomParameterDrafts.collect{ url, cachedSchema -> "    - ${url}"}.join("\n") }
                 """)
                 throw new SchemaValidationException("", [])
             } else if(validationType != "parameter" && draft != draft2020_12) {
@@ -60,22 +76,8 @@ public class JsonSchemaValidator {
                 throw new SchemaValidationException("", [])
             }
         }
-
-        def SchemaResolver resolver = (String uri) -> {
-            switch(uri) {
-                // TODO Change the base URL once the meta schema has been officially released
-                case "https://github.com/nextflow-io/schema-spec/raw/refs/heads/main/parameters_meta_schema.json" ->
-                    SchemaResolver.Result.fromString(Nextflow.file(getClass().getResource("/schemas/parameters/1.0/parameters_meta_schema.json").getFile()).text)
-                default -> SchemaResolver.Result.empty()
-            }
-        }
-
-        def ValidatorFactory validator = new ValidatorFactory()
-            .withJsonNodeFactory(new OrgJsonNode.Factory())
-            .withSchemaResolver(resolver)
-            .withEvaluatorFactory(EvaluatorFactory.compose(new CustomEvaluatorFactory(config), new FormatEvaluatorFactory()))
         
-        def Validator.Result result = validator.validate(schema, input)
+        def Validator.Result result = this.validator.validate(schema, input)
         def List<String> errors = []
         result.getErrors().each { error ->
             def String errorString = error.getError()
