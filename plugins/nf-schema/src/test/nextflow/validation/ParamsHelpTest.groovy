@@ -98,7 +98,7 @@ class ParamsHelpTest extends Dsl2Spec{
 
         then:
         noExceptionThrown()
-        stdout.size() == 10
+        stdout.size() == 11
     }
 
     def 'should print a help message with argument options' () {

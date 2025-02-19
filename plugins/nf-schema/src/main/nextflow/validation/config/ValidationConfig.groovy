@@ -14,47 +14,136 @@ import nextflow.validation.exceptions.SchemaValidationException
 @Slf4j
 class ValidationConfig {
 
-    final public Boolean lenientMode
-    final public Boolean monochromeLogs
-    final public Boolean failUnrecognisedParams
-    final public Boolean failUnrecognisedHeaders
-    final public String  parametersSchema
-    final public Boolean showHiddenParams
-    final public Integer maxErrValSize = 150
-    final public HelpConfig help
-    final public SummaryConfig summary
+    final public Boolean lenientMode = false
+    final public Boolean monochromeLogs = false
+    final public Boolean failUnrecognisedParams = false
+    final public Boolean failUnrecognisedHeaders = false
+    final public Boolean showHiddenParams = false
 
-    final public List<String> ignoreParams
+    final public Integer maxErrValSize = 150
+
+    final public String  parametersSchema = "nextflow_schema.json"
+
+    final public Set<String> ignoreParams = ["nf_test_output"] // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
+
+    final public HelpConfig help
+
+    final public SummaryConfig summary
 
     ValidationConfig(Map map, Map params){
         def config = map ?: Collections.emptyMap()
-        lenientMode             = config.lenientMode                                    ?: false
-        monochromeLogs          = config.monochromeLogs                                 ?: false
-        failUnrecognisedParams  = config.failUnrecognisedParams                         ?: false
-        failUnrecognisedHeaders = config.failUnrecognisedHeaders                        ?: false
-        showHiddenParams        = config.showHiddenParams                               ?: false
-        if(config.maxErrValSize != null) {
-            if(config.maxErrValSize >= 1 || config.maxErrValSize == -1) {
-                maxErrValSize = config.maxErrValSize
+
+        // lenientMode
+        if(config.containsKey("lenientMode")) {
+            if(config.lenientMode instanceof Boolean) {
+                lenientMode = config.lenientMode
+                log.debug("Set `validation.lenientMode` to ${lenientMode}")
             } else {
-                log.warn("`validation.maxErrValSize` needs to be a value above 0 or equal to -1, defaulting to ${maxErrValSize}")
+                log.warn("Incorrect value detected for `validation.lenientMode`, a boolean is expected. Defaulting to `${lenientMode}`")
             }
         }
+
+        // monochromeLogs
+        if(config.containsKey("monochromeLogs")) {
+            if(config.monochromeLogs instanceof Boolean) {
+                monochromeLogs = config.monochromeLogs
+                log.debug("Set `validation.monochromeLogs` to ${monochromeLogs}")
+            } else {
+                log.warn("Incorrect value detected for `validation.monochromeLogs`, a boolean is expected. Defaulting to `${monochromeLogs}`")
+            }
+        }
+
+        // failUnrecognisedParams
+        if(config.containsKey("failUnrecognisedParams")) {
+            if(config.failUnrecognisedParams instanceof Boolean) {
+                failUnrecognisedParams = config.failUnrecognisedParams
+                log.debug("Set `validation.failUnrecognisedParams` to ${failUnrecognisedParams}")
+            } else {
+                log.warn("Incorrect value detected for `validation.failUnrecognisedParams`, a boolean is expected. Defaulting to `${failUnrecognisedParams}`")
+            }
+        }
+
+        // failUnrecognisedHeaders
+        if(config.containsKey("failUnrecognisedHeaders")) {
+            if(config.failUnrecognisedHeaders instanceof Boolean) {
+                failUnrecognisedHeaders = config.failUnrecognisedHeaders
+                log.debug("Set `validation.failUnrecognisedHeaders` to ${failUnrecognisedHeaders}")
+            } else {
+                log.warn("Incorrect value detected for `validation.failUnrecognisedHeaders`, a boolean is expected. Defaulting to `${failUnrecognisedHeaders}`")
+            }
+        }
+
+        // showHiddenParams
         if(config.containsKey("showHiddenParams")) {
             log.warn("configuration option `validation.showHiddenParams` is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead")
+            if(config.showHiddenParams instanceof Boolean) {
+                showHiddenParams = config.showHiddenParams
+                log.debug("Set `validation.showHiddenParams` to ${showHiddenParams}")
+            } else {
+                log.warn("Incorrect value detected for `validation.showHiddenParams`, a boolean is expected. Defaulting to `${showHiddenParams}`")
+            }
         }
-        parametersSchema        = config.parametersSchema       ?: "nextflow_schema.json"
-        help                    = new HelpConfig(config.help as Map ?: [:], params, monochromeLogs, showHiddenParams)
-        summary                 = new SummaryConfig(config.summary as Map ?: [:], monochromeLogs)
 
-        if(config.ignoreParams && !(config.ignoreParams instanceof List<String>)) {
-            throw new SchemaValidationException("Config value 'validation.ignoreParams' should be a list of String values")
+        // maxErrValSize
+        if(config.containsKey("maxErrValSize")) {
+            if(config.maxErrValSize instanceof Integer && (config.maxErrValSize >= 1 || config.maxErrValSize == -1)) {
+                maxErrValSize = config.maxErrValSize
+                log.debug("Set `validation.maxErrValSize` to ${maxErrValSize}")
+            } else {
+                log.warn("`validation.maxErrValSize` needs to be a value above 0 or equal to -1. Defaulting to ${maxErrValSize}")
+            }
         }
-        ignoreParams = config.ignoreParams ?: []
-        if(config.defaultIgnoreParams && !(config.defaultIgnoreParams instanceof List<String>)) {
-            throw new SchemaValidationException("Config value 'validation.defaultIgnoreParams' should be a list of String values")
+
+        // parameterSchema
+        if(config.containsKey("parametersSchema")) {
+            if(config.parametersSchema instanceof String) {
+                parametersSchema = config.parametersSchema
+                log.debug("Set `validation.parametersSchema` to ${parametersSchema}")
+            } else {
+                log.warn("Incorrect value detected for `validation.parametersSchema`, a string is expected. Defaulting to `${parametersSchema}`")
+            }
         }
-        ignoreParams += config.defaultIgnoreParams ?: []
-        ignoreParams += 'nf_test_output' //ignore `nf_test_output` directory when using nf-test
+
+        // ignoreParams
+        if(config.containsKey("ignoreParams")) {
+            if(config.ignoreParams instanceof List<String>) {
+                ignoreParams += config.ignoreParams
+                log.debug("Added the following parameters to the ignored parameters: ${config.ignoreParams}")
+            } else {
+                log.warn("Incorrect value detected for `validation.ignoreParams`, a list with string values is expected. Defaulting to `${ignoreParams}`")
+            }
+        }
+
+        // defaultIgnoreParams
+        if(config.containsKey("defaultIgnoreParams")) {
+            if(config.defaultIgnoreParams instanceof List<String>) {
+                ignoreParams += config.defaultIgnoreParams
+                log.debug("Added the following parameters to the ignored parameters: ${config.defaultIgnoreParams}")
+            } else {
+                log.warn("Incorrect value detected for `validation.defaultIgnoreParams`, a list with string values is expected. Defaulting to `${ignoreParams}`")
+            }
+        }
+
+        // help
+        def Map helpConfig = [:]
+        if(config.containsKey("help")) {
+            if(config.help instanceof Map) {
+                helpConfig = config.help
+            } else {
+                log.warn("Incorrect value detected for `validation.help`, a map with key-value pairs is expected. Setting the defaults for all help options.")
+            }
+        }
+        help = new HelpConfig(helpConfig, params, monochromeLogs, showHiddenParams)
+
+        // summary
+        def Map summaryConfig = [:]
+        if(config.containsKey("summary")) {
+            if(config.summary instanceof Map) {
+                summaryConfig = config.summary
+            } else {
+                log.warn("Incorrect value detected for `validation.summary`, a map with key-value pairs is expected. Setting the defaults for all summary options.")
+            }
+        }
+        summary = new SummaryConfig(summaryConfig, monochromeLogs)
     }
 }
