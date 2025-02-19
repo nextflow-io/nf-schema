@@ -58,23 +58,21 @@ public class JsonSchemaValidator {
         def JSONObject schema = new JSONObject(schemaString)
         def String draft = getValueFromJsonPointer("#/\$schema", schema)
         def String draft2020_12 = "https://json-schema.org/draft/2020-12/schema"
-        if(config.mode == "limited") {
-            if(validationType == "parameter" && !supportedCustomParameterDrafts.containsKey(draft)) {
-                log.error("""Failed to load meta schema:
+        if(config.mode == "limited" && validationType == "parameter" && !supportedCustomParameterDrafts.containsKey(draft)) {
+            log.error("""Failed to load meta schema:
     Using '${draft}' for parameter JSON schemas is not allowed in limited mode. Please use one the following meta schemas instead:
 ${supportedCustomParameterDrafts.collect{ url, cachedSchema -> "    - ${url}"}.join("\n") }
-                """)
-                throw new SchemaValidationException("", [])
-            } else if(validationType != "parameter" && draft != draft2020_12) {
-                log.error("""Failed to load the meta schema:
+            """)
+            throw new SchemaValidationException("", [])
+        } else if(draft != draft2020_12 && !supportedCustomParameterDrafts.containsKey(draft)) {
+            log.error("""Failed to load the meta schema:
     The used schema draft (${draft}) is not correct, please use \"${draft2020_12}\" instead.
         - If you are a pipeline developer, check our migration guide for more information: https://nextflow-io.github.io/nf-schema/latest/migration_guide/
         - If you are a pipeline user, revert back to nf-validation to avoid this error: https://www.nextflow.io/docs/latest/plugins.html#using-plugins, i.e. set `plugins {
     id 'nf-validation@1.1.3'
 }` in your `nextflow.config` file
-                """)
-                throw new SchemaValidationException("", [])
-            }
+            """)
+            throw new SchemaValidationException("", [])
         }
         
         def Validator.Result result = this.validator.validate(schema, input)
