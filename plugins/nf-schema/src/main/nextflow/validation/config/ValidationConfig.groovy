@@ -21,6 +21,7 @@ class ValidationConfig {
     final public String  parametersSchema
     final public Boolean showHiddenParams
     final public Integer maxErrValSize = 150
+    final public String  mode = "unlimited"
     final public HelpConfig help
     final public SummaryConfig summary
 
@@ -46,6 +47,16 @@ class ValidationConfig {
         parametersSchema        = config.parametersSchema       ?: "nextflow_schema.json"
         help                    = new HelpConfig(config.help as Map ?: [:], params, monochromeLogs, showHiddenParams)
         summary                 = new SummaryConfig(config.summary as Map ?: [:], monochromeLogs)
+
+        if(config.containsKey("mode")) {
+            def List<String> allowedModes = ["limited", "unlimited"]
+            if(allowedModes.contains(config.mode)) {
+                mode = config.mode
+            } else {
+                log.warn("Detected an unsupported mode in `validation.mode`, supported options are: ${allowedModes}, defaulting to `${mode}`")
+            }
+            log.debug("Set nf-schema validation mode to `${mode}`")
+        }
 
         if(config.ignoreParams && !(config.ignoreParams instanceof List<String>)) {
             throw new SchemaValidationException("Config value 'validation.ignoreParams' should be a list of String values")
