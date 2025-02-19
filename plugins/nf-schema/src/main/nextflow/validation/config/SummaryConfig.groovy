@@ -2,6 +2,8 @@ package nextflow.validation.config
 
 import groovy.util.logging.Slf4j
 
+import static nextflow.validation.utils.Colors.removeColors
+
 /**
  * This class allows to model a specific configuration, extracting values from a map and converting
  *
@@ -11,19 +13,47 @@ import groovy.util.logging.Slf4j
 
 @Slf4j
 class SummaryConfig {
-    final public String beforeText
-    final public String afterText
-    final public List<String> hideParams
+    final public String beforeText = ""
+    final public String afterText = ""
+
+    final public Set<String> hideParams = []
 
     SummaryConfig(Map map, Boolean monochromeLogs) {
         def config = map ?: Collections.emptyMap()
-        if (monochromeLogs) {
-            beforeText  = config.beforeText ? Utils.removeColors(config.beforeText): ""
-            afterText   = config.afterText  ? Utils.removeColors(config.afterText) : ""
-        } else {
-            beforeText  = config.beforeText ?: ""
-            afterText   = config.afterText  ?: ""
+
+        // beforeText
+        if(config.containsKey("beforeText")) {
+            if(config.beforeText instanceof String) {
+                if(monochromeLogs) {
+                    beforeText = config.beforeText
+                } else {
+                    beforeText = removeColors(config.beforeText)
+                }
+            } else {
+                log.warn("Incorrect value detected for `validation.summary.beforeText`, a string is expected. Defaulting to `${beforeText}`")
+            }
         }
-        this.hideParams = config.hideParams ?: []
+
+        // afterText
+        if(config.containsKey("afterText")) {
+            if(config.afterText instanceof String) {
+                if(monochromeLogs) {
+                    afterText = config.afterText
+                } else {
+                    afterText = removeColors(config.afterText)
+                }
+            } else {
+                log.warn("Incorrect value detected for `validation.summary.afterText`, a string is expected. Defaulting to `${afterText}`")
+            }
+        }
+
+        // hideParams
+        if(config.containsKey("hideParams")) {
+            if(config.hideParams instanceof List<String>) {
+                hideParams = config.hideParams
+            } else {
+                log.warn("Incorrect value detected for `validation.summary.hideParams`, a list of strings is expected. Defaulting to `${hideParams}`")
+            }
+        }
     }
 }
