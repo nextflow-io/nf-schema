@@ -29,6 +29,7 @@ class SummaryConfig {
                 } else {
                     beforeText = removeColors(config.beforeText)
                 }
+                log.debug("Set `validation.summary.beforeText` to ${beforeText}")
             } else {
                 log.warn("Incorrect value detected for `validation.summary.beforeText`, a string is expected. Defaulting to `${beforeText}`")
             }
@@ -42,6 +43,7 @@ class SummaryConfig {
                 } else {
                     afterText = removeColors(config.afterText)
                 }
+                log.debug("Set `validation.summary.afterText` to ${afterText}")
             } else {
                 log.warn("Incorrect value detected for `validation.summary.afterText`, a string is expected. Defaulting to `${afterText}`")
             }
@@ -51,6 +53,7 @@ class SummaryConfig {
         if(config.containsKey("hideParams")) {
             if(config.hideParams instanceof List<String>) {
                 hideParams = config.hideParams
+                log.debug("Set `validation.summary.hideParams` to ${hideParams}")
             } else {
                 log.warn("Incorrect value detected for `validation.summary.hideParams`, a list of strings is expected. Defaulting to `${hideParams}`")
             }
