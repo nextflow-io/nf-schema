@@ -172,10 +172,14 @@ class HelpMessageCreator {
     //
     private List<String> getHelpListParams(Map<String,Map> params, Integer maxChars, String parentParameter = "") {
         def List helpMessage = []
-        def Integer typeMaxChars = longestStringLength(params.collect { key, value -> value.type instanceof String ? "[${value.type}]" : value.type as String})
+        def Integer typeMaxChars = longestStringLength(params.collect { key, value -> 
+            def Object type = value.get("type", "")
+            return type instanceof String && type.length() > 0 ? "[${type}]" : type as String}
+        )
         for (String paramName in params.keySet()) {
-            def Map paramOptions = params.get(paramName) as Map 
-            def String type = paramOptions.type instanceof String ? '[' + paramOptions.type + ']' : paramOptions.type as String
+            def Map paramOptions = params.get(paramName) as Map
+            def Object paramType = paramOptions.get("type", "")
+            def String type = paramType instanceof String && paramType.length() > 0 ? '[' + paramType + ']' : paramType as String
             def String enumsString = ""
             if (paramOptions.enum != null) {
                 def List enums = (List) paramOptions.enum

@@ -494,4 +494,39 @@ Reference genome options
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
+    def 'should get a help message when missing the type keyword' () {
+        given:
+        def validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema_no_type.json',
+            help: [
+                enabled: true
+            ]
+        ]
+        def params = [:]
+        def config = new ValidationConfig(validationConfig, params)
+        def helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        def help = helpCreator.getShortMessage("") + helpCreator.getAfterText()
+
+        then:
+        noExceptionThrown()
+        def expectedHelp = """--input        [string]          Path to comma-separated file containing information about the samples in the experiment. 
+--help         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+help message of that parameter will be printed. 
+--helpFull     [boolean]         Show the help message for all non-hidden parameters. 
+--showHidden   [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
+or `--helpFull`. 
+ 
+------------------------------------------------------
+
+"""
+        def resultHelp = help.readLines()
+        expectedHelp.readLines().each {
+            assert help.contains(it)
+            resultHelp.removeElement(it)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
 }
