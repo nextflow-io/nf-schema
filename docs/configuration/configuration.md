@@ -30,17 +30,6 @@ validation.parametersSchema = "path/to/schema.json" // default "nextflow_schema.
 
 This option can either be a path relative to the root of the pipeline directory or a full path to the JSON schema (Be wary to not use hardcoded local paths to ensure your pipeline will keep working on other systems)
 
-## mode
-
-This option can be used to set the validation mode for parameters. There are two valid options:
-
-- `unlimited`: No restrictions apply on the validation of parameters. All keywords and schema structures available in [draft 2020-12](https://json-schema.org/draft/2020-12) can be used freely.
-- `limited`: Limits the usage of keywords and schema structures for parameter validation to a subset of [draft 2020-12](https://json-schema.org/draft/2020-12). Enabling this mode will ensure compatibility with nf-core tooling, Seqera platform and others. The specified `$schema` inside of the parameters JSON schema needs to be set to the [official Nextflow meta schema](https://github.com/nextflow-io/schema-spec) for parameters.
-
-```groovy
-validation.mode = "limited|unlimited" // default: "limited"
-```
-
 ## monochromeLogs
 
 This option can be used to turn of the colored logs from nf-validation. This can be useful if you run a Nextflow pipeline in an environment that doesn't support colored logging.
