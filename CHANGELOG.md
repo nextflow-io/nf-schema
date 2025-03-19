@@ -1,6 +1,6 @@
 # nextflow-io/nf-schema: Changelog
 
-# Version 2.4.0dev
+# Version 2.4.0
 
 ## New features
 
