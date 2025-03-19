@@ -190,7 +190,7 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         
         then:
         noExceptionThrown()
-        stdout.size() == 13
+        stdout.size() == 14
         stdout ==~ /.*\[0;34moutdir     : .\[0;32moutDir.*/
     }
 
