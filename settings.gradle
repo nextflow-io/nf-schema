@@ -8,5 +8,3 @@
  */
 
 rootProject.name = 'nf-schema'
-include 'plugins'
-include('plugins:nf-schema')

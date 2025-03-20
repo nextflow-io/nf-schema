@@ -5,15 +5,15 @@ description: How to contribute to nf-schema
 
 # Getting started with plugin development
 
-## Compiling
+## Tests
 
-To compile and run the tests use the following command:
+To run the tests use the following command:
 
 ```bash
-./gradlew check
+make test
 ```
 
-## Launch it with installed Nextflow
+## Install and use in pipelines
 
 !!! warning
 
@@ -39,33 +39,6 @@ plugins {
 }
 ```
 
-## Launch it with a local version of Nextflow
-
-- Clone the Nextflow repo into a sibling directory
-
-```bash
-cd .. && git clone https://github.com/nextflow-io/nextflow
-cd nextflow && ./gradlew exportClasspath
-```
-
-- Append to the `settings.gradle` in this project the following line:
-
-```bash
-includeBuild('../nextflow')
-```
-
-- Compile the plugin code
-
-```bash
-./gradlew compileGroovy
-```
-
-- Run nextflow with this command:
-
-```bash
-./launch.sh run -plugins nf-schema <script/pipeline name> [pipeline params]
-```
-
 ## Change and preview the docs
 
 The docs are generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
@@ -82,3 +55,20 @@ mkdocs serve
 ```
 
 To preview the docs, open the URL provided by mkdocs in your browser.
+
+## Release and publish the plugin
+
+1. In `build.gradle` make sure that:
+   - `version` matches the desired release version,
+   - `github.repository` matches the repository of the plugin,
+   - `github.indexUrl` points to your fork of the plugins index repository.
+2. Create a file named `$HOME/.gradle/gradle.properties`, where `$HOME` is your home directory. Add the following properties:
+   - `github_username`: The GitHub username granting access to the plugin repository.
+   - `github_access_token`: The GitHub access token required to upload and commit changes to the plugin repository.
+   - `github_commit_email`: The email address associated with your GitHub account.
+3. Update the [changelog](./CHANGELOG.md).
+4. Build and publish the plugin to your GitHub repository:
+   ```bash
+   make release
+   ```
+5. Create a pull request against the [nextflow-io/plugins](https://github.com/nextflow-io/plugins/blob/main/plugins.json) repository to make the plugin publicly accessible.

@@ -19,7 +19,7 @@ jobs:
           python-version: 3.x
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       - name: Obtain version from MANIFEST.MF
-        run: echo "plugin_version=$(grep "Plugin-Version" plugins/nf-schema/src/resources/META-INF/MANIFEST.MF | awk '{print $2}' | awk -F '.' '{print $1"."$2}')" >> $GITHUB_ENV
+        run: echo "plugin_version=$(grep "version = " build.gradle | sed -e 's/version = //' | cut -d "'" -f 2)" >> $GITHUB_ENV
       - name: Setup git user
         run: |
           git config --global user.name "${{github.actor}}"
