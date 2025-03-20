@@ -82,7 +82,7 @@ However, they will be displayed as ungrouped in tools working off the schema.
 
 ## Nested parameters
 
-!!! example "New feature in v2.1.0"
+!!! example "Not supported in by the official [Nextflow specifications](https://github.com/nextflow-io/schema-spec/blob/main/parameters_meta_schema.json)"
 
 Nextflow config allows parameters to be nested as objects, for example:
 
@@ -397,6 +397,8 @@ Example usage is as follows:
 
 ### `mimetype`
 
+!!! example "Not supported in by the official [Nextflow specifications](https://github.com/nextflow-io/schema-spec/blob/main/parameters_meta_schema.json)"
+
 MIME type for a file path. Setting this value informs downstream tools about what _kind_ of file is expected.
 
 Should only be set when `format` is `file-path`.
@@ -464,6 +466,8 @@ Specify a minimum / maximum value for an integer or float number length with `mi
     However, they are not officially supported within the Nextflow schema ecosystem and so some interfaces may not recognise them.
 
 ## Array-specific keys
+
+!!! example "Not supported in by the official [Nextflow specifications](https://github.com/nextflow-io/schema-spec/blob/main/parameters_meta_schema.json)"
 
 ### `uniqueItems`
 

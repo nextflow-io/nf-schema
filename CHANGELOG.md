@@ -4,8 +4,10 @@
 
 ## New features
 
-1. Added a new configuration option: `validation.maxErrValSize` which sets the maximum length that a value in an error message can be. The default is set to 150 characters.
+1. Added 1 new configuration option:
+   - `validation.maxErrValSize` which sets the maximum length that a value in an error message can be. The default is set to 150 characters.
 2. Added a new function: `validate()` that can be used to validate any data structure using a JSON schema.
+3. Add support for the official Nextflow JSON schema specification for parameters located in https://github.com/nextflow-io/schema-spec
 
 ## Bug fixes
 

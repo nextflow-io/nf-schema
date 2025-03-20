@@ -9,7 +9,11 @@ import dev.harrel.jsonschema.EvaluatorFactory
 import dev.harrel.jsonschema.FormatEvaluatorFactory
 import dev.harrel.jsonschema.JsonNode
 import dev.harrel.jsonschema.providers.OrgJsonNode
+import dev.harrel.jsonschema.SchemaResolver
+import nextflow.Nextflow
 
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.regex.Pattern
 import java.util.regex.Matcher
 
@@ -28,24 +32,35 @@ import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
 @Slf4j
 public class JsonSchemaValidator {
 
-    private ValidatorFactory validator
-    private Pattern uriPattern = Pattern.compile('^#/(\\d*)?/?(.*)$')
+    // TODO Change the base URL once the meta schema has been officially released
+    final private Map<String,String> supportedCustomParameterDrafts = [
+        "https://github.com/nextflow-io/schema-spec/raw/refs/heads/main/parameters_meta_schema.json": "/schemas/parameters/1.0/parameters_meta_schema.json"
+    ]
+
     private ValidationConfig config
+    private ValidatorFactory validator
 
     JsonSchemaValidator(ValidationConfig config) {
+        def SchemaResolver resolver = (String uri) -> {
+            if(supportedCustomParameterDrafts.containsKey(uri)) {
+                return SchemaResolver.Result.fromString(Nextflow.file(getClass().getResource(supportedCustomParameterDrafts[uri]).getFile()).text)
+            }
+            return SchemaResolver.Result.empty()
+        }
+
         this.validator = new ValidatorFactory()
             .withJsonNodeFactory(new OrgJsonNode.Factory())
-            // .withDialect() // TODO define the dialect
+            .withSchemaResolver(resolver)
             .withEvaluatorFactory(EvaluatorFactory.compose(new CustomEvaluatorFactory(config), new FormatEvaluatorFactory()))
         this.config = config
     }
-
     private Tuple2<List<String>,List<String>> validateObject(JsonNode input, String validationType, Object rawJson, String schemaString) {
         def JSONObject schema = new JSONObject(schemaString)
         def String draft = getValueFromJsonPointer("#/\$schema", schema)
-        if(draft != "https://json-schema.org/draft/2020-12/schema") {
+        def String draft2020_12 = "https://json-schema.org/draft/2020-12/schema"
+        if(draft != draft2020_12 && !supportedCustomParameterDrafts.containsKey(draft)) {
             log.error("""Failed to load the meta schema:
-    The used schema draft (${draft}) is not correct, please use \"https://json-schema.org/draft/2020-12/schema\" instead.
+    The used schema draft (${draft}) is not correct, please use \"${draft2020_12}\" or one of the other supported specifications instead.
         - If you are a pipeline developer, check our migration guide for more information: https://nextflow-io.github.io/nf-schema/latest/migration_guide/
         - If you are a pipeline user, revert back to nf-validation to avoid this error: https://www.nextflow.io/docs/latest/plugins.html#using-plugins, i.e. set `plugins {
     id 'nf-validation@1.1.3'
