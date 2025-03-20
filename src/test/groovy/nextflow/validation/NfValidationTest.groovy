@@ -48,7 +48,7 @@ class NfValidationTest extends Dsl2Spec{
                         return new Manifest(input)
                     }
                     protected Path getManifestPath(Path pluginPath) {
-                        return pluginPath.resolve('build/resources/main/META-INF/MANIFEST.MF')
+                        return pluginPath.resolve('build/tmp/jar/MANIFEST.MF')
                     }
                 }
             }
