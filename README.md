@@ -25,7 +25,7 @@ Declare the plugin in your Nextflow pipeline configuration file:
 
 ```groovy title="nextflow.config"
 plugins {
-  id 'nf-schema@2.2.0'
+  id 'nf-schema@2.4.0'
 }
 ```
 
@@ -65,7 +65,7 @@ validation {
 
 - Java 11 or later
 - <https://github.com/harrel56/json-schema>
-- Nextflow 23.10.0 or later
+- Nextflow 24.10.0 or later
 
 ## Slack channel
 

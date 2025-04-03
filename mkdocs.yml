@@ -24,6 +24,7 @@ nav:
       - Parameter log: parameters/summary_log.md
       - Samplesheet parsing: samplesheets/samplesheetToList.md
       - Samplesheet examples: samplesheets/examples.md
+      - Other validation: validate/validate.md
   - Contributing:
       - contributing/setup.md
 

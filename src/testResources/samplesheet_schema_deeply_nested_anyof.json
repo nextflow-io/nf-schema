@@ -1,0 +1,89 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/test/test/master/assets/schema_input.json",
+    "title": "Test schema for samplesheets",
+    "description": "Schema for the file provided with params.input",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "map": {
+                "type": "object",
+                "properties": {
+                    "arrayTest": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }, 
+                    "stringTest": {
+                        "type": "string"
+                    },
+                    "numberTest": {
+                        "type": "number"
+                    },
+                    "integerTest": {
+                        "type": "integer"
+                    },
+                    "fileTest": {
+                        "type": "string",
+                        "format": "file-path"
+                    },
+                    "mapMeta": {
+                        "type": "string",
+                        "meta": "mapMeta"
+                    }
+                }
+            },
+            "array": {
+                "anyOf": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": ["test"]
+                    },
+                    {
+                        "type": "string"
+                    }
+                ]
+            },
+            "arrayInArray": {
+                "type": "array",
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "arrayMeta": {
+                "type": "array",
+                "meta": ["arrayMeta", "otherArrayMeta"],
+                "items": {
+                    "type": "string"
+                }
+            },
+            "value": {
+                "type": "string"
+            },
+            "meta": {
+                "type": "string",
+                "meta": "meta"
+            },
+            "metaMap": {
+                "type": "object",
+                "meta": "metaMap",
+                "properties": {
+                    "entry1": {
+                        "type": "string"
+                    },
+                    "entry2": {
+                        "type": "number"
+                    }
+                }
+            }
+        }
+    }
+}

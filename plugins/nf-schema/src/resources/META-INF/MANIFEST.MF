@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Plugin-Id: nf-schema
-Plugin-Version: 2.3.0
-Plugin-Class: nextflow.validation.ValidationPlugin
-Plugin-Provider: nextflow
-Plugin-Requires: >=23.10.0

@@ -1,5 +1,31 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.4.0
+
+## New features
+
+1. Added a new configuration option: `validation.maxErrValSize` which sets the maximum length that a value in an error message can be. The default is set to 150 characters.
+2. Added a new function: `validate()` that can be used to validate any data structure using a JSON schema.
+
+## Bug fixes
+
+1. Move the unpinned version check to an observer. This makes sure the warning is always shown and not only when importing a function.
+2. Added a missing inherited method to the observer to fix issues with workflow output publishing
+3. Fixed unexpected failures with samplesheet schemas using `anyOf`, `allOf` and `oneOf`
+4. Fixed an error with help messages when the `type` keyword was missing
+5. Fix compilation errors in Java 21
+
+## Improvements
+
+1. Slow uniqueness check (> 2hrs for 100k samples) made 400x faster by switching from `findAll` to a `subMap` for isolating the required unique fields.
+2. `patternProperties` now has greater support, with no warnings about invalid parameters which actually match a pattern
+3. Added better error handling and debug messages to the configuration parser.
+
+## Changes
+
+1. Refactored the whole codebase to make future development easier
+2. Bumped the minimal Nextflow version to `24.10.0`
+
 # Version 2.3.0 - Hakodate
 
 ## Bug fixes
