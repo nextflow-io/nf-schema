@@ -15,12 +15,12 @@ class HelpConfig {
     final public Boolean enabled = false
     final public Boolean showHidden = false
 
-    final public String showHiddenParameter = "showHidden"
-    final public String shortParameter = "help"
-    final public String fullParameter = "helpFull"
-    final public String beforeText = ""
-    final public String afterText = ""
-    final public String command = ""
+    final public CharSequence showHiddenParameter = "showHidden"
+    final public CharSequence shortParameter = "help"
+    final public CharSequence fullParameter = "helpFull"
+    final public CharSequence beforeText = ""
+    final public CharSequence afterText = ""
+    final public CharSequence command = ""
 
     HelpConfig(Map map, Map params, Boolean monochromeLogs, Boolean showHiddenParams) {
         def config = map ?: Collections.emptyMap()
@@ -37,7 +37,7 @@ class HelpConfig {
 
         // showHiddenParameter
         if(config.containsKey("showHiddenParameter")) {
-            if(config.showHiddenParameter instanceof String) {
+            if(config.showHiddenParameter instanceof CharSequence) {
                 showHiddenParameter = config.showHiddenParameter
                 log.debug("Set `validation.help.showHiddenParameter` to ${showHiddenParameter}")
             } else {
@@ -60,7 +60,7 @@ class HelpConfig {
 
         // shortParameter
         if(config.containsKey("shortParameter")) {
-            if(config.shortParameter instanceof String) {
+            if(config.shortParameter instanceof CharSequence) {
                 shortParameter = config.shortParameter
                 log.debug("Set `validation.help.shortParameter` to ${shortParameter}")
             } else {
@@ -70,7 +70,7 @@ class HelpConfig {
 
         // fullParameter
         if(config.containsKey("fullParameter")) {
-            if(config.fullParameter instanceof String) {
+            if(config.fullParameter instanceof CharSequence) {
                 fullParameter = config.fullParameter
                 log.debug("Set `validation.help.fullParameter` to ${fullParameter}")
             } else {
@@ -80,7 +80,7 @@ class HelpConfig {
 
         // beforeText
         if(config.containsKey("beforeText")) {
-            if(config.beforeText instanceof String) {
+            if(config.beforeText instanceof CharSequence) {
                 if(monochromeLogs) {
                     beforeText = config.beforeText
                 } else {
@@ -94,7 +94,7 @@ class HelpConfig {
 
         // afterText
         if(config.containsKey("afterText")) {
-            if(config.afterText instanceof String) {
+            if(config.afterText instanceof CharSequence) {
                 if(monochromeLogs) {
                     afterText = config.afterText
                 } else {
@@ -108,7 +108,7 @@ class HelpConfig {
 
         // command
         if(config.containsKey("command")) {
-            if(config.command instanceof String) {
+            if(config.command instanceof CharSequence) {
                 if(monochromeLogs) {
                     command = config.command
                 } else {

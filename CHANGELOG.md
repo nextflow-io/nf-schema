@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.4.1
+
+## Bug fixes
+
+1. Allow `GString` values for all configuration options that allow `String` values.
+
 # Version 2.4.0
 
 ## New features
