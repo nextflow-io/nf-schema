@@ -16,10 +16,10 @@ import java.nio.file.Path
 class ExistsEvaluator implements Evaluator {
     // The file should or should not exist
 
-    private final Boolean exists
+    private final Boolean shouldExist // true if the file should exist, false if it should not
 
     ExistsEvaluator(Boolean exists) {
-        this.exists = exists
+        this.shouldExist = exists
     }
 
     @Override
@@ -30,24 +30,24 @@ class ExistsEvaluator implements Evaluator {
         }
 
         def String value = node.asString()
-
-        // Skip validation of S3 paths for now
-        if (value.startsWith('s3://') || value.startsWith('az://') || value.startsWith('gs://')) {
-            log.debug("S3 paths are not supported by 'ExistsEvaluator': '${value}'")
-            return Evaluator.Result.success()
-        }
-       
-        // Actual validation logic
         def Path file = Nextflow.file(value) as Path
+        def Boolean exists
+
+        try {
+            file = Nextflow.file(value) as Path
+            exists = file.exists()
+        } catch (Exception e) {
+            return Evaluator.Result.failure("could not check existence of '${value}': ${e.message}" as String)
+        }
 
         // Don't evaluate file path patterns
         if (file instanceof List) {
             return Evaluator.Result.success()
         }
 
-        if (!file.exists() && this.exists == true) {
+        if (!exists && this.shouldExist == true) {
             return Evaluator.Result.failure("the file or directory '${value}' does not exist" as String)
-        } else if(file.exists() && this.exists == false) {
+        } else if(exists && this.shouldExist == false) {
             return Evaluator.Result.failure("the file or directory '${value}' should not exist" as String)
         }
         return Evaluator.Result.success()
