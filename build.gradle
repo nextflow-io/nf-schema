@@ -2,13 +2,18 @@ plugins {
     id 'io.nextflow.nextflow-plugin' version '0.0.1-alpha2'
 }
 
+repositories {
+    mavenCentral()
+    maven { url = "https://s3-eu-west-1.amazonaws.com/maven.seqera.io/releases" }
+}
+
 dependencies {
     implementation 'org.json:json:20240303'
     implementation 'dev.harrel:json-schema:1.5.0'
     implementation 'com.sanctionco.jmail:jmail:1.6.3' // Needed for e-mail format validation
 }
 
-version = '2.5.0dev'
+version = '2.5.0'
 
 nextflowPlugin {
     nextflowVersion = '25.03.0-edge'

@@ -55,8 +55,12 @@ class ValidationConfig {
     @Description('A list of parameters to ignore during validation.')
     final public Set<String> ignoreParams = ["nf_test_output"] // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
 
+    @ConfigOption
+    @Description('Configuration scope for the help message.')
     final public HelpConfig help
 
+    @ConfigOption
+    @Description('Configuration scope for the parameter summary.')
     final public SummaryConfig summary
 
     ValidationConfig(Map map, Map params){
