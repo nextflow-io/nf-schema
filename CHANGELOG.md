@@ -6,6 +6,12 @@
 
 1. The plugin now properly validates cloud storage files instead of skipping them. Exotic errors will be added to the error messages instead of failing the validation outright.
 
+# Version 2.4.1
+
+## Bug fixes
+
+1. Allow `GString` values for all configuration options that allow `String` values.
+
 # Version 2.4.0
 
 ## New features

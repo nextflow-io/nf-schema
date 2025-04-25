@@ -13,17 +13,17 @@ import static nextflow.validation.utils.Colors.removeColors
 
 @Slf4j
 class SummaryConfig {
-    final public String beforeText = ""
-    final public String afterText = ""
+    final public CharSequence beforeText = ""
+    final public CharSequence afterText = ""
 
-    final public Set<String> hideParams = []
+    final public Set<CharSequence> hideParams = []
 
     SummaryConfig(Map map, Boolean monochromeLogs) {
         def config = map ?: Collections.emptyMap()
 
         // beforeText
         if(config.containsKey("beforeText")) {
-            if(config.beforeText instanceof String) {
+            if(config.beforeText instanceof CharSequence) {
                 if(monochromeLogs) {
                     beforeText = config.beforeText
                 } else {
@@ -37,7 +37,7 @@ class SummaryConfig {
 
         // afterText
         if(config.containsKey("afterText")) {
-            if(config.afterText instanceof String) {
+            if(config.afterText instanceof CharSequence) {
                 if(monochromeLogs) {
                     afterText = config.afterText
                 } else {
@@ -51,7 +51,7 @@ class SummaryConfig {
 
         // hideParams
         if(config.containsKey("hideParams")) {
-            if(config.hideParams instanceof List<String>) {
+            if(config.hideParams instanceof List<CharSequence>) {
                 hideParams = config.hideParams
                 log.debug("Set `validation.summary.hideParams` to ${hideParams}")
             } else {
