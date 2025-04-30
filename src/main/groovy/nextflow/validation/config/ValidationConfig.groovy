@@ -21,7 +21,7 @@ import nextflow.script.dsl.Description
 @Description('''
     The `validation` scope allows you to configure the `nf-schema` plugin.
 ''')
-class ValidationConfig {
+class ValidationConfig implements ConfigScope {
 
     @ConfigOption
     @Description('Toggle lenient mode. In lenient mode, the validation of types will be more lenient (e.g. an integer will pass as a string type).')
@@ -55,11 +55,9 @@ class ValidationConfig {
     @Description('A list of parameters to ignore during validation.')
     final public Set<String> ignoreParams = ["nf_test_output"] // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
 
-    @ConfigOption
     @Description('Configuration scope for the help message.')
     final public HelpConfig help
 
-    @ConfigOption
     @Description('Configuration scope for the parameter summary.')
     final public SummaryConfig summary
 

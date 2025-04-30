@@ -17,11 +17,7 @@ import nextflow.script.dsl.Description
  */
 
 @Slf4j
-@ScopeName('validation.help')
-@Description('''
-    The `validation.help` scope allows you to configure the help message produced by the `nf-schema` plugin.
-''')
-class HelpConfig {
+class HelpConfig implements ConfigScope {
 
     @ConfigOption
     @Description('Enable the help message.')

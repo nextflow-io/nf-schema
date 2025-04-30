@@ -17,7 +17,7 @@ import nextflow.script.dsl.Description
  */
 
 @Slf4j
-class SummaryConfig {
+class SummaryConfig implements ConfigScope{
 
     @ConfigOption
     @Description('The text to show before the summary message.')
