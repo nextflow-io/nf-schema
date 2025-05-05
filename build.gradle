@@ -1,10 +1,5 @@
 plugins {
-    id 'io.nextflow.nextflow-plugin' version '0.0.1-alpha2'
-}
-
-repositories {
-    mavenCentral()
-    maven { url = "https://s3-eu-west-1.amazonaws.com/maven.seqera.io/releases" }
+    id 'io.nextflow.nextflow-plugin' version '0.0.1-alpha3'
 }
 
 dependencies {
@@ -21,6 +16,7 @@ nextflowPlugin {
     provider = 'nextflow'
     className = 'nextflow.validation.ValidationPlugin'
     extensionPoints = [
+        'nextflow.validation.config.ValidationConfig',
         'nextflow.validation.ValidationExtension',
         'nextflow.validation.ValidationObserverFactory'
     ]
