@@ -153,10 +153,13 @@ class ParameterValidator {
             if (NF_OPTIONS.contains(param)) {
                 errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
             }
-            else if (config.failUnrecognisedParams && !config.ignoreParams.contains(param)) {
-                errors << "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
-            } else if (!config.ignoreParams.contains(param)) {
-                warnings << "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
+            else if (!config.ignoreParams.any { param.startsWith(it) } ) {
+                def String text = "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
+                if(config.failUnrecognisedParams) {
+                    errors << text
+                } else {
+                    warnings << text
+                }
             }
         }
         // check for warnings
