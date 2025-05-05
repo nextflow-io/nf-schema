@@ -49,11 +49,11 @@ class ValidationConfig implements ConfigScope {
 
     @ConfigOption
     @Description('The JSON schema file to use for parameter validation.')
-    final public String  parametersSchema = "nextflow_schema.json"
+    final public CharSequence  parametersSchema = "nextflow_schema.json"
 
     @ConfigOption
     @Description('A list of parameters to ignore during validation.')
-    final public Set<String> ignoreParams = ["nf_test_output"] // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
+    final public Set<CharSequence> ignoreParams = ["nf_test_output"] // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
 
     @Description('Configuration scope for the help message.')
     final public HelpConfig help
@@ -127,7 +127,7 @@ class ValidationConfig implements ConfigScope {
 
         // parameterSchema
         if(config.containsKey("parametersSchema")) {
-            if(config.parametersSchema instanceof String) {
+            if(config.parametersSchema instanceof CharSequence) {
                 parametersSchema = config.parametersSchema
                 log.debug("Set `validation.parametersSchema` to ${parametersSchema}")
             } else {
@@ -137,7 +137,7 @@ class ValidationConfig implements ConfigScope {
 
         // ignoreParams
         if(config.containsKey("ignoreParams")) {
-            if(config.ignoreParams instanceof List<String>) {
+            if(config.ignoreParams instanceof List<CharSequence>) {
                 ignoreParams += config.ignoreParams
                 log.debug("Added the following parameters to the ignored parameters: ${config.ignoreParams}")
             } else {
@@ -147,7 +147,7 @@ class ValidationConfig implements ConfigScope {
 
         // defaultIgnoreParams
         if(config.containsKey("defaultIgnoreParams")) {
-            if(config.defaultIgnoreParams instanceof List<String>) {
+            if(config.defaultIgnoreParams instanceof List<CharSequence>) {
                 ignoreParams += config.defaultIgnoreParams
                 log.debug("Added the following parameters to the ignored parameters: ${config.defaultIgnoreParams}")
             } else {

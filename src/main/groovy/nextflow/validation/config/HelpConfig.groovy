@@ -29,27 +29,27 @@ class HelpConfig implements ConfigScope {
 
     @ConfigOption
     @Description('The parameter to use to show hidden parameters in the help message.')
-    final public String showHiddenParameter = "showHidden"
+    final public CharSequence showHiddenParameter = "showHidden"
 
     @ConfigOption
     @Description('The parameter to use to show the short help message.')
-    final public String shortParameter = "help"
+    final public CharSequence shortParameter = "help"
 
     @ConfigOption
     @Description('The parameter to use to show the full help message.')
-    final public String fullParameter = "helpFull"
+    final public CharSequence fullParameter = "helpFull"
 
     @ConfigOption
     @Description('The text to show before the help message.')
-    final public String beforeText = ""
+    final public CharSequence beforeText = ""
 
     @ConfigOption
     @Description('The text to show after the help message.')
-    final public String afterText = ""
+    final public CharSequence afterText = ""
 
     @ConfigOption
     @Description('An example command of how to run the pipeline.')
-    final public String command = ""
+    final public CharSequence command = ""
 
     HelpConfig(Map map, Map params, Boolean monochromeLogs, Boolean showHiddenParams) {
         def config = map ?: Collections.emptyMap()
@@ -66,7 +66,7 @@ class HelpConfig implements ConfigScope {
 
         // showHiddenParameter
         if(config.containsKey("showHiddenParameter")) {
-            if(config.showHiddenParameter instanceof String) {
+            if(config.showHiddenParameter instanceof CharSequence) {
                 showHiddenParameter = config.showHiddenParameter
                 log.debug("Set `validation.help.showHiddenParameter` to ${showHiddenParameter}")
             } else {
@@ -89,7 +89,7 @@ class HelpConfig implements ConfigScope {
 
         // shortParameter
         if(config.containsKey("shortParameter")) {
-            if(config.shortParameter instanceof String) {
+            if(config.shortParameter instanceof CharSequence) {
                 shortParameter = config.shortParameter
                 log.debug("Set `validation.help.shortParameter` to ${shortParameter}")
             } else {
@@ -99,7 +99,7 @@ class HelpConfig implements ConfigScope {
 
         // fullParameter
         if(config.containsKey("fullParameter")) {
-            if(config.fullParameter instanceof String) {
+            if(config.fullParameter instanceof CharSequence) {
                 fullParameter = config.fullParameter
                 log.debug("Set `validation.help.fullParameter` to ${fullParameter}")
             } else {
@@ -109,7 +109,7 @@ class HelpConfig implements ConfigScope {
 
         // beforeText
         if(config.containsKey("beforeText")) {
-            if(config.beforeText instanceof String) {
+            if(config.beforeText instanceof CharSequence) {
                 if(monochromeLogs) {
                     beforeText = config.beforeText
                 } else {
@@ -123,7 +123,7 @@ class HelpConfig implements ConfigScope {
 
         // afterText
         if(config.containsKey("afterText")) {
-            if(config.afterText instanceof String) {
+            if(config.afterText instanceof CharSequence) {
                 if(monochromeLogs) {
                     afterText = config.afterText
                 } else {
@@ -137,7 +137,7 @@ class HelpConfig implements ConfigScope {
 
         // command
         if(config.containsKey("command")) {
-            if(config.command instanceof String) {
+            if(config.command instanceof CharSequence) {
                 if(monochromeLogs) {
                     command = config.command
                 } else {
