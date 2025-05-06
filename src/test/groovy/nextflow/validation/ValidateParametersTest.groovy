@@ -1443,6 +1443,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.genome = [
                 "test": "test"
             ]
+            params.genomebutlonger = true
             params.testing = "test"
             include { validateParameters } from 'plugin/nf-schema'
             
@@ -1461,6 +1462,6 @@ class ValidateParametersTest extends Dsl2Spec{
 
         then:
         noExceptionThrown()
-        stdout == ["* --testing: test"]
+        stdout == ["* --testing: test", "* --genomebutlonger: true"]
     }
 }

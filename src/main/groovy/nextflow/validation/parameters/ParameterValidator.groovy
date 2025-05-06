@@ -150,10 +150,11 @@ class ParameterValidator {
         // Check for nextflow core params and unexpected params
         //=====================================================================//
         unevaluatedParams.each{ param ->
+            def String dotParam = param.replaceAll("/", ".")
             if (NF_OPTIONS.contains(param)) {
                 errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
             }
-            else if (!config.ignoreParams.any { param.startsWith(it) } ) {
+            else if (!config.ignoreParams.any { dotParam == it || dotParam.startsWith(it + ".") } ) { // Check if an ignore param is present
                 def String text = "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
                 if(config.failUnrecognisedParams) {
                     errors << text
