@@ -6,6 +6,12 @@
 
 1. The plugin now properly validates cloud storage files instead of skipping them. Exotic errors will be added to the error messages instead of failing the validation outright.
 
+# Version 2.4.2
+
+## Bug fixes
+
+1. `validateParameters` should now correctly ignore nested parameters given in the `validation.ignoreParams` and the `validation.defaultIgnoreParams` configuration options.
+
 # Version 2.4.1
 
 ## Bug fixes
