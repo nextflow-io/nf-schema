@@ -52,6 +52,10 @@ class ValidationConfig implements ConfigScope {
     final public CharSequence  parametersSchema = "nextflow_schema.json"
 
     @ConfigOption
+    @Description('A list of default parameters to ignore during validation. This option should only be used by pipeline developers.')
+    final private Set<CharSequence> defaultIgnoreParams
+
+    @ConfigOption
     @Description('A list of parameters to ignore during validation.')
     final public Set<CharSequence> ignoreParams = ["nf_test_output"] // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
 
@@ -60,6 +64,9 @@ class ValidationConfig implements ConfigScope {
 
     @Description('Configuration scope for the parameter summary.')
     final public SummaryConfig summary
+
+    // Keep the no-arg constructor in order to be able to use the `@ConfigOption` annotation
+    ValidationConfig(){}
 
     ValidationConfig(Map map, Map params){
         def config = map ?: Collections.emptyMap()
