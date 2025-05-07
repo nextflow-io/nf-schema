@@ -1435,4 +1435,33 @@ class ValidateParametersTest extends Dsl2Spec{
         error.message.contains("* --input (src/testRe..._extension): \"src/testResources/wrong_samplesheet_with_a_super_long_name.and_a_weird_extension\" does not match regular expression [^\\S+\\.(csv|tsv|yaml|json)\$]")
         !stdout
     }
+
+    def 'should correctly detect invalid parameters' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_no_type.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.genome = [
+                "test": "test"
+            ]
+            params.genomebutlonger = true
+            params.testing = "test"
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = ["validation": [
+            "defaultIgnoreParams": [ "genome" ]
+        ]]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        stdout == ["* --testing: test", "* --genomebutlonger: true"]
+    }
 }
