@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/nextflow-io/nf-schema/master/plugins/nf-schema/src/testResources/schema_input.json",
+    "$id": "https://raw.githubusercontent.com/nextflow-io/nf-schema/master/src/testResources/schema_input.json",
     "title": "Samplesheet validation schema",
     "description": "Schema for the samplesheet used in this pipeline",
     "type": "array",

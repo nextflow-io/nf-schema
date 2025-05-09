@@ -88,4 +88,4 @@ For example:
 ```
 
 will convert the `field` value to a meta value, resulting in the channel `[[id:value]...]`
-See [here](https://github.com/nextflow-io/nf-schema/blob/master/plugins/nf-schema/src/testResources/schema_input.json#L10-L25) for an example in the sample sheet.
+See [here](https://github.com/nextflow-io/nf-schema/blob/master/src/testResources/schema_input.json#L10-L25) for an example in the sample sheet.
