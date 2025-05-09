@@ -3,23 +3,52 @@ package nextflow.validation.config
 import groovy.util.logging.Slf4j
 
 import static nextflow.validation.utils.Colors.removeColors
+
+import nextflow.config.schema.ConfigOption
+import nextflow.config.schema.ConfigScope
+import nextflow.config.schema.ScopeName
+import nextflow.script.dsl.Description
+
 /**
- * This class allows to model a specific configuration, extracting values from a map and converting
+ * This class is used to read, parse and validate the `validation.help` config block.
  *
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  *
  */
 
 @Slf4j
-class HelpConfig {
+class HelpConfig implements ConfigScope {
+
+    @ConfigOption
+    @Description('Enable the help message.')
     final public Boolean enabled = false
+
+    @ConfigOption
+    @Description('Show hidden parameters in the help message.')
     final public Boolean showHidden = false
 
+    @ConfigOption
+    @Description('The parameter to use to show hidden parameters in the help message.')
     final public CharSequence showHiddenParameter = "showHidden"
+
+    @ConfigOption
+    @Description('The parameter to use to show the short help message.')
     final public CharSequence shortParameter = "help"
+
+    @ConfigOption
+    @Description('The parameter to use to show the full help message.')
     final public CharSequence fullParameter = "helpFull"
+
+    @ConfigOption
+    @Description('The text to show before the help message.')
     final public CharSequence beforeText = ""
+
+    @ConfigOption
+    @Description('The text to show after the help message.')
     final public CharSequence afterText = ""
+
+    @ConfigOption
+    @Description('An example command of how to run the pipeline.')
     final public CharSequence command = ""
 
     HelpConfig(Map map, Map params, Boolean monochromeLogs, Boolean showHiddenParams) {

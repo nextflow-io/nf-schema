@@ -4,31 +4,69 @@ import groovy.util.logging.Slf4j
 
 import nextflow.validation.exceptions.SchemaValidationException
 
+import nextflow.config.schema.ConfigOption
+import nextflow.config.schema.ConfigScope
+import nextflow.config.schema.ScopeName
+import nextflow.script.dsl.Description
+
 /**
- * This class allows model an specific configuration, extracting values from a map and converting
+ * This class is used to read, parse and validate the `validation` config block.
  *
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  *
  */
 
 @Slf4j
-class ValidationConfig {
+@ScopeName('validation')
+@Description('''
+    The `validation` scope allows you to configure the `nf-schema` plugin.
+''')
+class ValidationConfig implements ConfigScope {
 
+    @ConfigOption
+    @Description('Toggle lenient mode. In lenient mode, the validation of types will be more lenient (e.g. an integer will pass as a string type).')
     final public Boolean lenientMode = false
+
+    @ConfigOption
+    @Description('Toggle monochrome logs. In monochrome mode, the logs will not be colored.')
     final public Boolean monochromeLogs = false
+
+    @ConfigOption
+    @Description('Fail if unrecognised parameters are found in the config file. A warning will be given by default.')
     final public Boolean failUnrecognisedParams = false
+
+    @ConfigOption
+    @Description('Fail if unrecognised headers are found in the samplesheets. A warning will be given by default.')
     final public Boolean failUnrecognisedHeaders = false
+
+    @ConfigOption
+    @Description('Show hidden parameters in the help message. This is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead.')
     final public Boolean showHiddenParams = false
 
+    @ConfigOption
+    @Description('Maximum size of the value shown in the error message. If the value is larger than this threshold, it will be truncated. Set to -1 to disable truncation.')
     final public Integer maxErrValSize = 150
 
+    @ConfigOption
+    @Description('The JSON schema file to use for parameter validation.')
     final public CharSequence  parametersSchema = "nextflow_schema.json"
 
+    @ConfigOption
+    @Description('A list of default parameters to ignore during validation. This option should only be used by pipeline developers.')
+    final private Set<CharSequence> defaultIgnoreParams
+
+    @ConfigOption
+    @Description('A list of parameters to ignore during validation.')
     final public Set<CharSequence> ignoreParams = ["nf_test_output"] // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
 
+    @Description('Configuration scope for the help message.')
     final public HelpConfig help
 
+    @Description('Configuration scope for the parameter summary.')
     final public SummaryConfig summary
+
+    // Keep the no-arg constructor in order to be able to use the `@ConfigOption` annotation
+    ValidationConfig(){}
 
     ValidationConfig(Map map, Map params){
         def config = map ?: Collections.emptyMap()

@@ -4,6 +4,11 @@ import groovy.util.logging.Slf4j
 
 import static nextflow.validation.utils.Colors.removeColors
 
+import nextflow.config.schema.ConfigOption
+import nextflow.config.schema.ConfigScope
+import nextflow.config.schema.ScopeName
+import nextflow.script.dsl.Description
+
 /**
  * This class allows to model a specific configuration, extracting values from a map and converting
  *
@@ -12,10 +17,18 @@ import static nextflow.validation.utils.Colors.removeColors
  */
 
 @Slf4j
-class SummaryConfig {
+class SummaryConfig implements ConfigScope{
+
+    @ConfigOption
+    @Description('The text to show before the summary message.')
     final public CharSequence beforeText = ""
+
+    @ConfigOption
+    @Description('The text to show after the summary message.')
     final public CharSequence afterText = ""
 
+    @ConfigOption
+    @Description('A list of parameters to hide in the summary message.')
     final public Set<CharSequence> hideParams = []
 
     SummaryConfig(Map map, Boolean monochromeLogs) {
