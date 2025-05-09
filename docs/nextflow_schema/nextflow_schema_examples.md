@@ -16,5 +16,5 @@ It is used as a test fixture in the nf-schema package [here](https://github.com/
     More examples can be found in the plugin [`testResources` directory](https://github.com/nextflow-io/nf-schema/master/plugins/nf-schema/testResources/).
 
 ```json
---8<-- "plugins/nf-schema/src/testResources/nextflow_schema.json"
+--8<-- "src/testResources/nextflow_schema.json"
 ```
