@@ -1,7 +1,13 @@
-N E X T F L O W  ~  version 23.04.1
-Launching `pipeline/main.nf` [exotic_rutherford] DSL2 - revision: 8bf4c8d053
 
-Typical pipeline command:
+ N E X T F L O W   ~  version 25.04.0
+
+Launching `pipeline/main.nf` [agitated_wegener] DSL2 - revision: 629cc11c05
+
+
+This is a help message for the pipeline.
+It provides information about the parameters and usage.
+
+    Typical pipeline command:
 
   nextflow run my_pipeline --input input_file.csv
 
@@ -10,3 +16,6 @@ Typical pipeline command:
     format     : directory-path
     description: The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
 ------------------------------------------------------
+
+For more information, please refer to the documentation.
+    
