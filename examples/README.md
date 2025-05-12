@@ -10,3 +10,4 @@ This directory contains example files for the nf-schema project.
 6. [Samplesheet conversion order](./samplesheetToListOrder/) contains a pipeline that converts a samplesheet to a list. This example is used to explain the order of the fields in the samplesheet can be changed freely while maintaining the same output list order. The output order is based on the order of the fields in the schema.
 7. [Validate Parameters](./validateParameters/) contains a pipeline that validates the parameters used in a given schema.
 8. [Fail unrecognized parameters](./failUnrecognizedParameters/) contains a pipeline that fails when unrecognized parameters are used in a given schema.
+9. [Warning unrecognized parameters](./warningUnrecognizedParameters/) contains a pipeline that warns when unrecognized parameters are used in a given schema.
