@@ -1,9 +1,13 @@
-N E X T F L O W  ~  version 23.04.1
-Launching `pipeline/main.nf` [pedantic_descartes] DSL2 - revision: 53bd9eac20
 
-ERROR ~ ERROR: Validation of pipeline parameters failed!
+ N E X T F L O W   ~  version 25.04.0
+
+Launching `pipeline/main.nf` [backstabbing_swanson] DSL2 - revision: 9a77abe017
+
+ERROR ~ Validation of pipeline parameters failed!
 
  -- Check '.nextflow.log' file for details
 The following invalid input values have been detected:
 
 * --foo: bar
+
+ -- Check script 'pipeline/main.nf' at line: 4 or see '.nextflow.log' file for more details
