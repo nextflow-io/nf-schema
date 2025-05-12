@@ -1,10 +1,14 @@
-N E X T F L O W  ~  version 23.04.1
-Launching `pipeline/main.nf` [amazing_crick] DSL2 - revision: 53bd9eac20
+
+ N E X T F L O W   ~  version 25.04.0
+
+Launching `pipeline/main.nf` [tender_kalam] DSL2 - revision: 9b42afdac9
 
 ERROR ~ Validation of pipeline parameters failed!
 
  -- Check '.nextflow.log' file for details
 The following invalid input values have been detected:
 
-* --input (samplesheet.txt): "samplesheet.txt" does not match regular expression [^\S+\.(csv|tsv|yml|yaml)$]
-* --input (samplesheet.txt): the file or directory 'samplesheet.txt' does not exist
+* --input (/home/nvnieuwk/Documents/nextflow/nf-schema/examples/validateParameters/pipeline/../samplesheet.txt): "/home/nvnieuwk/Documents/nextflow/nf-schema/examples/validateParameters/pipeline/../samplesheet.txt" does not match regular expression [^\S+\.(csv|tsv|yaml|json)$]
+* --input (/home/nvnieuwk/Documents/nextflow/nf-schema/examples/validateParameters/pipeline/../samplesheet.txt): the file or directory '/home/nvnieuwk/Documents/nextflow/nf-schema/examples/validateParameters/pipeline/../samplesheet.txt' does not exist
+
+ -- Check script 'pipeline/main.nf' at line: 4 or see '.nextflow.log' file for more details
