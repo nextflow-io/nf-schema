@@ -9,15 +9,6 @@ description: Example JSON Schema for a Nextflow pipeline `nextflow_schema.json` 
 The nf-core/rnaseq pipeline was one of the first to have a sample sheet schema.
 You can see this, used for validating sample sheets with `--input` here: [`assets/schema_input.json`](https://github.com/nf-core/rnaseq/blob/5671b65af97fe78a2f9b4d05d850304918b1b86e/assets/schema_input.json).
 
-!!! tip
-
-    Note the approach used for validating filenames in the `fastq_2` column.
-    The column is optional, so if a `pattern` was supplied by itself then validation would fail
-    when no string is supplied.
-
-    Instead, we say that the string must _either_ match that pattern or it must have a
-    `maxLength` of `0` (an empty string).
-
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -71,3 +62,5 @@ It is used as a test fixture in the nf-schema package [here](https://github.com/
 ```json
 --8<-- "plugins/nf-schema/src/testResources/schema_input.json"
 ```
+
+Even more examples can be found in the plugin [`examples` directory](../../examples) in the GitHub repository.

@@ -18,3 +18,5 @@ It is used as a test fixture in the nf-schema package [here](https://github.com/
 ```json
 --8<-- "plugins/nf-schema/src/testResources/nextflow_schema.json"
 ```
+
+Even more examples can be found in the plugin [`examples` directory](../../examples) in the GitHub repository.
