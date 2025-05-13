@@ -1,5 +1,5 @@
 plugins {
-    id 'io.nextflow.nextflow-plugin' version '0.0.1-alpha2'
+    id 'io.nextflow.nextflow-plugin' version '0.0.1-alpha3'
 }
 
 dependencies {
@@ -8,14 +8,15 @@ dependencies {
     implementation 'com.sanctionco.jmail:jmail:1.6.3' // Needed for e-mail format validation
 }
 
-version = '2.5.0dev'
+version = '2.5.0'
 
 nextflowPlugin {
-    nextflowVersion = '24.10.0'
+    nextflowVersion = '25.04.0'
 
     provider = 'nextflow'
     className = 'nextflow.validation.ValidationPlugin'
     extensionPoints = [
+        'nextflow.validation.config.ValidationConfig',
         'nextflow.validation.ValidationExtension',
         'nextflow.validation.ValidationObserverFactory'
     ]
