@@ -16,6 +16,7 @@ nextflowPlugin {
     provider = 'nextflow'
     className = 'nextflow.validation.ValidationPlugin'
     extensionPoints = [
+        'nextflow.validation.config.ValidationConfig',
         'nextflow.validation.ValidationExtension',
         'nextflow.validation.ValidationObserverFactory'
     ]
