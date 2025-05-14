@@ -1,7 +1,7 @@
 package nextflow.validation
 
 import nextflow.Session
-import nextflow.trace.TraceObserver
+import nextflow.trace.TraceObserverV2
 
 import groovy.util.logging.Slf4j
 
@@ -13,7 +13,7 @@ import groovy.util.logging.Slf4j
 
 
 @Slf4j
-class ValidationObserver implements TraceObserver {
+class ValidationObserver implements TraceObserverV2 {
     
     @Override
     void onFlowCreate(Session session) {
@@ -37,6 +37,4 @@ class ValidationObserver implements TraceObserver {
             """)
         }
     }
-
-    void onWorkflowPublish(Object input) {}
 }

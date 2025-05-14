@@ -1,15 +1,15 @@
 package nextflow.validation
 
 import nextflow.Session
-import nextflow.trace.TraceObserver
-import nextflow.trace.TraceObserverFactory
+import nextflow.trace.TraceObserverV2
+import nextflow.trace.TraceObserverFactoryV2
 
 import nextflow.validation.help.HelpObserver
 
-class ValidationObserverFactory implements TraceObserverFactory {
+class ValidationObserverFactory implements TraceObserverFactoryV2 {
 
     @Override
-    Collection<TraceObserver> create(Session session) {
+    Collection<TraceObserverV2> create(Session session) {
         def List observers = [ new ValidationObserver() ]
         // Only enable the help observer when a help message needs to be printed
         if(session.config.navigate('validation.help.enabled')) {
