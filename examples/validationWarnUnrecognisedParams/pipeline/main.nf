@@ -1,5 +1,7 @@
 include { validateParameters } from 'plugin/nf-schema'
 
-validateParameters()
+workflow {
+    validateParameters()
 
-println "Hello World!"
+    println "Hello World!"
+}

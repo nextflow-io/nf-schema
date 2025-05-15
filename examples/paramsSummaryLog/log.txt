@@ -1,18 +1,24 @@
-N E X T F L O W  ~  version 23.04.1
-Launching `pipeline/main.nf` [sleepy_goldberg] DSL2 - revision: 7a280216f3
 
-Core Nextflow options
-  runName    : sleepy_goldberg
-  launchDir  : /Users/demo/GitHub/nextflow-io/nf-schema/examples/paramsSummaryLog
-  workDir    : /Users/demo/GitHub/nextflow-io/nf-schema/examples/paramsSummaryLog/work
-  projectDir : /Users/demo/GitHub/nextflow-io/nf-schema/examples/paramsSummaryLog/pipeline
-  userName   : demo
-  profile    : standard
-  configFiles:
+ N E X T F L O W   ~  version 25.04.0
 
-Input/output options
+Launching `pipeline/main.nf` [angry_poitras] DSL2 - revision: fca518be2f
+
+
+This is a summary message for the pipeline parameters.
+    Input/output options
   input      : samplesheet.csv
   outdir     : results
 
+Core Nextflow options
+  runName    : angry_poitras
+  launchDir  : /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryLog
+  workDir    : /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryLog/work
+  projectDir : /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryLog/pipeline
+  userName   : nvnieuwk
+  profile    : standard
+  configFiles: /home/nvnieuwk/.nextflow/config, /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryLog/pipeline/nextflow.config
+
 !! Only displaying parameters that differ from the pipeline defaults !!
 ------------------------------------------------------
+For more information, please refer to the documentation.
+    

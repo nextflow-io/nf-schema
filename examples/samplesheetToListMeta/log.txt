@@ -1,4 +1,7 @@
-N E X T F L O W  ~  version 23.04.0
-Launching `pipeline/main.nf` [romantic_kare] DSL2 - revision: 74f697a0d9
+
+ N E X T F L O W   ~  version 25.04.0
+
+Launching `pipeline/main.nf` [nostalgic_darwin] DSL2 - revision: 2d849659b1
+
 [[my_sample_id:mysample1, my_strandedness:forward], input1_R1.fq.gz, input1_R2.fq.gz]
 [[my_sample_id:mysample2, my_strandedness:forward], input2_R1.fq.gz, input2_R2.fq.gz]

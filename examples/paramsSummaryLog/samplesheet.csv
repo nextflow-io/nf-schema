@@ -1,3 +1,0 @@
-sample,fastq_1,fastq_2,strandedness
-mysample1,input1_R1.fq.gz,input1_R2.fq.gz,forward
-mysample2,input2_R1.fq.gz,input2_R2.fq.gz,forward
