@@ -53,14 +53,14 @@ You can see this, used for validating sample sheets with `--input` here: [`asset
 
 You can see a very feature-complete example JSON Schema for a sample sheet schema file below.
 
-It is used as a test fixture in the nf-schema package [here](https://github.com/nextflow-io/nf-schema/blob/master/plugins/nf-schema/src/testResources/schema_input.json).
+It is used as a test fixture in the nf-schema package [here](https://github.com/nextflow-io/nf-schema/blob/master/src/testResources/schema_input.json).
 
 !!! note
 
-    More examples can be found in the plugin [`testResources` directory](https://github.com/nextflow-io/nf-schema/blob/master/plugins/nf-schema/src/testResources/).
+    More examples can be found in the plugin [`testResources` directory](https://github.com/nextflow-io/nf-schema/blob/master/src/testResources/).
 
 ```json
---8<-- "plugins/nf-schema/src/testResources/schema_input.json"
+--8<-- "src/testResources/schema_input.json"
 ```
 
 Even more examples can be found in the plugin [`examples` directory](../../examples) in the GitHub repository.

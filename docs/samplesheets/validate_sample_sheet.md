@@ -10,7 +10,7 @@ parse and validate the provided file contents using this JSON schema.
 It can validate CSV, TSV, JSON and YAML files.
 
 The path of the schema file must be relative to the root of the pipeline directory.
-See an example in the `input` field from the [example schema.json](https://raw.githubusercontent.com/nextflow-io/nf-schema/master/plugins/nf-schema/src/testResources/nextflow_schema_with_samplesheet.json#L20).
+See an example in the `input` field from the [example schema.json](https://raw.githubusercontent.com/nextflow-io/nf-schema/master/src/testResources/nextflow_schema_with_samplesheet.json#L20).
 
 ```json
 {

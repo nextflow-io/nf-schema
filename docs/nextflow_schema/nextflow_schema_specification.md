@@ -177,8 +177,8 @@ Variable type, taken from the [JSON schema keyword vocabulary](https://json-sche
 - `number` (float)
 - `integer`
 - `boolean` (true / false)
-- `object` (currently only supported for file validation, see [Nested paramters](#nested-parameters))
-- `array` (currently only supported for file validation, see [Nested paramters](#nested-parameters))
+- `object` (currently only supported for file validation, see [Nested parameters](#nested-parameters))
+- `array` (currently only supported for file validation, see [Nested parameters](#nested-parameters))
 
 Validation checks that the supplied parameter matches the expected type, and will fail with an error if not.
 
