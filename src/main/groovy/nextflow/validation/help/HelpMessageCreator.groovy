@@ -7,6 +7,7 @@ import java.nio.file.Path
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
+import nextflow.validation.utils.AssetsHelper
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Files.paramsLoad
 import static nextflow.validation.utils.Common.getBasePath
@@ -27,12 +28,14 @@ class HelpMessageCreator {
     private final Map colors
     private Integer hiddenParametersCount = 0
     private Map<String,Map> paramsMap
+    private AssetsHelper assetsHelper
 
     // The length of the terminal
     private Integer terminalLength = System.getenv("COLUMNS")?.toInteger() ?: 100
 
     HelpMessageCreator(ValidationConfig inputConfig, Session session) {
         config = inputConfig
+        this.assetsHelper = new AssetsHelper(session.baseDir.toString(), config.parametersSchema, config.monochromeLogs)
         colors = getLogColors(config.monochromeLogs)
         paramsMap = paramsLoad( Path.of(getBasePath(session.baseDir.toString(), config.parametersSchema)) )
         addHelpParameters()
@@ -88,6 +91,23 @@ class HelpMessageCreator {
         afterText += "-${colors.dim}----------------------------------------------------${colors.reset}-\n"
         afterText += config.help.afterText
         return afterText
+    }
+
+    public String getAssetsMessage() {
+        def String assetsMessage = ""
+        
+        // Discover schema files from nextflow_schema.json
+        def Map<String, String> schemaFiles = assetsHelper.discoverSchemaFiles()
+        
+        assetsMessage += "\nFound ${schemaFiles.size()} schema file(s) in nextflow_schema.json:\n"
+        schemaFiles.each { argumentName, schemaPath ->
+            def String helpOutput = assetsHelper.generateSchemaHelp(argumentName, schemaPath)
+            if (helpOutput) {
+                assetsMessage += helpOutput
+            }
+        }
+        
+        return assetsMessage
     }
 
     //
@@ -241,6 +261,10 @@ class HelpMessageCreator {
         paramsMap["Other parameters"][config.help.showHiddenParameter] = [
             "type": "boolean",
             "description": "Show all hidden parameters in the help message. This needs to be used in combination with `--${config.help.shortParameter}` or `--${config.help.fullParameter}`."
+        ]
+        paramsMap["Other parameters"][config.help.showAssetsParameter] = [
+            "type": "boolean",
+            "description": "Show help information for all samplesheet schema files found in the project. This needs to be used in combination with `--${config.help.shortParameter}` or `--${config.help.fullParameter}`."
         ]
     }
 
