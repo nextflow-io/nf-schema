@@ -56,7 +56,7 @@ Or enable the creation of the help message (using `--help`) in the configuration
 ```groovy title="nextflow.config"
 validation {
   help {
-    enabled: true
+    enabled = true
   }
 }
 ```
