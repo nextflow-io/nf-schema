@@ -76,7 +76,7 @@ class HelpConfig implements ConfigScope {
 
         // showHidden
         if(params.containsKey(showHiddenParameter) || config.containsKey("showHidden")) {
-            if(params.get(showHiddenParameter) instanceof Boolean) {
+            if(params.containsKey(showHiddenParameter) && params.get(showHiddenParameter) instanceof Boolean) {
                 showHidden = params.get(showHiddenParameter)
                 log.debug("Set `validation.help.showHidden` to ${showHidden} (Due to --${showHiddenParameter})")
             } else if(config.showHidden instanceof Boolean) {
