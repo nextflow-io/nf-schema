@@ -32,10 +32,6 @@ class ValidationConfig implements ConfigScope {
     final public Boolean monochromeLogs = false
 
     @ConfigOption
-    @Description('Fail if unrecognised parameters are found in the config file. A warning will be given by default.')
-    final public Boolean failUnrecognisedParams = false
-
-    @ConfigOption
     @Description('Fail if unrecognised headers are found in the samplesheets. A warning will be given by default.')
     final public Boolean failUnrecognisedHeaders = false
 
@@ -64,6 +60,9 @@ class ValidationConfig implements ConfigScope {
 
     @Description('Configuration scope for the parameter summary.')
     final public SummaryConfig summary
+
+    @Description('Configuration scope for the logging of the validation plugin.')
+    final public LoggingConfig logging
 
     // Keep the no-arg constructor in order to be able to use the `@ConfigOption` annotation
     ValidationConfig(){}
@@ -183,5 +182,16 @@ class ValidationConfig implements ConfigScope {
             }
         }
         summary = new SummaryConfig(summaryConfig, monochromeLogs)
+
+        // logging
+        def Map loggingConfig = [:]
+        if(config.containsKey("logging")) {
+            if(config.logging instanceof Map) {
+                loggingConfig = config.logging
+            } else {
+                log.warn("Incorrect value detected for `validation.logging`, a map with key-value pairs is expected. Setting the defaults for all logging options.")
+            }
+        }
+        logging = new LoggingConfig(loggingConfig)
     }
 }

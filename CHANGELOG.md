@@ -11,6 +11,20 @@
 
 1. CSV and TSV files with trailing commas or tabs will now be properly sanitized. This fixes issues with CSV and TSV files that contained empty header columns.
 
+## Logging configuration
+
+This update contains a rework of the logging configuration. The `valdiation.logging` configuration scope has been added with options to replace and expand the current logging configuration options. These options can all take the following values:
+
+- `skip`: Skip logging
+- `debug`: Log debug messages (only printed in the `.nextflow.log` file)
+- `info`: Log info messages (also printed in the terminal)
+- `warn`: Log warning messages (also printed in the terminal, but in yellow)
+- `error`: Fail the pipeline and print the error message
+
+| Old option                          | New option                                 | Description                                    |
+| ----------------------------------- | ------------------------------------------ | ---------------------------------------------- |
+| `validation.failUnrecognisedParams` | `validation.logging.logUnrecognisedParams` | The logging level for unrecognised parameters. |
+
 # Version 2.4.2
 
 ## Bug fixes

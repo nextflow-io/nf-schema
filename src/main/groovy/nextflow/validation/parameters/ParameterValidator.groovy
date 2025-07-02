@@ -149,24 +149,19 @@ class ParameterValidator {
         //=====================================================================//
         // Check for nextflow core params and unexpected params
         //=====================================================================//
+        def List<String> unexpectedParams = []
         unevaluatedParams.each{ param ->
             def String dotParam = param.replaceAll("/", ".")
             if (NF_OPTIONS.contains(param)) {
                 errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
             }
             else if (!config.ignoreParams.any { dotParam == it || dotParam.startsWith(it + ".") } ) { // Check if an ignore param is present
-                def String text = "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
-                if(config.failUnrecognisedParams) {
-                    errors << text
-                } else {
-                    warnings << text
-                }
+                unexpectedParams << "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
             }
         }
-        // check for warnings
-        if( this.hasWarnings() ) {
-            def msg = "The following invalid input values have been detected:\n\n" + this.getWarnings().join('\n').trim() + "\n\n"
-            log.warn(msg)
+
+        if (unexpectedParams.size() > 0) {
+            config.logging.logUnrecognisedParams.log("The following invalid input values have been detected:\n\n" + unexpectedParams.join("\n").trim() + "\n")
         }
 
         def List<String> modifiedIgnoreParams = config.ignoreParams.collect { param -> "* --${param}" as String }
