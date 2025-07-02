@@ -27,12 +27,14 @@ class HelpMessageCreator {
     private final Map colors
     private Integer hiddenParametersCount = 0
     private Map<String,Map> paramsMap
+    private final Integer enumLength
 
     // The length of the terminal
     private Integer terminalLength = System.getenv("COLUMNS")?.toInteger() ?: 100
 
     HelpMessageCreator(ValidationConfig inputConfig, Session session) {
         config = inputConfig
+        enumLength = config.help.enumLength
         colors = getLogColors(config.monochromeLogs)
         paramsMap = paramsLoad( Path.of(getBasePath(session.baseDir.toString(), config.parametersSchema)) )
         addHelpParameters()
@@ -184,9 +186,13 @@ class HelpMessageCreator {
             if (paramOptions.enum != null) {
                 def List enums = (List) paramOptions.enum
                 def String chopEnums = enums.join(", ")
-                if(chopEnums.length() > terminalLength){
-                    chopEnums = chopEnums.substring(0, terminalLength-5)
-                    chopEnums = chopEnums.substring(0, chopEnums.lastIndexOf(",")) + ", ..."
+                if(chopEnums.length() > enumLength && enumLength >= 0) {
+                    chopEnums = chopEnums.substring(0, enumLength)
+                    if (chopEnums.contains(",")) {
+                        chopEnums = chopEnums.substring(0, chopEnums.lastIndexOf(",")) + ", ..."
+                    } else {
+                        chopEnums = "..."
+                    }
                 }
                 enumsString = " (accepted: " + chopEnums + ") "
             }
