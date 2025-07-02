@@ -167,6 +167,7 @@ class ValidationExtension extends PluginExtensionPoint {
 
         // Adapt config options with function options
         config.parametersSchema = options.get('parameters_schema', config.get("parametersSchema", "nextflow_schema.json")) as String
+        config.help = config.help ?: [:]
         config.help.enabled = true
         config.help.beforeText = options.get('beforeText', config.help.get("beforeText", "")) as String
         config.help.afterText = options.get('afterText', config.help.get("afterText", "")) as String
