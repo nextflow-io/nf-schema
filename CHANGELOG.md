@@ -7,6 +7,10 @@
 1. The plugin now properly validates cloud storage files instead of skipping them. Exotic errors will be added to the error messages instead of failing the validation outright.
 2. Migrated to the new observer class in Nextflow 25.04.0
 
+## Bug fixes
+
+1. CSV and TSV files with trailing commas or tabs will now be properly sanitized. This fixes issues with CSV and TSV files that contained empty header columns.
+
 # Version 2.4.2
 
 ## Bug fixes
