@@ -161,7 +161,7 @@ class ParameterValidator {
         }
 
         if (unexpectedParams.size() > 0) {
-            config.logging.logUnrecognisedParams.log("The following invalid input values have been detected:\n\n" + unexpectedParams.join("\n").trim() + "\n")
+            config.logging.unrecognisedParams.log("The following invalid input values have been detected:\n\n" + unexpectedParams.join("\n").trim() + "\n")
         }
 
         def List<String> modifiedIgnoreParams = config.ignoreParams.collect { param -> "* --${param}" as String }

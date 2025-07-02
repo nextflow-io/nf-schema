@@ -21,9 +21,10 @@ This update contains a rework of the logging configuration. The `valdiation.logg
 - `warn`: Log warning messages (also printed in the terminal, but in yellow)
 - `error`: Fail the pipeline and print the error message
 
-| Old option                          | New option                                 | Description                                    |
-| ----------------------------------- | ------------------------------------------ | ---------------------------------------------- |
-| `validation.failUnrecognisedParams` | `validation.logging.logUnrecognisedParams` | The logging level for unrecognised parameters. |
+| Old option                           | New option                               | Description                                                 |
+| ------------------------------------ | ---------------------------------------- | ----------------------------------------------------------- |
+| `validation.failUnrecognisedParams`  | `validation.logging.unrecognisedParams`  | The logging level for unrecognised parameters.              |
+| `validation.failUnrecognisedHeaders` | `validation.logging.unrecognisedHeaders` | The logging level for unrecognised headers in samplesheets. |
 
 # Version 2.4.2
 

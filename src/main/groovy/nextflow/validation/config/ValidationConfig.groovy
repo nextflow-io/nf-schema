@@ -32,10 +32,6 @@ class ValidationConfig implements ConfigScope {
     final public Boolean monochromeLogs = false
 
     @ConfigOption
-    @Description('Fail if unrecognised headers are found in the samplesheets. A warning will be given by default.')
-    final public Boolean failUnrecognisedHeaders = false
-
-    @ConfigOption
     @Description('Show hidden parameters in the help message. This is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead.')
     final public Boolean showHiddenParams = false
 
@@ -192,6 +188,6 @@ class ValidationConfig implements ConfigScope {
                 log.warn("Incorrect value detected for `validation.logging`, a map with key-value pairs is expected. Setting the defaults for all logging options.")
             }
         }
-        logging = new LoggingConfig(loggingConfig)
+        logging = new LoggingConfig(loggingConfig, monochromeLogs)
     }
 }
