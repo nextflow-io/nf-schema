@@ -67,7 +67,7 @@ class ConfigTest extends Dsl2Spec{
         def params = [:]
 
         when:
-        new ValidationConfig(config, params)
+        new ValidationConfig(config, session)
         def stdout = capture
             .toString()
             .readLines()
@@ -108,7 +108,7 @@ class ConfigTest extends Dsl2Spec{
         def params = [:]
 
         when:
-        new ValidationConfig(config, params)
+        new ValidationConfig(config, session)
         def stdout = capture
             .toString()
             .readLines()
@@ -149,7 +149,7 @@ class ConfigTest extends Dsl2Spec{
         def params = [:]
 
         when:
-        new ValidationConfig(config, params)
+        new ValidationConfig(config, session)
         def stdout = capture
             .toString()
             .readLines()

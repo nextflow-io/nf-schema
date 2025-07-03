@@ -17,7 +17,7 @@ class HelpObserver implements TraceObserverV2 {
     void onFlowCreate(Session session) {
         // Help message logic
         def Map params = (Map)session.params ?: [:]
-        def ValidationConfig config = new ValidationConfig(session?.config?.navigate('validation') as Map, params)
+        def ValidationConfig config = new ValidationConfig(session?.config?.navigate('validation') as Map, session)
         def Boolean containsFullParameter = params.containsKey(config.help.fullParameter) && params[config.help.fullParameter]
         def Boolean containsShortParameter = params.containsKey(config.help.shortParameter) && params[config.help.shortParameter]
         if (config.help.enabled && (containsFullParameter || containsShortParameter)) {

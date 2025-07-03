@@ -32,7 +32,7 @@ This option can either be a path relative to the root of the pipeline directory 
 
 ## monochromeLogs
 
-This option can be used to turn of the colored logs from nf-validation. This can be useful if you run a Nextflow pipeline in an environment that doesn't support colored logging.
+This option can be used to turn of the colored logs from nf-schema. This can be useful if you run a Nextflow pipeline in an environment that doesn't support colored logging. This option will automatically be set to `true` when ANSI logging is disabled in Nextflow.
 
 ```groovy
 validation.monochromeLogs = <true|false> // default: false

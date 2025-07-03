@@ -4,6 +4,7 @@ import groovy.util.logging.Slf4j
 
 import nextflow.validation.exceptions.SchemaValidationException
 
+import nextflow.Session
 import nextflow.config.schema.ConfigOption
 import nextflow.config.schema.ConfigScope
 import nextflow.config.schema.ScopeName
@@ -68,8 +69,9 @@ class ValidationConfig implements ConfigScope {
     // Keep the no-arg constructor in order to be able to use the `@ConfigOption` annotation
     ValidationConfig(){}
 
-    ValidationConfig(Map map, Map params){
+    ValidationConfig(Map map, Session session){
         def config = map ?: Collections.emptyMap()
+        def params = (Map)session.params ?: [:]
 
         // lenientMode
         if(config.containsKey("lenientMode")) {
@@ -82,8 +84,12 @@ class ValidationConfig implements ConfigScope {
         }
 
         // monochromeLogs
-        if(config.containsKey("monochromeLogs")) {
-            if(config.monochromeLogs instanceof Boolean) {
+        def ansiLog = session?.ansiLog ?: false
+        if(config.containsKey("monochromeLogs") || !ansiLog) {
+            if(!ansiLog) {
+                monochromeLogs = !ansiLog
+                log.debug("Set `validation.monochromeLogs` to ${monochromeLogs} due to the ANSI log settings.")
+            } else if(config.monochromeLogs instanceof Boolean) {
                 monochromeLogs = config.monochromeLogs
                 log.debug("Set `validation.monochromeLogs` to ${monochromeLogs}")
             } else {
