@@ -15,6 +15,7 @@
 ## Bug fixes
 
 1. CSV and TSV files with trailing commas or tabs will now be properly sanitized. This fixes issues with CSV and TSV files that contained empty header columns.
+2. Unidentified parameters are no longer printed out on failure of the parameter validation. This is to prevent a bug where all parameters would be printed out on failure.
 
 # Version 2.4.2
 

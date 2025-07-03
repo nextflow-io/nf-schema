@@ -116,7 +116,10 @@ public class JsonSchemaValidator {
             errors.add(printableError)
 
         }
-        def List<String> unevaluated = getUnevaluated(result, rawJson)
+        def List<String> unevaluated = []
+        if(errors.size() == 0) { 
+            unevaluated = getUnevaluated(result, rawJson)
+        }
         return Tuple.tuple(errors, unevaluated)
     }
 
