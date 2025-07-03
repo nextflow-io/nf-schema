@@ -213,6 +213,16 @@ validation.help.afterText = "Please cite the pipeline owners when using this pip
 
     All color values (like `\033[0;31m`, which means the color red) will be filtered out when `validation.monochromeLogs` is set to `true`
 
+### enumLength
+
+This option can be used to set the maximum length of enum values in the help message. This is useful when the enum values are very long and would make the help message hard to read.
+
+The default value is set to the value in the `COLUMNS` environment variable or 100 characters if that variable isn't set. Set this option to `-1` to disable the length limit.
+
+```groovy
+validation.help.enumLength = <integer>
+```
+
 ## Summary
 
 The `validation.summary` config scope can be used to configure the output of the `paramsSummaryLog()` function.

@@ -2,6 +2,10 @@
 
 # Version 2.5.0
 
+## New features
+
+1. Added a new configuration option: `validation.help.enumLength` which sets the maximum length of enum values in the help message. The default is set to the value in the `COLUMNS` environment variable or 100 character if that variable isn't set.
+
 ## Changes
 
 1. The plugin now properly validates cloud storage files instead of skipping them. Exotic errors will be added to the error messages instead of failing the validation outright.
