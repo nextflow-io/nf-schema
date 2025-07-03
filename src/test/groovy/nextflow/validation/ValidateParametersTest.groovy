@@ -611,8 +611,10 @@ class ValidateParametersTest extends Dsl2Spec{
 
         when:
         def config = ["validation": [
-            "failUnrecognisedParams": true,
-            "monochromeLogs": true
+            "monochromeLogs": true,
+            "logging": [
+                "unrecognisedParams": "error"
+            ]
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture

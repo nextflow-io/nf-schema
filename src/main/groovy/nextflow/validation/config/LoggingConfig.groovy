@@ -33,7 +33,7 @@ class LoggingConfig implements ConfigScope {
         def config = map ?: [:]
 
         // unrecognisedParams
-        def String level = config.get("unrecognisedParams", "warn")
+        def String level = config.get("unrecognisedParams") instanceof CharSequence ? config.get("unrecognisedParams") : "warn"
         if(OPTIONS.contains(level)) {
             if(config.get("unrecognisedParams")) {
                 log.debug("Set `validation.unrecognisedParams` to ${level}")
@@ -45,7 +45,7 @@ class LoggingConfig implements ConfigScope {
         }
 
         // unrecognisedHeaders
-        level = config.get("unrecognisedHeaders", "warn")
+        level = config.get("unrecognisedHeaders") instanceof CharSequence ? config.get("unrecognisedHeaders") : "warn"
         if(OPTIONS.contains(level)) {
             if(config.get("unrecognisedHeaders")) {
                 log.debug("Set `validation.unrecognisedHeaders` to ${level}")
