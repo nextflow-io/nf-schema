@@ -70,7 +70,7 @@ class ParamsSummaryLogTest extends Dsl2Spec{
     def 'should print params summary' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def  SCRIPT_TEXT = """
+        def  SCRIPT = """
             params.outdir = "outDir"
             include { paramsSummaryLog } from 'plugin/nf-schema'
             
@@ -79,7 +79,8 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         """
 
         when:
-        dsl_eval(SCRIPT_TEXT)
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
@@ -99,7 +100,7 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         then:
         noExceptionThrown()
         stdout.size() == 11
-        stdout ==~ /.*\[0;34moutdir     : .\[0;32moutDir.*/
+        stdout ==~ /.*outdir     : outDir.*/
     }
 
     def 'should print params summary - nested parameters' () {
@@ -145,7 +146,7 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         then:
         noExceptionThrown()
         stdout.size() == 11
-        stdout ==~ /.*\[0;34mthis.is.so.deep: .\[0;32mchanged_value.*/
+        stdout ==~ /.*this.is.so.deep: changed_value.*/
     }
 
     def 'should print params summary - adds before and after text' () {
@@ -191,7 +192,7 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         then:
         noExceptionThrown()
         stdout.size() == 14
-        stdout ==~ /.*\[0;34moutdir     : .\[0;32moutDir.*/
+        stdout ==~ /.*outdir     : outDir.*/
     }
 
     def 'should print params summary - nested parameters - hide params' () {
@@ -242,7 +243,7 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         then:
         noExceptionThrown()
         stdout.size() == 10
-        stdout !=~ /.*\[0;34mthis.is.so.deep: .\[0;32mchanged_value.*/
+        stdout !=~ /.*this.is.so.deep: changed_value.*/
     }
 
     def 'should print params summary - hide params' () {
@@ -283,6 +284,6 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         then:
         noExceptionThrown()
         stdout.size() == 9
-        stdout !=~ /.*\[0;34moutdir     : .\[0;32moutDir.*/
+        stdout !=~ /.*outdir     : outDir.*/
     }
 }

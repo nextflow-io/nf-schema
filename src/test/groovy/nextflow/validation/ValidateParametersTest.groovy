@@ -246,7 +246,7 @@ class ValidateParametersTest extends Dsl2Spec{
         then:
         def error = thrown(SchemaValidationException)
         def errorMessages = error.message.readLines()
-        errorMessages[0] == "\033[0;31mThe following invalid input values have been detected:"
+        errorMessages[0] == "The following invalid input values have been detected:"
         errorMessages[1] == ""
         errorMessages[2] == "* --input (src/testResources/wrong.csv): Validation of file failed:"
         errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
@@ -280,7 +280,7 @@ class ValidateParametersTest extends Dsl2Spec{
         then:
         def error = thrown(SchemaValidationException)
         def errorMessages = error.message.readLines()
-        errorMessages[0] == "\033[0;31mThe following invalid input values have been detected:"
+        errorMessages[0] == "The following invalid input values have been detected:"
         errorMessages[1] == ""
         errorMessages[2] == "* --input (src/testResources/wrong.tsv): Validation of file failed:"
         errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
@@ -314,7 +314,7 @@ class ValidateParametersTest extends Dsl2Spec{
         then:
         def error = thrown(SchemaValidationException)
         def errorMessages = error.message.readLines()
-        errorMessages[0] == "\033[0;31mThe following invalid input values have been detected:"
+        errorMessages[0] == "The following invalid input values have been detected:"
         errorMessages[1] == ""
         errorMessages[2] == "* --input (src/testResources/wrong.yaml): Validation of file failed:"
         errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
@@ -348,7 +348,7 @@ class ValidateParametersTest extends Dsl2Spec{
         then:
         def error = thrown(SchemaValidationException)
         def errorMessages = error.message.readLines()
-        errorMessages[0] == "\033[0;31mThe following invalid input values have been detected:"
+        errorMessages[0] == "The following invalid input values have been detected:"
         errorMessages[1] == ""
         errorMessages[2] == "* --input (src/testResources/wrong.json): Validation of file failed:"
         errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"

@@ -120,9 +120,9 @@ class HelpConfig implements ConfigScope {
         if(config.containsKey("beforeText")) {
             if(config.beforeText instanceof CharSequence) {
                 if(monochromeLogs) {
-                    beforeText = config.beforeText
-                } else {
                     beforeText = removeColors(config.beforeText)
+                } else {
+                    beforeText = config.beforeText
                 }
                 log.debug("Set `validation.help.beforeText` to ${beforeText}")
             } else {
@@ -134,9 +134,9 @@ class HelpConfig implements ConfigScope {
         if(config.containsKey("afterText")) {
             if(config.afterText instanceof CharSequence) {
                 if(monochromeLogs) {
-                    afterText = config.afterText
-                } else {
                     afterText = removeColors(config.afterText)
+                } else {
+                    afterText = config.afterText
                 }
                 log.debug("Set `validation.help.afterText` to ${afterText}")
             } else {
