@@ -61,11 +61,7 @@ class SamplesheetConverter {
         if(unrecognisedHeaders.size() > 0) {
             def String processedHeaders = unrecognisedHeaders.collect { "\t- ${it}" }.join("\n")
             def String msg = "Found the following unidentified headers in ${fileName}:\n${processedHeaders}\n" as String
-            if( config.failUnrecognisedHeaders ) {
-                throw new SchemaValidationException(msg)
-            } else {
-                log.warn(msg)
-            }
+            config.logging.unrecognisedHeaders.log(msg)
         }
     }
 
