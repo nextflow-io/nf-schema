@@ -18,7 +18,6 @@ class HelpConfig {
     final public CharSequence showHiddenParameter = "showHidden"
     final public CharSequence shortParameter = "help"
     final public CharSequence fullParameter = "helpFull"
-    final public CharSequence showAssetsParameter = "showAssets"
     final public CharSequence beforeText = ""
     final public CharSequence afterText = ""
     final public CharSequence command = ""
@@ -79,15 +78,6 @@ class HelpConfig {
             }
         }
 
-        // sampleSheetParameter
-        if(config.containsKey("showAssetsParameter")) {
-            if(config.showAssetsParameter instanceof CharSequence) {
-                showAssetsParameter = config.showAssetsParameter
-                log.debug("Set `validation.help.showAssetsParameter` to ${showAssetsParameter}")
-            } else {
-                log.warn("Incorrect value detected for `validation.help.showAssetsParameter`, a string is expected. Defaulting to `${showAssetsParameter}`")
-            }
-        }
 
         // beforeText
         if(config.containsKey("beforeText")) {

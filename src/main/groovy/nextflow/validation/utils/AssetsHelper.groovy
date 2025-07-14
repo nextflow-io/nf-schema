@@ -29,31 +29,28 @@ class AssetsHelper {
     }
 
     /**
-     * Discover schema files referenced in nextflow_schema.json
-     * @return Map of argument names to schema file paths found in the nextflow_schema.json
+     * Discover schema file for a specific parameter
+     * @param param Parameter name to look for
+     * @return Schema file path if found, null otherwise
      */
-    Map<String, String> discoverSchemaFiles() {
-        def Map<String, String> schemaFiles = new HashMap<>()
-        
+    String discoverSchemaFile(String param) {
         try {
             def Path schemaPath = Paths.get(getBasePath(baseDir, schemaFileName))
             if (!Files.exists(schemaPath)) {
                 log.warn("nextflow_schema.json not found at: ${schemaPath}")
-                return [:]
+                return null
             }
 
             def JsonSlurper jsonSlurper = new JsonSlurper()
             def Map schema = jsonSlurper.parse(schemaPath.toFile()) as Map
             
-            // Search for schema references in the JSON structure
-            findSchemaReferences(schema, schemaFiles, "")
+            // Search for the specific parameter's schema reference
+            return findSchemaReference(schema, param, "")
             
         } catch (Exception e) {
-            log.error("Error discovering schema files: ${e.message}")
-            return [:]
+            log.error("Error discovering schema file for parameter ${param}: ${e.message}")
+            return null
         }
-        
-        return schemaFiles
     }
 
     /**
@@ -82,33 +79,49 @@ class AssetsHelper {
     }
 
     /**
-     * Recursively search for schema references in JSON structure
+     * Recursively search for a specific parameter's schema reference in JSON structure
      */
-    private void findSchemaReferences(Object obj, Map<String, String> schemaFiles, String currentPath) {
+    private String findSchemaReference(Object obj, String targetParam, String currentPath) {
         if (obj instanceof Map) {
             Map map = obj as Map
-            map.each { key, value ->
+            for (entry in map) {
+                def String key = entry.key
+                def value = entry.value
                 def String newPath = currentPath ? "${currentPath}.${key}" : key
+                
                 if (key == "schema" && value instanceof String) {
                     // Extract the argument name from the current path
                     def String argumentName = currentPath.split('\\.').last()
-                    schemaFiles.put(argumentName, value as String)
+                    if (argumentName == targetParam) {
+                        return value as String
+                    }
                 } else if (key == "properties" && value instanceof Map) {
                     // When we find properties, we're at the level where argument names are defined
                     Map properties = value as Map
-                    properties.each { propKey, propValue ->
-                        findSchemaReferences(propValue, schemaFiles, propKey)
+                    for (propEntry in properties) {
+                        def String propKey = propEntry.key
+                        def propValue = propEntry.value
+                        if (propKey == targetParam) {
+                            def String result = findSchemaReference(propValue, targetParam, propKey)
+                            if (result) return result
+                        } else {
+                            def String result = findSchemaReference(propValue, targetParam, propKey)
+                            if (result) return result
+                        }
                     }
                 } else {
-                    findSchemaReferences(value, schemaFiles, newPath)
+                    def String result = findSchemaReference(value, targetParam, newPath)
+                    if (result) return result
                 }
             }
         } else if (obj instanceof List) {
             List list = obj as List
-            list.each { item ->
-                findSchemaReferences(item, schemaFiles, currentPath)
+            for (item in list) {
+                def String result = findSchemaReference(item, targetParam, currentPath)
+                if (result) return result
             }
         }
+        return null
     }
 
     /**
@@ -165,23 +178,22 @@ class AssetsHelper {
     private String formatObjectSchema(Map properties, List required = []) {
         def StringBuilder help = new StringBuilder()
         
-        // Show required fields first if any
-        if (required && required.size() > 0) {
-            help.append("${colors.bold}Required fields${colors.reset} (${colors.red}*${colors.reset}): ${required.join(', ')}\n")
-        }
         help.append("${colors.bold}Fields:${colors.reset}\n")
-
         
         // Calculate max width for alignment
         def Integer maxWidth = properties.keySet().collect { it.length() }.max() ?: 0
         maxWidth = Math.max(maxWidth, 10)
         
         properties.each { String key, Map property ->
-            def String requiredMarker = required?.contains(key) ? "(${colors.red}*${colors.reset}) " : "( ) "
             def String type = property.type ?: "string"
             def String typeStr = "[${type}]"
+            def String requiredStr = required?.contains(key) ? "[required]" : ""
             
-            help.append("  ${requiredMarker}${colors.cyan}${key.padRight(maxWidth)}${colors.reset} ${colors.dim}${typeStr.padRight(10)}${colors.reset}")
+            help.append("  ${colors.cyan}${key.padRight(maxWidth)}${colors.reset} ${colors.dim}${typeStr.padRight(10)}${colors.reset}")
+            
+            if (requiredStr) {
+                help.append(" ${colors.dim}${requiredStr}${colors.reset}")
+            }
             
             if (property.description) {
                 help.append(" ${property.description}")

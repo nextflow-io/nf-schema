@@ -64,6 +64,15 @@ class HelpMessageCreator {
                 paramOptions.properties = removeHidden(paramOptions.properties)
             }
             helpMessage = getDetailedHelpString(param, paramOptions)
+            
+            // Check if this parameter has an associated schema file and append schema help
+            def String schemaPath = assetsHelper.discoverSchemaFile(paramNames[0])
+            if (schemaPath) {
+                def String schemaHelp = assetsHelper.generateSchemaHelp(paramNames[0], schemaPath)
+                if (schemaHelp) {
+                    helpMessage += schemaHelp
+                }
+            }
         } else {
             helpMessage = getGroupHelpString()
         }
@@ -93,22 +102,6 @@ class HelpMessageCreator {
         return afterText
     }
 
-    public String getAssetsMessage() {
-        def String assetsMessage = ""
-        
-        // Discover schema files from nextflow_schema.json
-        def Map<String, String> schemaFiles = assetsHelper.discoverSchemaFiles()
-        
-        assetsMessage += "\nFound ${schemaFiles.size()} schema file(s) in nextflow_schema.json:\n"
-        schemaFiles.each { argumentName, schemaPath ->
-            def String helpOutput = assetsHelper.generateSchemaHelp(argumentName, schemaPath)
-            if (helpOutput) {
-                assetsMessage += helpOutput
-            }
-        }
-        
-        return assetsMessage
-    }
 
     //
     // Get a detailed help string from one parameter
@@ -261,10 +254,6 @@ class HelpMessageCreator {
         paramsMap["Other parameters"][config.help.showHiddenParameter] = [
             "type": "boolean",
             "description": "Show all hidden parameters in the help message. This needs to be used in combination with `--${config.help.shortParameter}` or `--${config.help.fullParameter}`."
-        ]
-        paramsMap["Other parameters"][config.help.showAssetsParameter] = [
-            "type": "boolean",
-            "description": "Show help information for all samplesheet schema files found in the project. This needs to be used in combination with `--${config.help.shortParameter}` or `--${config.help.fullParameter}`."
         ]
     }
 

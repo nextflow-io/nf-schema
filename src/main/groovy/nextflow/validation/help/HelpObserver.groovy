@@ -20,10 +20,8 @@ class HelpObserver implements TraceObserver {
         def ValidationConfig config = new ValidationConfig(session?.config?.navigate('validation') as Map, params)
         def Boolean containsFullParameter = params.containsKey(config.help.fullParameter) && params[config.help.fullParameter]
         def Boolean containsShortParameter = params.containsKey(config.help.shortParameter) && params[config.help.shortParameter]
-        def Boolean containsshowAssetsParameter = params.containsKey(config.help.showAssetsParameter) && params[config.help.showAssetsParameter]
         if (config.help.enabled && (containsFullParameter || containsShortParameter)) {
             def String help = ""
-            def String assetsHelp = ""
             def HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
             help += helpCreator.getBeforeText()
             if (containsFullParameter) {
@@ -33,10 +31,6 @@ class HelpObserver implements TraceObserver {
                 log.debug("Printing out the short help message")
                 def paramValue = params.get(config.help.shortParameter)
                 help += helpCreator.getShortMessage(paramValue instanceof String ? paramValue : "")
-            }
-            if (containsshowAssetsParameter) {
-                log.debug("Printing out the assets help message")
-                help += helpCreator.getAssetsMessage()
             }
             help += helpCreator.getAfterText()
             log.info(help)
