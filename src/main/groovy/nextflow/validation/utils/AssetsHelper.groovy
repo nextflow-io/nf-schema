@@ -131,8 +131,7 @@ class AssetsHelper {
         def StringBuilder help = new StringBuilder()
         
         // Header
-        help.append("\n${colors.underlined}${colors.bold}Argument: --${argumentName}${colors.reset}\n")
-        help.append("${colors.bold}Schema: ${schemaPath}${colors.reset}\n")
+        help.append("== Simplified schema below ==${colors.reset}\n")
         
         if (schema.title) {
             help.append("${colors.bold}Title:${colors.reset} ${schema.title}\n")
@@ -189,7 +188,7 @@ class AssetsHelper {
             def String typeStr = "[${type}]"
             def String requiredStr = required?.contains(key) ? "[required]" : ""
             
-            help.append("  ${colors.cyan}${key.padRight(maxWidth)}${colors.reset} ${colors.dim}${typeStr.padRight(10)}${colors.reset}")
+            help.append("    ${colors.cyan}${key.padRight(maxWidth)}${colors.reset} ${colors.dim}${typeStr.padRight(10)}${colors.reset}")
             
             if (requiredStr) {
                 help.append(" ${colors.dim}${requiredStr}${colors.reset}")
@@ -212,7 +211,7 @@ class AssetsHelper {
             
             // Add error message if available
             if (property.errorMessage) {
-                help.append("\n    ${colors.yellow}Note: ${property.errorMessage}${colors.reset}")
+                help.append("\n      ${colors.yellow}Note: ${property.errorMessage}${colors.reset}")
             }
             
             help.append("\n")

@@ -563,19 +563,18 @@ file with 3 columns, and a header row. See [usage
 docs](https://nf-co.re/testpipeline/usage#samplesheet-input). 
     exists     : true
 
-Argument: --input
-Schema: src/testResources/samplesheet_schema.json
+== Simplified schema below ==
 Title: Test schema for samplesheets
 Description: Schema for the file provided with params.input
 Fields:
-  sample       [string]   [required] Sample name to use in the analysis (pattern: ^\\S+\$)
-    Note: Sample name must be provided and cannot contain spaces
-  fastq_1      [string]   [required] FastQ file for R1 reads (pattern: ^\\S+\\.f(ast)?q\\.gz\$)
-    Note: FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
-  fastq_2      [string]   FastQ file for R2 reads
-    Note: FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
-  strandedness [string]   [required] Strandedness of the library (allowed: forward, reverse, unstranded)
-    Note: Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'
+    sample       [string]   [required] Sample name to use in the analysis (pattern: ^\\S+\$)
+      Note: Sample name must be provided and cannot contain spaces
+    fastq_1      [string]   [required] FastQ file for R1 reads (pattern: ^\\S+\\.f(ast)?q\\.gz\$)
+      Note: FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
+    fastq_2      [string]   FastQ file for R2 reads
+      Note: FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
+    strandedness [string]   [required] Strandedness of the library (allowed: forward, reverse, unstranded)
+      Note: Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'
 
 """
         def resultHelp = help.readLines()
