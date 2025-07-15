@@ -3,24 +3,62 @@ package nextflow.validation.config
 import groovy.util.logging.Slf4j
 
 import static nextflow.validation.utils.Colors.removeColors
+
+import nextflow.config.schema.ConfigOption
+import nextflow.config.schema.ConfigScope
+import nextflow.config.schema.ScopeName
+import nextflow.script.dsl.Description
+
 /**
- * This class allows to model a specific configuration, extracting values from a map and converting
+ * This class is used to read, parse and validate the `validation.help` config block.
  *
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  *
  */
 
 @Slf4j
-class HelpConfig {
+class HelpConfig implements ConfigScope {
+
+    @ConfigOption
+    @Description('Enable the help message.')
     final public Boolean enabled = false
+
+    @ConfigOption
+    @Description('Show hidden parameters in the help message.')
     final public Boolean showHidden = false
 
+    @ConfigOption
+    @Description('The parameter to use to show hidden parameters in the help message.')
     final public CharSequence showHiddenParameter = "showHidden"
+
+    @ConfigOption
+    @Description('The parameter to use to show the short help message.')
     final public CharSequence shortParameter = "help"
+
+    @ConfigOption
+    @Description('The parameter to use to show the full help message.')
     final public CharSequence fullParameter = "helpFull"
+
+    @ConfigOption
+    @Description('The text to show before the help message.')
     final public CharSequence beforeText = ""
+
+    @ConfigOption
+    @Description('The text to show after the help message.')
     final public CharSequence afterText = ""
+
+    @ConfigOption
+    @Description('An example command of how to run the pipeline.')
     final public CharSequence command = ""
+
+    @ConfigOption
+    @Description('''
+    The maximum length in characters of the enum preview in the help message.
+    This defaults to the length of the terminal window specified by the `COLUMNS` environment variable or 100 characters if this variable hasn't been set.
+    If the enum preview exceeds this length, it will be truncated.
+    Set this option to -1 to disable the enum preview truncation.
+    ''')
+    final public Integer enumLength = System.getenv("COLUMNS")?.toInteger() ?: 100
 
     HelpConfig(Map map, Map params, Boolean monochromeLogs, Boolean showHiddenParams) {
         def config = map ?: Collections.emptyMap()
@@ -47,7 +85,7 @@ class HelpConfig {
 
         // showHidden
         if(params.containsKey(showHiddenParameter) || config.containsKey("showHidden")) {
-            if(params.get(showHiddenParameter) instanceof Boolean) {
+            if(params.containsKey(showHiddenParameter) && params.get(showHiddenParameter) instanceof Boolean) {
                 showHidden = params.get(showHiddenParameter)
                 log.debug("Set `validation.help.showHidden` to ${showHidden} (Due to --${showHiddenParameter})")
             } else if(config.showHidden instanceof Boolean) {
@@ -118,6 +156,16 @@ class HelpConfig {
                 log.debug("Set `validation.help.command` to ${command}")
             } else {
                 log.warn("Incorrect value detected for `validation.help.command`, a string is expected. Defaulting to `${command}`")
+            }
+        }
+
+        // enumLength
+        if(config.containsKey("enumLength")) {
+            if(config.enumLength instanceof Integer) {
+                enumLength = config.enumLength
+                log.debug("Set `validation.help.enumLength` to ${enumLength}")
+            } else {
+                log.warn("Incorrect value detected for `validation.help.enumLength`, an integer is expected. Defaulting to `${enumLength}`")
             }
         }
     }

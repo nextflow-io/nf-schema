@@ -151,34 +151,47 @@ class ValidationExtension extends PluginExtensionPoint {
     //
     @Function
     public String paramsHelp(
-        Map options = [:],
-        String command
+        final Map options = [:]
     ) {
-        if (!options.containsKey("hideWarning") || options.hideWarning == false) {
-            log.warn("""
-Using `paramsHelp()` is not recommended. Check out the help message migration guide: https://nextflow-io.github.io/nf-schema/latest/migration_guide/#updating-the-help-message
-If you intended to use this function, please add the following option to the input of the function:
-    `hideWarning: true`
+        return paramsHelp(options, "")
+    }
 
-Please contact the pipeline maintainer(s) if you see this warning as a user.
-            """)
-        }
-
+    @Function
+    public String paramsHelp(
+        final Map options = [:],
+        final String parameter
+    ) {
+        log.debug "Generating help message with options: ${options}"
         def Map params = session.params
-        def Map validationConfig = (Map)session.config.navigate("validation") ?: [:]
-        validationConfig.parametersSchema = options.containsKey('parameters_schema') ? options.parameters_schema as String : validationConfig.parametersSchema
-        validationConfig.help = (Map)(validationConfig.help ?: [:]) + [command: command, beforeText: "", afterText: ""]
-        def ValidationConfig copyConfig = new ValidationConfig(validationConfig, params)
-        def HelpMessageCreator helpCreator = new HelpMessageCreator(copyConfig, session)
+        def Map config = session.config.navigate("validation") ?: [:]
+
+        // Adapt config options with function options
+        config.parametersSchema = options.get('parameters_schema', config.get("parametersSchema", "nextflow_schema.json")) as String
+        config.help = config.help ?: [:]
+        config.help.enabled = true
+        config.help.beforeText = options.get('beforeText', config.help.get("beforeText", "")) as String
+        config.help.afterText = options.get('afterText', config.help.get("afterText", "")) as String
+        config.help.command = options.get('command', config.help.get("command", "")) as String
+        config.help.showHidden = options.get('showHidden', false) as Boolean
+
+        // Get function logic options
+        def Boolean fullHelp = options.get('fullHelp') as Boolean ?: false
+
+        // Generate the new help config
+        def final ValidationConfig functionConfig = new ValidationConfig(config, params)
+
+        // Create the help message
+        def HelpMessageCreator helpCreator = new HelpMessageCreator(functionConfig, session)
         def String help = helpCreator.getBeforeText()
-        def List<String> helpBodyLines = helpCreator.getShortMessage(params.help && params.help instanceof String ? params.help : "").readLines()
-        help += helpBodyLines.findAll {
+        def String helpBodyLines = fullHelp ? helpCreator.getFullMessage() : helpCreator.getShortMessage(parameter)
+        help += helpBodyLines.readLines().findAll {
             // Remove added ungrouped help parameters
-            !it.startsWith("--${copyConfig.help.shortParameter}") && 
-            !it.startsWith("--${copyConfig.help.fullParameter}") && 
-            !it.startsWith("--${copyConfig.help.showHiddenParameter}")
+            !it.startsWith("--${functionConfig.help.shortParameter}") && 
+            !it.startsWith("--${functionConfig.help.fullParameter}") && 
+            !it.startsWith("--${functionConfig.help.showHiddenParameter}")
         }.join("\n")
         help += helpCreator.getAfterText()
+        log.debug "Done generating help message"
         return help
     }
 

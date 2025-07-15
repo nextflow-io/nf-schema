@@ -530,7 +530,6 @@ or `--helpFull`.
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-
     def 'should get integrated schema help with parameter help' () {
         given:
         def validationConfig = [
@@ -583,5 +582,55 @@ Fields:
             resultHelp.removeElement(it)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+
+    def 'should be able to limit the enum length' () {
+        given:
+        def validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                enabled: true,
+                enumLength: 10,
+                showHidden: true
+            ]
+        ]
+        def params = [:]
+        def config = new ValidationConfig(validationConfig, params)
+        def helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        def help = helpCreator.getShortMessage("")
+
+        then:
+        noExceptionThrown()
+        def expectedHelp = "  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, ...) [default: copy] "
+        assert help.readLines().find { it.startsWith("  --publish_dir_mode")} == expectedHelp
+    }
+
+    def 'should be able to set unlimited enum length' () {
+        given:
+        def validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                enabled: true,
+                enumLength: -1,
+                showHidden: true
+            ]
+        ]
+        def params = [:]
+        def config = new ValidationConfig(validationConfig, params)
+        def helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        def help = helpCreator.getShortMessage("")
+
+        then:
+        noExceptionThrown()
+        def expectedHelp = """  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, rellink, link, copy, 
+copyNoFollow, move) [default: copy] """
+        assert help.readLines()[35..36].join("\n") == expectedHelp
     }
 }

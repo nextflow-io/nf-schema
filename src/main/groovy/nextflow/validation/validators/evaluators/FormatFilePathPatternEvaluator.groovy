@@ -24,21 +24,23 @@ class FormatFilePathPatternEvaluator implements Evaluator {
         }
 
         def String value = node.asString()
+        def List<Path> files
 
-        // Skip validation of S3 paths for now
-        if (value.startsWith('s3://') || value.startsWith('az://') || value.startsWith('gs://')) {
-            log.debug("S3 paths are not supported by 'FormatFilePathPatternEvaluator': '${value}'")
-            return Evaluator.Result.success()
+        try {
+            files = Nextflow.files(value)
+            files.each { file ->
+                file.exists() // Do an exists check to see if the file can be correctly accessed
+            }
+        } catch (Exception e) {
+            return Evaluator.Result.failure("could not validate file format of '${value}': ${e.message}" as String)
         }
-
         // Actual validation logic
-        def List<Path> files = Nextflow.files(value)
         def List<String> errors = []
 
         if(files.size() == 0) {
             return Evaluator.Result.failure("No files were found using the glob pattern '${value}'" as String)
         }
-        for( file : files ) {
+        files.each { file ->
             if (file.isDirectory()) {
                 errors.add("'${file.toString()}' is not a file, but a directory" as String)
             }

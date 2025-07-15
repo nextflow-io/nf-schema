@@ -3,7 +3,7 @@ package nextflow.validation.help
 import groovy.util.logging.Slf4j
 
 import nextflow.processor.TaskHandler
-import nextflow.trace.TraceObserver
+import nextflow.trace.TraceObserverV2
 import nextflow.trace.TraceRecord
 import nextflow.Session
 
@@ -11,7 +11,7 @@ import nextflow.validation.help.HelpMessageCreator
 import nextflow.validation.config.ValidationConfig
 
 @Slf4j
-class HelpObserver implements TraceObserver {
+class HelpObserver implements TraceObserverV2 {
     
     @Override
     void onFlowCreate(Session session) {
