@@ -5,6 +5,7 @@
 ## New features
 
 1. Added a new configuration option: `validation.help.enumLength` which sets the maximum length of enum values in the help message. The default is set to the value in the `COLUMNS` environment variable or 100 character if that variable isn't set.
+2. Added top-level schema description for detailed help `--help <args>`. If `<args>` is associated with a schema, then the top-level fields will be shown similarly to `--help` for the main schema (#146).
 
 ## Changes
 
