@@ -518,7 +518,7 @@ help message of that parameter will be printed.
 --helpFull     [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden   [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
 or `--helpFull`. 
- 
+
 ------------------------------------------------------
 
 """
@@ -529,6 +529,61 @@ or `--helpFull`.
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
+
+    def 'should get integrated schema help with parameter help' () {
+        given:
+        def validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema_with_samplesheet.json',
+            help: [
+                enabled: true
+            ]
+        ]
+        def params = [:]
+        def config = new ValidationConfig(validationConfig, params)
+        def helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        def help = helpCreator.getShortMessage("input")
+
+        then:
+        println help
+        noExceptionThrown()
+        def expectedHelp = """--input
+    type       : string
+    format     : file-path
+    mimetype   : text/csv
+    pattern    : ^\\S+\\.csv\$
+    schema     : src/testResources/samplesheet_schema.json
+    description: Path to comma-separated file containing information about the samples in the experiment.
+    help_text  : You will need to create a design file with information about the samples in your experiment before 
+running the pipeline. Use this parameter to specify its location. It has to be a comma-separated 
+file with 3 columns, and a header row. See [usage 
+docs](https://nf-co.re/testpipeline/usage#samplesheet-input). 
+    exists     : true
+
+== Top-level schema below ==
+Title: Test schema for samplesheets
+Description: Schema for the file provided with params.input
+Fields:
+    sample       [string]   [required] Sample name to use in the analysis (pattern: ^\\S+\$)
+      Note: Sample name must be provided and cannot contain spaces
+    fastq_1      [string]   [required] FastQ file for R1 reads (pattern: ^\\S+\\.f(ast)?q\\.gz\$)
+      Note: FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
+    fastq_2      [string]   FastQ file for R2 reads
+      Note: FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
+    strandedness [string]   [required] Strandedness of the library (allowed: forward, reverse, unstranded)
+      Note: Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'
+
+"""
+        def resultHelp = help.readLines()
+        expectedHelp.readLines().each {
+            assert help.contains(it)
+            resultHelp.removeElement(it)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
 
     def 'should be able to limit the enum length' () {
         given:

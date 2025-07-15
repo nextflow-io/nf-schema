@@ -116,6 +116,7 @@ class HelpConfig implements ConfigScope {
             }
         }
 
+
         // beforeText
         if(config.containsKey("beforeText")) {
             if(config.beforeText instanceof CharSequence) {
