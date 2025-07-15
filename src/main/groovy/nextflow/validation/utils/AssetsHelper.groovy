@@ -131,7 +131,7 @@ class AssetsHelper {
         def StringBuilder help = new StringBuilder()
         
         // Header
-        help.append("== Simplified schema below ==${colors.reset}\n")
+        help.append("== Top-level schema below ==${colors.reset}\n")
         
         if (schema.title) {
             help.append("${colors.bold}Title:${colors.reset} ${schema.title}\n")

@@ -563,7 +563,7 @@ file with 3 columns, and a header row. See [usage
 docs](https://nf-co.re/testpipeline/usage#samplesheet-input). 
     exists     : true
 
-== Simplified schema below ==
+== Top-level schema below ==
 Title: Test schema for samplesheets
 Description: Schema for the file provided with params.input
 Fields:
