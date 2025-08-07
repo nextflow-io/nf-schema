@@ -136,8 +136,9 @@ class ValidationExtension extends PluginExtensionPoint {
         } else {
             jsonObj = input
         }
-        def String schemaString = Files.readString( Path.of(getBasePath(session.baseDir.toString(), schema)) )
-        def List<String> errors = validator.validateObj(jsonObj, schemaString)[0]
+        def String schemaFilename = getBasePath(session.baseDir.toString(), schema)
+        def String schemaString = Files.readString(Path.of(schemaFilename))
+        def List<String> errors = validator.validateObj(jsonObj, schemaString, schemaFilename)[0]
         if(exitOnError && errors != []) {
             def colors = getLogColors(config.monochromeLogs)
             def String msg = "${colors.red}${errors.join('\n')}${colors.reset}\n"

@@ -56,7 +56,7 @@ class SchemaEvaluator implements Evaluator {
         def String schemaContents = Files.readString( Path.of(schemaFull) )
         def validator = new JsonSchemaValidator(config)
 
-        def Tuple2<List<String>,List<String>> validationResult = validator.validate(json, schemaContents)
+        def Tuple2<List<String>,List<String>> validationResult = validator.validate(json, schemaContents, schemaFull.toString())
         def validationErrors = validationResult[0]
         if (validationErrors) {
             def List<String> errors = ["Validation of file failed:"] + validationErrors.collect { "\t${it}" as String}

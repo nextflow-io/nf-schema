@@ -12,6 +12,7 @@
 1. The plugin now properly validates cloud storage files instead of skipping them. Exotic errors will be added to the error messages instead of failing the validation outright.
 2. Migrated to the new observer class in Nextflow 25.04.0
 3. Rework the deprecated `paramsHelp()` function to allow pipeline developers a fully fledged alternative to the help messages created via the configuration options. This change enables the use of dynamic help message with the strict configuration syntax introduced in Nextflow 25.04.0.
+4. Updated the error message when the JSON schema file is invalid to include the full file name.
 
 ## Bug fixes
 

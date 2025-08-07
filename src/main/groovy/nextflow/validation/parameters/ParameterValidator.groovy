@@ -134,14 +134,15 @@ class ParameterValidator {
 
         //=====================================================================//
         // Validate parameters against the schema
-        def String schema_string = Files.readString( Path.of(getBasePath(baseDir, schemaFilename)) )
+        def Path schemaFile = Path.of(getBasePath(baseDir, schemaFilename))
+        def String schema_string = Files.readString(schemaFile)
         def validator = new JsonSchemaValidator(config)
 
         // Colors
         def colors = getLogColors(config.monochromeLogs)
 
         // Validate
-        Tuple2<List<String>,List<String>> validationResult = validator.validate(paramsJSON, schema_string)
+        Tuple2<List<String>,List<String>> validationResult = validator.validate(paramsJSON, schema_string, schemaFile.toString())
         def validationErrors = validationResult[0]
         def unevaluatedParams = validationResult[1]
         this.errors.addAll(validationErrors)
