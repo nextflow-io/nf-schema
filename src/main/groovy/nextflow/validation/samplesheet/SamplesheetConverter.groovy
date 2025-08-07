@@ -140,7 +140,7 @@ class SamplesheetConverter {
     private Object formatEntry(Object input, Map schema, String headerPrefix = "") {
 
         // Add default values for missing entries
-        input = input != null ? input : findDeep(schema, "default") != null ? findDeep(schema, "default") : []
+        input = input != null ? input : hasDeepKey(schema, "default") ? findDeep(schema, "default") : []
 
         if (input instanceof Map) {
             def List result = []
