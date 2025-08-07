@@ -7,7 +7,6 @@ import nextflow.Nextflow
 
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
-import java.nio.file.Files
 
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Files.fileToJson
@@ -53,10 +52,9 @@ class SchemaEvaluator implements Evaluator {
 
         def String schemaFull = getBasePath(this.baseDir, this.schema)
         def Object json = fileToJson(file, Path.of(schemaFull))
-        def String schemaContents = Files.readString( Path.of(schemaFull) )
         def validator = new JsonSchemaValidator(config)
 
-        def Tuple2<List<String>,List<String>> validationResult = validator.validate(json, schemaContents, schemaFull.toString())
+        def Tuple2<List<String>,List<String>> validationResult = validator.validate(json, schemaFull)
         def validationErrors = validationResult[0]
         if (validationErrors) {
             def List<String> errors = ["Validation of file failed:"] + validationErrors.collect { "\t${it}" as String}
