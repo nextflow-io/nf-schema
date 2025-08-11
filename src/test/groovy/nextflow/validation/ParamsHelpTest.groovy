@@ -75,7 +75,7 @@ class ParamsHelpTest extends Dsl2Spec{
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
             
-            def help_msg = paramsHelp(command, parameters_schema: '$schema')
+            def help_msg = paramsHelp(parameters_schema: '$schema', command: command)
             log.info help_msg
         """
 
@@ -98,7 +98,7 @@ class ParamsHelpTest extends Dsl2Spec{
 
         then:
         noExceptionThrown()
-        stdout.size() == 11
+        stdout.size() == 12
     }
 
     def 'should print a help message with argument options' () {
@@ -108,17 +108,12 @@ class ParamsHelpTest extends Dsl2Spec{
             include { paramsHelp } from 'plugin/nf-schema'
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
             
-            def help_msg = paramsHelp(command, parameters_schema: '$schema')
+            def help_msg = paramsHelp(parameters_schema: '$schema', command: command, showHidden: true)
             log.info help_msg
         """
 
         when:
-        def config = ["validation": [
-            "help": [
-                "showHidden": true
-            ]
-        ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def result = new MockScriptRunner([:]).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
@@ -136,11 +131,10 @@ class ParamsHelpTest extends Dsl2Spec{
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
         def SCRIPT = """
             include { paramsHelp } from 'plugin/nf-schema'
-            params.help = 'publish_dir_mode'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
             
-            def help_msg = paramsHelp(command, parameters_schema: '$schema')
+            def help_msg = paramsHelp("publish_dir_mode", parameters_schema: '$schema', command: command)
             log.info help_msg
         """
 
@@ -169,11 +163,10 @@ class ParamsHelpTest extends Dsl2Spec{
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
         def SCRIPT = """
             include { paramsHelp } from 'plugin/nf-schema'
-            params.help = 'no_exist'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
             
-            def help_msg = paramsHelp(command, parameters_schema: '$schema')
+            def help_msg = paramsHelp("no_exist", parameters_schema: '$schema', command: command)
             log.info help_msg
         """
 
@@ -195,11 +188,10 @@ class ParamsHelpTest extends Dsl2Spec{
         def schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath().toString()
         def SCRIPT = """
             include { paramsHelp } from 'plugin/nf-schema'
-            params.help = 'this.is'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
             
-            def help_msg = paramsHelp(command, parameters_schema: '$schema')
+            def help_msg = paramsHelp("this.is", parameters_schema: '$schema', command: command)
             log.info help_msg
         """
 

@@ -2,10 +2,21 @@
 
 # Version 2.5.0
 
+## New features
+
+1. Added a new configuration option: `validation.help.enumLength` which sets the maximum length of enum values in the help message. The default is set to the value in the `COLUMNS` environment variable or 100 character if that variable isn't set.
+2. Added top-level schema description for detailed help `--help <args>`. If `<args>` is associated with a schema, then the top-level fields will be shown similarly to `--help` for the main schema (#146).
+
 ## Changes
 
 1. The plugin now properly validates cloud storage files instead of skipping them. Exotic errors will be added to the error messages instead of failing the validation outright.
 2. Migrated to the new observer class in Nextflow 25.04.0
+3. Rework the deprecated `paramsHelp()` function to allow pipeline developers a fully fledged alternative to the help messages created via the configuration options. This change enables the use of dynamic help message with the strict configuration syntax introduced in Nextflow 25.04.0.
+
+## Bug fixes
+
+1. CSV and TSV files with trailing commas or tabs will now be properly sanitized. This fixes issues with CSV and TSV files that contained empty header columns.
+2. Unidentified parameters are no longer printed out on failure of the parameter validation. This is to prevent a bug where all parameters would be printed out on failure.
 
 # Version 2.4.2
 

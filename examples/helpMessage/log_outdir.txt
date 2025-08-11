@@ -9,12 +9,13 @@ It provides information about the parameters and usage.
 
     Typical pipeline command:
 
-  nextflow run my_pipeline --input input_file.csv
+  nextflow run main.nf
 
---outdir
-    type       : string
-    format     : directory-path
-    description: The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
+
+Input/output options
+  --input      [string]  Path to comma-separated file containing information about the samples in the experiment. 
+  --outdir     [string]  The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure. 
+  --help       [boolean] Show the help message for the pipeline. [default: false] 
 ------------------------------------------------------
 
 For more information, please refer to the documentation.

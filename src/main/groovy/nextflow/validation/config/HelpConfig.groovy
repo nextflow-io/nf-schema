@@ -51,6 +51,15 @@ class HelpConfig implements ConfigScope {
     @Description('An example command of how to run the pipeline.')
     final public CharSequence command = ""
 
+    @ConfigOption
+    @Description('''
+    The maximum length in characters of the enum preview in the help message.
+    This defaults to the length of the terminal window specified by the `COLUMNS` environment variable or 100 characters if this variable hasn't been set.
+    If the enum preview exceeds this length, it will be truncated.
+    Set this option to -1 to disable the enum preview truncation.
+    ''')
+    final public Integer enumLength = System.getenv("COLUMNS")?.toInteger() ?: 100
+
     HelpConfig(Map map, Map params, Boolean monochromeLogs, Boolean showHiddenParams) {
         def config = map ?: Collections.emptyMap()
 
@@ -76,7 +85,7 @@ class HelpConfig implements ConfigScope {
 
         // showHidden
         if(params.containsKey(showHiddenParameter) || config.containsKey("showHidden")) {
-            if(params.get(showHiddenParameter) instanceof Boolean) {
+            if(params.containsKey(showHiddenParameter) && params.get(showHiddenParameter) instanceof Boolean) {
                 showHidden = params.get(showHiddenParameter)
                 log.debug("Set `validation.help.showHidden` to ${showHidden} (Due to --${showHiddenParameter})")
             } else if(config.showHidden instanceof Boolean) {
@@ -106,6 +115,7 @@ class HelpConfig implements ConfigScope {
                 log.warn("Incorrect value detected for `validation.help.fullParameter`, a string is expected. Defaulting to `${fullParameter}`")
             }
         }
+
 
         // beforeText
         if(config.containsKey("beforeText")) {
@@ -146,6 +156,16 @@ class HelpConfig implements ConfigScope {
                 log.debug("Set `validation.help.command` to ${command}")
             } else {
                 log.warn("Incorrect value detected for `validation.help.command`, a string is expected. Defaulting to `${command}`")
+            }
+        }
+
+        // enumLength
+        if(config.containsKey("enumLength")) {
+            if(config.enumLength instanceof Integer) {
+                enumLength = config.enumLength
+                log.debug("Set `validation.help.enumLength` to ${enumLength}")
+            } else {
+                log.warn("Incorrect value detected for `validation.help.enumLength`, an integer is expected. Defaulting to `${enumLength}`")
             }
         }
     }
