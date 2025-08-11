@@ -1,14 +1,20 @@
 
- N E X T F L O W   ~  version 25.04.0
+ N E X T F L O W   ~  version 25.04.6
 
-Launching `pipeline/main.nf` [tender_kalam] DSL2 - revision: 9b42afdac9
+Launching `examples/validateParameters/pipeline/main.nf` [lethal_mcclintock] DSL2 - revision: 9b42afdac9
+
+WARN: The following invalid input values have been detected:
+
+* --param1: 120
+* --param2: true
+
 
 ERROR ~ Validation of pipeline parameters failed!
 
  -- Check '.nextflow.log' file for details
 The following invalid input values have been detected:
 
-* --input (/home/nvnieuwk/Documents/nextflow/nf-schema/examples/validateParameters/pipeline/../samplesheet.txt): "/home/nvnieuwk/Documents/nextflow/nf-schema/examples/validateParameters/pipeline/../samplesheet.txt" does not match regular expression [^\S+\.(csv|tsv|yaml|json)$]
-* --input (/home/nvnieuwk/Documents/nextflow/nf-schema/examples/validateParameters/pipeline/../samplesheet.txt): the file or directory '/home/nvnieuwk/Documents/nextflow/nf-schema/examples/validateParameters/pipeline/../samplesheet.txt' does not exist
+* --param1 (120): Value is [integer] but should be [string]
+* --param2 (true): Value is [boolean] but should be [integer]
 
- -- Check script 'pipeline/main.nf' at line: 4 or see '.nextflow.log' file for more details
+ -- Check script 'examples/validateParameters/pipeline/main.nf' at line: 4 or see '.nextflow.log' file for more details

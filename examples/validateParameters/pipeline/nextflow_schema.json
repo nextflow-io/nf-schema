@@ -5,36 +5,25 @@
     "description": "this is a test",
     "type": "object",
     "$defs": {
-        "input_output_options": {
-            "title": "Input/output options",
+        "test_parameters": {
+            "title": "Test parameters",
             "type": "object",
             "fa_icon": "fas fa-terminal",
-            "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "description": "Some random test parameters",
+            "required": ["param1", "param2"],
             "properties": {
-                "input": {
-                    "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/csv",
-                    "schema": "assets/schema_input.json",
-                    "pattern": "^\\S+\\.(csv|tsv|yaml|json)$",
-                    "exists": true,
-                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/testpipeline/usage#samplesheet-input).",
-                    "fa_icon": "fas fa-file-csv"
+                "param1": {
+                    "type": "string"
                 },
-                "outdir": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                    "fa_icon": "fas fa-folder-open"
+                "param2": {
+                    "type": "integer"
                 }
             }
         }
     },
     "allOf": [
         {
-            "$ref": "#/$defs/input_output_options"
+            "$ref": "#/$defs/test_parameters"
         }
     ]
 }
