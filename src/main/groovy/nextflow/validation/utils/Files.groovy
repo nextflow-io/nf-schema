@@ -17,7 +17,7 @@ import java.io.File
 
 import nextflow.validation.exceptions.SchemaValidationException
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
-import static nextflow.validation.utils.Types.inferType
+import static nextflow.validation.utils.Types.castToType
 
 /**
  * A collection of functions used to get data from files
@@ -98,8 +98,7 @@ public class Files {
                 // Flatten no header inputs if they contain one value
                 fileContent = fileContent.collect { it instanceof List && it.size() == 1 ? it[0] : it }
             }
-
-            return inferType(fileContent)
+            return castToType(fileContent, schemaMap)
         }
     }
 
