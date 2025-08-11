@@ -1,0 +1,12 @@
+
+ N E X T F L O W   ~  version 25.04.6
+
+Launching `examples/paramsHelp/pipeline/main.nf` [cheeky_swartz] DSL2 - revision: 5c681b32ca
+
+Could not read parameters settings from JSON. java.nio.file.NoSuchFileException: /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsHelp/pipeline/nextflow_schema.json
+This is a help message for the pipeline.Typical pipeline command:
+
+  nextflow run main.nf
+
+------------------------------------------------------
+Done with the help message.

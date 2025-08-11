@@ -1,7 +1,7 @@
 
- N E X T F L O W   ~  version 25.04.0
+ N E X T F L O W   ~  version 25.04.6
 
-Launching `pipeline/main.nf` [confident_lamarr] DSL2 - revision: 629cc11c05
+Launching `examples/helpMessage/pipeline/main.nf` [nauseous_hoover] DSL2 - revision: 629cc11c05
 
 
 This is a help message for the pipeline.
@@ -16,8 +16,9 @@ It provides information about the parameters and usage.
 --showHidden   [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` or `--helpFull`. 
 
 Input/output options
-  --input      [string] Path to comma-separated file containing information about the samples in the experiment. 
-  --outdir     [string] The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure. 
+  --input      [string]  Path to comma-separated file containing information about the samples in the experiment. 
+  --outdir     [string]  The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure. 
+  --help       [boolean] Show the help message for the pipeline. [default: false] 
 
 ------------------------------------------------------
 
