@@ -4,7 +4,7 @@ plugin_version=$(grep 'version =' "$script_dir/../build.gradle" | awk -F "'" '{p
 echo "Testing examples with nf-schema version $plugin_version"
 
 failures=0
-ignore_values='runName|launchDir|workDir|Check script'
+ignore_values='runName|launchDir|workDir|Check script|projectDir|userName'
 
 run_example() {
     echo "Running example command: $command"
