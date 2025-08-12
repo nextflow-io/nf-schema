@@ -4,7 +4,7 @@ plugin_version=$(grep 'version =' "$script_dir/../build.gradle" | awk -F "'" '{p
 echo "Testing examples with nf-schema version $plugin_version"
 
 failures=0
-ignore_values='runName|launchDir|workDir|Check script|projectDir|userName'
+ignore_values='runName|launchDir|workDir|Check script|projectDir|userName|configFiles'
 
 run_example() {
     echo "Running example command: $command"
@@ -28,12 +28,12 @@ do
     if compgen -G "$example_dir/../options*.txt" > /dev/null; then
         for option in $example_dir/../options*.txt
         do
-            command="nextflow run $example -plugins nf-schema@$plugin_version $(cat $option)"
+            command="COLUMNS=1000 nextflow run $example -plugins nf-schema@$plugin_version $(cat $option)"
             expected_output=$(echo $option | sed -e 's/options/log/')
             run_example
         done
     else
-        command="nextflow run $example -plugins nf-schema@$plugin_version"
+        command="COLUMNS=1000 nextflow run $example -plugins nf-schema@$plugin_version"
         expected_output="$(dirname $example)/../log.txt"
         run_example
     fi
