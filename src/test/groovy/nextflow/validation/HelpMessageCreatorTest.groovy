@@ -49,7 +49,7 @@ class HelpMessageCreatorTest extends Specification{
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -94,7 +94,7 @@ Reference genome options
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -172,8 +172,12 @@ copyNoFollow, move) [default: copy]
         def params = [
             showMeThoseHiddenParams:true
         ]
-        def config = new ValidationConfig(validationConfig, params)
-        def helpCreator = new HelpMessageCreator(config, session)
+        // Create new session to use the parameter
+        def newSession = Mock(Session)
+        newSession.getBaseDir() >> getRoot()
+        newSession.params >> params
+        def config = new ValidationConfig(validationConfig, newSession)
+        def helpCreator = new HelpMessageCreator(config, newSession)
 
         when:
         def help = helpCreator.getShortMessage("")
@@ -247,7 +251,7 @@ copyNoFollow, move) [default: copy]
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -283,7 +287,7 @@ Nested Parameters
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -315,7 +319,7 @@ Nested Parameters
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -357,7 +361,7 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -393,7 +397,7 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -426,7 +430,7 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -457,7 +461,7 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -504,7 +508,7 @@ Reference genome options
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -597,7 +601,7 @@ Fields:
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
@@ -621,7 +625,7 @@ Fields:
             ]
         ]
         def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
