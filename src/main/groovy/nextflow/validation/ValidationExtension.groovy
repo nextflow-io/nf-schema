@@ -5,7 +5,6 @@ import org.json.JSONObject
 import org.json.JSONArray
 
 import groovy.util.logging.Slf4j
-import java.nio.file.Files
 import java.nio.file.Path
 import nextflow.Nextflow
 import nextflow.plugin.extension.Function
@@ -42,10 +41,7 @@ class ValidationExtension extends PluginExtensionPoint {
     @Override
     protected void init(Session session) {
         this.session = session
-
-        // Help message logic
-        def Map params = (Map)session.params ?: [:]
-        config = new ValidationConfig(session?.config?.navigate('validation') as Map, params)
+        config = new ValidationConfig(session?.config?.navigate('validation') as Map, session)
 
     }
 
@@ -136,8 +132,7 @@ class ValidationExtension extends PluginExtensionPoint {
         } else {
             jsonObj = input
         }
-        def String schemaString = Files.readString( Path.of(getBasePath(session.baseDir.toString(), schema)) )
-        def List<String> errors = validator.validateObj(jsonObj, schemaString)[0]
+        def List<String> errors = validator.validateObj(jsonObj, getBasePath(session.baseDir.toString(), schema))[0]
         if(exitOnError && errors != []) {
             def colors = getLogColors(config.monochromeLogs)
             def String msg = "${colors.red}${errors.join('\n')}${colors.reset}\n"
@@ -162,7 +157,6 @@ class ValidationExtension extends PluginExtensionPoint {
         final String parameter
     ) {
         log.debug "Generating help message with options: ${options}"
-        def Map params = session.params
         def Map config = session.config.navigate("validation") ?: [:]
 
         // Adapt config options with function options
@@ -178,7 +172,7 @@ class ValidationExtension extends PluginExtensionPoint {
         def Boolean fullHelp = options.get('fullHelp') as Boolean ?: false
 
         // Generate the new help config
-        def final ValidationConfig functionConfig = new ValidationConfig(config, params)
+        def final ValidationConfig functionConfig = new ValidationConfig(config, session)
 
         // Create the help message
         def HelpMessageCreator helpCreator = new HelpMessageCreator(functionConfig, session)

@@ -3,6 +3,8 @@ package nextflow.validation.validators
 import groovy.util.logging.Slf4j
 import org.json.JSONObject
 import org.json.JSONArray
+import java.nio.file.Files
+import java.nio.file.Path
 import dev.harrel.jsonschema.ValidatorFactory
 import dev.harrel.jsonschema.Validator
 import dev.harrel.jsonschema.EvaluatorFactory
@@ -40,8 +42,17 @@ public class JsonSchemaValidator {
         this.config = config
     }
 
-    private Tuple2<List<String>,List<String>> validateObject(JsonNode input, String validationType, Object rawJson, String schemaString) {
-        def JSONObject schema = new JSONObject(schemaString)
+    private Tuple2<List<String>,List<String>> validateObject(JsonNode input, String validationType, Object rawJson, String schemaFileName) {
+        def JSONObject schema
+        try {
+            schema = new JSONObject(Files.readString(Path.of(schemaFileName)))
+        } catch (org.json.JSONException e) {
+            throw new SchemaValidationException("""Failed to load JSON schema (${schemaFileName}):
+    ${e.message}
+
+""")
+        }
+
         def String draft = getValueFromJsonPointer("#/\$schema", schema)
         if(draft != "https://json-schema.org/draft/2020-12/schema") {
             log.error("""Failed to load the meta schema:
@@ -123,19 +134,19 @@ public class JsonSchemaValidator {
         return Tuple.tuple(errors, unevaluated)
     }
 
-    public Tuple2<List<String>,List<String>> validate(JSONArray input, String schemaString) {
+    public Tuple2<List<String>,List<String>> validate(JSONArray input, String schemaFileName) {
         def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
-        return this.validateObject(jsonInput, "field", input, schemaString)
+        return this.validateObject(jsonInput, "field", input, schemaFileName)
     }
 
-    public Tuple2<List<String>,List<String>> validate(JSONObject input, String schemaString) {
+    public Tuple2<List<String>,List<String>> validate(JSONObject input, String schemaFileName) {
         def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
-        return this.validateObject(jsonInput, "parameter", input, schemaString)
+        return this.validateObject(jsonInput, "parameter", input, schemaFileName)
     }
 
-    public Tuple2<List<String>,List<String>> validateObj(Object input, String schemaString) {
+    public Tuple2<List<String>,List<String>> validateObj(Object input, String schemaFileName) {
         def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
-        return this.validateObject(jsonInput, "object", input, schemaString)
+        return this.validateObject(jsonInput, "object", input, schemaFileName)
     }
 
     public static List<String> getUnevaluated(Validator.Result result, Object rawJson) {

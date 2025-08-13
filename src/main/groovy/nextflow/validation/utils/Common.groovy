@@ -76,6 +76,23 @@ public class Common {
         return null
     }
 
+    //
+    // Check if a key exists in a nested map
+    //
+    public static boolean hasDeepKey(Object m, String key) {
+        if (m instanceof Map) {
+            if (m.containsKey(key)) {
+                return true
+            } else {
+                return m.any { k, v -> hasDeepKey(v, key) }
+            }
+        } 
+        else if (m instanceof List) {
+            return m.any { element -> hasDeepKey(element, key) }
+        }
+        return false
+    }
+
     public static void findAllKeys(Object object, String key, Set<String> finalKeys, String sep) {
         if (object instanceof JSONObject) {
             JSONObject jsonObject = (JSONObject) object;
