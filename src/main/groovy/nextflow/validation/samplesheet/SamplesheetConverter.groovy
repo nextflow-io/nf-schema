@@ -12,6 +12,7 @@ import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Files.fileToJson
 import static nextflow.validation.utils.Files.fileToObject
 import static nextflow.validation.utils.Common.findDeep
+import static nextflow.validation.utils.Common.hasDeepKey
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
@@ -135,7 +136,7 @@ class SamplesheetConverter {
     private Object formatEntry(Object input, Map schema, String headerPrefix = "") {
 
         // Add default values for missing entries
-        input = input != null ? input : findDeep(schema, "default") != null ? findDeep(schema, "default") : []
+        input = input != null ? input : hasDeepKey(schema, "default") ? findDeep(schema, "default") : []
 
         if (input instanceof Map) {
             def List result = []
@@ -244,7 +245,7 @@ class SamplesheetConverter {
     */
     private Object processMeta(Object input, Map schema, String headerPrefix) {
         // Add default values for missing entries
-        input = input != null ? input : findDeep(schema, "default") != null ? findDeep(schema, "default") : []
+        input = input != null ? input : hasDeepKey(schema, "default") ? findDeep(schema, "default") : []
 
         if (input instanceof Map) {
             def Map result = [:]
