@@ -543,8 +543,7 @@ or `--helpFull`.
                 enabled: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, params)
+        def config = new ValidationConfig(validationConfig, session)
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
