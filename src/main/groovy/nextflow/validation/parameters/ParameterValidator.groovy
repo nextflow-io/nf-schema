@@ -3,8 +3,6 @@ package nextflow.validation.parameters
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
-import java.nio.file.Files
-import java.nio.file.Path
 import nextflow.Nextflow
 import nextflow.util.Duration
 import nextflow.util.MemoryUnit
@@ -134,14 +132,13 @@ class ParameterValidator {
 
         //=====================================================================//
         // Validate parameters against the schema
-        def String schema_string = Files.readString( Path.of(getBasePath(baseDir, schemaFilename)) )
         def validator = new JsonSchemaValidator(config)
 
         // Colors
         def colors = getLogColors(config.monochromeLogs)
 
         // Validate
-        Tuple2<List<String>,List<String>> validationResult = validator.validate(paramsJSON, schema_string)
+        Tuple2<List<String>,List<String>> validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
         def validationErrors = validationResult[0]
         def unevaluatedParams = validationResult[1]
         this.errors.addAll(validationErrors)

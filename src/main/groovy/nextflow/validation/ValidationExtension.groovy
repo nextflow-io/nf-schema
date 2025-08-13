@@ -5,7 +5,6 @@ import org.json.JSONObject
 import org.json.JSONArray
 
 import groovy.util.logging.Slf4j
-import java.nio.file.Files
 import java.nio.file.Path
 import nextflow.Nextflow
 import nextflow.plugin.extension.Function
@@ -133,8 +132,7 @@ class ValidationExtension extends PluginExtensionPoint {
         } else {
             jsonObj = input
         }
-        def String schemaString = Files.readString( Path.of(getBasePath(session.baseDir.toString(), schema)) )
-        def List<String> errors = validator.validateObj(jsonObj, schemaString)[0]
+        def List<String> errors = validator.validateObj(jsonObj, getBasePath(session.baseDir.toString(), schema))[0]
         if(exitOnError && errors != []) {
             def colors = getLogColors(config.monochromeLogs)
             def String msg = "${colors.red}${errors.join('\n')}${colors.reset}\n"
