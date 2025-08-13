@@ -41,10 +41,7 @@ class ValidationExtension extends PluginExtensionPoint {
     @Override
     protected void init(Session session) {
         this.session = session
-
-        // Help message logic
-        def Map params = (Map)session.params ?: [:]
-        config = new ValidationConfig(session?.config?.navigate('validation') as Map, params)
+        config = new ValidationConfig(session?.config?.navigate('validation') as Map, session)
 
     }
 
@@ -160,7 +157,6 @@ class ValidationExtension extends PluginExtensionPoint {
         final String parameter
     ) {
         log.debug "Generating help message with options: ${options}"
-        def Map params = session.params
         def Map config = session.config.navigate("validation") ?: [:]
 
         // Adapt config options with function options
@@ -176,7 +172,7 @@ class ValidationExtension extends PluginExtensionPoint {
         def Boolean fullHelp = options.get('fullHelp') as Boolean ?: false
 
         // Generate the new help config
-        def final ValidationConfig functionConfig = new ValidationConfig(config, params)
+        def final ValidationConfig functionConfig = new ValidationConfig(config, session)
 
         // Create the help message
         def HelpMessageCreator helpCreator = new HelpMessageCreator(functionConfig, session)

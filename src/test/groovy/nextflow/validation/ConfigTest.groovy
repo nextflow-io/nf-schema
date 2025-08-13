@@ -43,8 +43,6 @@ class ConfigTest extends Dsl2Spec{
         def config = [
             lenientMode: true,
             monochromeLogs: true,
-            failUnrecognisedParams: true,
-            failUnrecognisedHeaders: true,
             maxErrValSize: 20,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             ignoreParams: ['some_random_param'],
@@ -62,12 +60,16 @@ class ConfigTest extends Dsl2Spec{
                 beforeText: 'before',
                 afterText: 'after',
                 hideParams: ['some_random_param'],
+            ],
+            logging: [
+                unrecognisedParams: 'error',
+                unrecognisedHeaders: 'error'
             ]
         ]
         def params = [:]
 
         when:
-        new ValidationConfig(config, params)
+        new ValidationConfig(config, session)
         def stdout = capture
             .toString()
             .readLines()
@@ -81,11 +83,10 @@ class ConfigTest extends Dsl2Spec{
     def 'test valid config - GStrings' () {
         given:
         def randomString = 'randomString'
+        def errorLevel = 'error'
         def config = [
             lenientMode: true,
             monochromeLogs: true,
-            failUnrecognisedParams: true,
-            failUnrecognisedHeaders: true,
             maxErrValSize: 20,
             parametersSchema: "${randomString}",
             ignoreParams: ["${randomString}"],
@@ -103,12 +104,16 @@ class ConfigTest extends Dsl2Spec{
                 beforeText: "${randomString}",
                 afterText: "${randomString}",
                 hideParams: ["${randomString}"],
+            ],
+            logging: [
+                unrecognisedParams: "${errorLevel}",
+                unrecognisedHeaders: "${errorLevel}"
             ]
         ]
         def params = [:]
 
         when:
-        new ValidationConfig(config, params)
+        new ValidationConfig(config, session)
         def stdout = capture
             .toString()
             .readLines()
@@ -124,8 +129,6 @@ class ConfigTest extends Dsl2Spec{
         def config = [
             lenientMode: 'notABoolean',
             monochromeLogs: 12,
-            failUnrecognisedParams: 'notABoolean',
-            failUnrecognisedHeaders: 'notABoolean',
             showHiddenParams: 'notABoolean',
             maxErrValSize: ["notAnInteger"],
             parametersSchema: 42,
@@ -144,12 +147,16 @@ class ConfigTest extends Dsl2Spec{
                 beforeText: 63,
                 afterText: false,
                 hideParams: 'randomString',
+            ],
+            logging: [
+                unrecognisedParams: true,
+                unrecognisedHeaders: 589654
             ]
         ]
         def params = [:]
 
         when:
-        new ValidationConfig(config, params)
+        new ValidationConfig(config, session)
         def stdout = capture
             .toString()
             .readLines()

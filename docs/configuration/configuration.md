@@ -32,7 +32,7 @@ This option can either be a path relative to the root of the pipeline directory 
 
 ## monochromeLogs
 
-This option can be used to turn of the colored logs from nf-validation. This can be useful if you run a Nextflow pipeline in an environment that doesn't support colored logging.
+This option can be used to turn of the colored logs from nf-schema. This can be useful if you run a Nextflow pipeline in an environment that doesn't support colored logging. This option will automatically be set to `true` when ANSI logging is disabled in Nextflow.
 
 ```groovy
 validation.monochromeLogs = <true|false> // default: false
@@ -44,22 +44,6 @@ This option can be used to make the type validation more lenient. In normal case
 
 ```groovy
 validation.lenientMode = <true|false> // default: false
-```
-
-## failUnrecognisedParams
-
-By default the `validateParameters()` function will only give a warning if an unrecognised parameter has been given. This usually indicates that a typo has been made and can be easily overlooked when the plugin only emits a warning. You can turn this warning into an error with the `failUnrecognisedParams` option.
-
-```groovy
-validation.failUnrecognisedParams = <true|false> // default: false
-```
-
-## failUnrecognisedHeaders
-
-By default the `samplesheetToList()` function will only give a warning if an unrecognised header is present in the samplesheet. This usually indicates that a typo has been made and can be easily overlooked when the plugin only emits a warning. You can turn this warning into an error with the `failUnrecognisedHeaders` option.
-
-```groovy
-validation.failUnrecognisedHeaders = <true|false> // default: false
 ```
 
 ## showHiddenParams
@@ -259,4 +243,33 @@ Takes a list of parameter names to exclude from the parameters summary created b
 
 ```groovy
 validation.summary.hideParams = ["param1", "nested.param"] // default: []
+```
+
+## Logging
+
+The `validation.logging` config scope can be used to configure the logging of the plugin.
+These config options can receive the following values:
+
+- `skip`: Skip logging
+- `debug`: Log debug messages (only printed in the `.nextflow.log` file)
+- `info`: Log info messages (also printed in the terminal)
+- `warn`: Log warning messages (also printed in the terminal, but in yellow)
+- `error`: Fail the pipeline and print the error message
+
+This scope contains the following options:
+
+### unrecognisedParams
+
+This option can be used to configure the logging of unrecognised parameters.
+
+```groovy
+validation.logging.unrecognisedParams = "warn" // default: "warn"
+```
+
+### unrecognisedHeaders
+
+This option can be used to configure the logging of unrecognised headers in samplesheets.
+
+```groovy
+validation.logging.unrecognisedHeaders = "warn" // default: "warn"
 ```
