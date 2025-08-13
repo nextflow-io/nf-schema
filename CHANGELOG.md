@@ -14,6 +14,7 @@
 3. Rework the deprecated `paramsHelp()` function to allow pipeline developers a fully fledged alternative to the help messages created via the configuration options. This change enables the use of dynamic help message with the strict configuration syntax introduced in Nextflow 25.04.0.
 4. Updated the error message when the JSON schema file is invalid to include the full file name.
 5. The ANSI log setting of Nextflow is now used to determine whether or not the log should be monochrome. This setting will take priority over the `validation.monochromeLogs` configuration option.
+6. Updated the examples in the [examples](examples/) directory and added automatic checking for validity of these examples.
 
 ## Bug fixes
 
