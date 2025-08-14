@@ -9,7 +9,7 @@
             "title": "Test parameters",
             "type": "object",
             "fa_icon": "fas fa-terminal",
-            "description": "Some random test parameters",
+            "description": "Some example test parameters",
             "required": ["param1", "param2"],
             "properties": {
                 "param1": {
@@ -17,6 +17,9 @@
                 },
                 "param2": {
                     "type": "integer"
+                },
+                "param3": {
+                    "type": "string"
                 }
             }
         }
