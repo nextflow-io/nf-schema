@@ -1,6 +1,16 @@
 
  N E X T F L O W   ~  version 25.04.6
 
-Launching `pipeline/main.nf` [fervent_thompson] DSL2 - revision: 116c60c214
+Launching `examples/paramsSummaryMap/pipeline/main.nf` [big_spence] DSL2 - revision: 7e4bad0a5e
 
-[Input/output options:[input:samplesheet.csv, outdir:results], Core Nextflow options:[profile:standard]]
+Input/output options:
+  input:samplesheet.csv
+  outdir:results
+Core Nextflow options:
+  runName:big_spence
+  launchDir:/home/nvnieuwk/Documents/nextflow/nf-schema
+  workDir:/home/nvnieuwk/Documents/nextflow/nf-schema/work
+  projectDir:/home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryMap/pipeline
+  userName:nvnieuwk
+  profile:standard
+  configFiles:/home/nvnieuwk/.nextflow/config, /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryMap/pipeline/nextflow.config
