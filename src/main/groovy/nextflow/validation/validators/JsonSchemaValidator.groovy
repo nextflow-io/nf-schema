@@ -64,18 +64,6 @@ public class JsonSchemaValidator {
         return new ValidationResult(result, rawJson, schemaString, config)
     }
 
-    /*
-    public ValidationResult validate(JSONArray input, String schemaString) {
-        def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
-        return this.validateObject(jsonInput, input, schemaString)
-    }
-
-    public ValidationResult validate(JSONObject input, String schemaString) {
-        def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
-        return this.validateObject(jsonInput, input, schemaString)
-    }
-    */
-
     public ValidationResult validate(Object input, String schemaFileName) {
         def JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
         return this.validateObject(jsonInput, input, schemaFileName)
