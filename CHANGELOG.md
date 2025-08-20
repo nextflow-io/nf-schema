@@ -20,6 +20,8 @@
 1. CSV and TSV files with trailing commas or tabs will now be properly sanitized. This fixes issues with CSV and TSV files that contained empty header columns.
 2. Unidentified parameters are no longer printed out on failure of the parameter validation. This is to prevent a bug where all parameters would be printed out on failure.
 3. Fixed an issue where default values of `null` weren't being set correctly in `samplesheetToList()`.
+4. Fixed an undocumented limit of `3MB` for `YAML` format samplesheets (new limit is `50MB`).
+5. Fixed issue where an empty string in a yaml for a file type string format would throw a Java error instead of reporting a proper validation error.
 
 ## Logging configuration
 
