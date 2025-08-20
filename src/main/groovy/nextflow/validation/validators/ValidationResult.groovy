@@ -53,7 +53,6 @@ public class ValidationResult {
     public List<String> getErrors(String validationType) {
         def List<String> errors = []
         this.result.getErrors().each { error ->
-            println "${error.getError()}: '${error.getKeyword()}' at '${error.getEvaluationPath()}'"
             def String errorString = error.getError()
 
             // Skip double error in the parameter schema
