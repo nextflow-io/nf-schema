@@ -1,4 +1,16 @@
-N E X T F L O W  ~  version 23.04.1
-Launching `pipeline/main.nf` [happy_lamport] DSL2 - revision: c45338cd96
 
-[Core Nextflow options:[runName:happy_lamport, launchDir:/Users/ewels/GitHub/nextflow-io/nf-schema/examples/paramsSummaryMap, workDir:/Users/ewels/GitHub/nextflow-io/nf-schema/examples/paramsSummaryMap/work, projectDir:/Users/ewels/GitHub/nextflow-io/nf-schema/examples/paramsSummaryMap/pipeline, userName:ewels, profile:standard, configFiles:], Input/output options:[input:samplesheet.csv, outdir:results]]
+ N E X T F L O W   ~  version 25.04.6
+
+Launching `examples/paramsSummaryMap/pipeline/main.nf` [big_spence] DSL2 - revision: 7e4bad0a5e
+
+Input/output options:
+  input:samplesheet.csv
+  outdir:results
+Core Nextflow options:
+  runName:big_spence
+  launchDir:/home/nvnieuwk/Documents/nextflow/nf-schema
+  workDir:/home/nvnieuwk/Documents/nextflow/nf-schema/work
+  projectDir:/home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryMap/pipeline
+  userName:nvnieuwk
+  profile:standard
+  configFiles:/home/nvnieuwk/.nextflow/config, /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryMap/pipeline/nextflow.config

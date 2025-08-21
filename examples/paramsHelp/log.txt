@@ -1,4 +1,7 @@
-Launching `examples/paramsHelp/pipeline/main.nf` [deadly_turing] DSL2 - revision: 5c681b32ca
+
+ N E X T F L O W   ~  version 25.04.6
+
+Launching `examples/paramsHelp/pipeline/main.nf` [kickass_miescher] DSL2 - revision: 5c681b32ca
 
 This is a help message for the pipeline.Typical pipeline command:
 
