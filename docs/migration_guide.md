@@ -36,7 +36,7 @@ Updating your pipeline can be done in a couple simple steps.
 
 ### Updating the name and version of the plugin
 
-The name and the version of the plugin should be updated from `nf-validation` to `nf-schema@2.0.0`:
+The name and the version of the plugin should be updated from `nf-validation` to any version of `nf-schema@2.x.x`:
 
 === "nf-validation"
 
@@ -50,7 +50,7 @@ The name and the version of the plugin should be updated from `nf-validation` to
 
     ```groovy
     plugins {
-        id 'nf-schema@2.0.0'
+        id 'nf-schema@2.x.x'
     }
     ```
 
