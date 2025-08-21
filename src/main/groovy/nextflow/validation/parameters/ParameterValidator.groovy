@@ -14,6 +14,7 @@ import nextflow.validation.validators.JsonSchemaValidator
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
+import nextflow.validation.validators.ValidationResult
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -138,22 +139,23 @@ class ParameterValidator {
         def colors = getLogColors(config.monochromeLogs)
 
         // Validate
-        Tuple2<List<String>,List<String>> validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
-        def validationErrors = validationResult[0]
-        def unevaluatedParams = validationResult[1]
-        this.errors.addAll(validationErrors)
+        def ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
+        def List<String> paramErrors = validationResult.getErrors('parameter')
+        this.errors.addAll(paramErrors)
 
         //=====================================================================//
         // Check for nextflow core params and unexpected params
         //=====================================================================//
         def List<String> unexpectedParams = []
-        unevaluatedParams.each{ param ->
-            def String dotParam = param.replaceAll("/", ".")
-            if (NF_OPTIONS.contains(param)) {
-                errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
-            }
-            else if (!config.ignoreParams.any { dotParam == it || dotParam.startsWith(it + ".") } ) { // Check if an ignore param is present
-                unexpectedParams << "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
+        if(paramErrors.size() == 0) {
+            validationResult.getUnevaluated().each{ param ->
+                def String dotParam = param.replaceAll("/", ".")
+                if (NF_OPTIONS.contains(param)) {
+                    errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
+                }
+                else if (!config.ignoreParams.any { dotParam == it || dotParam.startsWith(it + ".") } ) { // Check if an ignore param is present
+                    unexpectedParams << "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
+                }
             }
         }
 

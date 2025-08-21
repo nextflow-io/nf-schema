@@ -19,6 +19,7 @@ import nextflow.validation.samplesheet.SamplesheetConverter
 import nextflow.validation.summary.SummaryCreator
 import nextflow.validation.parameters.ParameterValidator
 import nextflow.validation.validators.JsonSchemaValidator
+import nextflow.validation.validators.ValidationResult
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.getLongestKeyLength
@@ -132,7 +133,8 @@ class ValidationExtension extends PluginExtensionPoint {
         } else {
             jsonObj = input
         }
-        def List<String> errors = validator.validateObj(jsonObj, getBasePath(session.baseDir.toString(), schema))[0]
+        def ValidationResult result = validator.validate(jsonObj, getBasePath(session.baseDir.toString(), schema))
+        def List<String> errors = result.getErrors('object')
         if(exitOnError && errors != []) {
             def colors = getLogColors(config.monochromeLogs)
             def String msg = "${colors.red}${errors.join('\n')}${colors.reset}\n"
