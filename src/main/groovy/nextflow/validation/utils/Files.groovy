@@ -1,6 +1,7 @@
 package nextflow.validation.utils
 
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.LoaderOptions
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONPointer
@@ -85,7 +86,9 @@ public class Files {
         }
 
         if(fileType == "yaml"){
-            return new Yaml().load((file.text))
+            def LoaderOptions yamlLoaderOptions = new LoaderOptions()
+            yamlLoaderOptions.setCodePointLimit(50 * 1024 * 1024)
+            return new Yaml(yamlLoaderOptions).load((file.text))
         }
         else if(fileType == "json"){
             return new JsonSlurper().parseText(file.text)

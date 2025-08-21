@@ -16,6 +16,7 @@ import static nextflow.validation.utils.Common.hasDeepKey
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
+import nextflow.validation.validators.ValidationResult
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -98,8 +99,8 @@ class SamplesheetConverter {
         // Validate
         final validator = new JsonSchemaValidator(config)
         def JSONArray samplesheet = fileToJson(samplesheetFile, schemaFile) as JSONArray
-        def Tuple2<List<String>,List<String>> validationResults = validator.validate(samplesheet, schemaFile.toString())
-        def validationErrors = validationResults[0]
+        def ValidationResult validationResult = validator.validate(samplesheet, schemaFile.toString())
+        def validationErrors = validationResult.getErrors('field')
         if (validationErrors) {
             def msg = "${colors.red}The following errors have been detected in ${samplesheetFile.toString()}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
             log.error("Validation of samplesheet failed!")

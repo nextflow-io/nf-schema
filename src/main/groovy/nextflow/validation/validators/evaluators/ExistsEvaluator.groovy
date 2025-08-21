@@ -30,8 +30,8 @@ class ExistsEvaluator implements Evaluator {
         }
 
         def String value = node.asString()
-        def Path file = Nextflow.file(value) as Path
         def Boolean exists
+        def Path file
 
         try {
             file = Nextflow.file(value) as Path
