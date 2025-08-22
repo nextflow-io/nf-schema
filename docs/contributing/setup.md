@@ -66,7 +66,7 @@ To preview the docs, open the URL provided by mkdocs in your browser.
    - `github_username`: The GitHub username granting access to the plugin repository.
    - `github_access_token`: The GitHub access token required to upload and commit changes to the plugin repository.
    - `github_commit_email`: The email address associated with your GitHub account.
-3. Update the [changelog](./CHANGELOG.md).
+3. Update the [changelog](https://github.com/nextflow-io/nf-schema/blob/master/CHANGELOG.md).
 4. Build and publish the plugin to your GitHub repository:
    ```bash
    make release

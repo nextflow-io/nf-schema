@@ -63,4 +63,4 @@ It is used as a test fixture in the nf-schema package [here](https://github.com/
 --8<-- "src/testResources/schema_input.json"
 ```
 
-Even more examples can be found in the plugin [`examples` directory](../../examples) in the GitHub repository.
+Even more examples can be found in the plugin [`examples` directory](https://github.com/nextflow-io/nf-schema/tree/master/examples) in the GitHub repository.
