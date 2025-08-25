@@ -168,7 +168,7 @@ If you prefer, you can disable these by setting the `validation.monochromeLogs` 
 This function returns a help message with the command to run a pipeline and the available parameters.
 Pass it to `log.info` to print in the terminal.
 
-The function takes one optional positional argument, which can be a parameter name to get the help message for. Additionally, it can take a couple of options to customize the help message:
+The function takes one optional positional argument, which can be a parameter name to get the help message for. Additionally, it accepts the following options to customize the help message:
 
 - `parametersSchema`: Path to the JSON schema to get the help message from. Defaults to the schema defined in the `validation.parametersSchema` configuration option (which is `nextflow_schema.json` by default).
 - `beforeText`: Text to print before the help message. Defaults to the `validation.help.beforeText` configuration option.

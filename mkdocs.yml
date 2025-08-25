@@ -13,7 +13,7 @@ nav:
       - nextflow_schema/sample_sheet_schema_examples.md
   - Tutorials:
       - nextflow_schema/create_schema.md
-      - migration_guide.md
+      - Nf-validation migration guide: migration_guide.md
   - Reference:
       - nextflow_schema/nextflow_schema_specification.md
       - nextflow_schema/sample_sheet_schema_specification.md
@@ -25,6 +25,9 @@ nav:
       - Samplesheet parsing: samplesheets/samplesheetToList.md
       - Samplesheet examples: samplesheets/examples.md
       - Other validation: validate/validate.md
+  - Extras:
+      - FAQ: extras/faq.md
+      - extras/troubleshooting.md
   - Contributing:
       - contributing/setup.md
 
