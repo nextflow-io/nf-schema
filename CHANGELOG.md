@@ -1,5 +1,46 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.5.0
+
+## New features
+
+1. Added a new configuration option: `validation.help.enumLength` which sets the maximum length of enum values in the help message. The default is set to the value in the `COLUMNS` environment variable or 100 character if that variable isn't set.
+2. Added top-level schema description for detailed help `--help <args>`. If `<args>` is associated with a schema, then the top-level fields will be shown similarly to `--help` for the main schema (#146).
+3. Added a Troubleshooting and FAQ page to the documentation.
+
+## Changes
+
+1. The plugin now properly validates cloud storage files instead of skipping them. Exotic errors will be added to the error messages instead of failing the validation outright.
+2. Migrated to the new observer class in Nextflow 25.04.0
+3. Rework the deprecated `paramsHelp()` function to allow pipeline developers a fully fledged alternative to the help messages created via the configuration options. This change enables the use of dynamic help message with the strict configuration syntax introduced in Nextflow 25.04.0.
+4. Updated the error message when the JSON schema file is invalid to include the full file name.
+5. The ANSI log setting of Nextflow is now used to determine whether or not the log should be monochrome. This setting will take priority over the `validation.monochromeLogs` configuration option.
+6. Updated the examples in the [examples](examples/) directory and added automatic checking for validity of these examples.
+7. Refactored logic for parsing the `jsonschema` validation result into a new `ValidationResult` class.
+
+## Bug fixes
+
+1. CSV and TSV files with trailing commas or tabs will now be properly sanitized. This fixes issues with CSV and TSV files that contained empty header columns.
+2. Unidentified parameters are no longer printed out on failure of the parameter validation. This is to prevent a bug where all parameters would be printed out on failure.
+3. Fixed an issue where default values of `null` weren't being set correctly in `samplesheetToList()`.
+4. Fixed an undocumented limit of `3MB` for `YAML` format samplesheets (new limit is `50MB`).
+5. Fixed issue where an empty string in a yaml for a file type string format would throw a Java error instead of reporting a proper validation error.
+
+## Logging configuration
+
+This update contains a rework of the logging configuration. The `valdiation.logging` configuration scope has been added with options to replace and expand the current logging configuration options. These options can all take the following values:
+
+- `skip`: Skip logging
+- `debug`: Log debug messages (only printed in the `.nextflow.log` file)
+- `info`: Log info messages (also printed in the terminal)
+- `warn`: Log warning messages (also printed in the terminal, but in yellow)
+- `error`: Fail the pipeline and print the error message
+
+| Old option                           | New option                               | Description                                                 |
+| ------------------------------------ | ---------------------------------------- | ----------------------------------------------------------- |
+| `validation.failUnrecognisedParams`  | `validation.logging.unrecognisedParams`  | The logging level for unrecognised parameters.              |
+| `validation.failUnrecognisedHeaders` | `validation.logging.unrecognisedHeaders` | The logging level for unrecognised headers in samplesheets. |
+
 # Version 2.4.2
 
 ## Bug fixes

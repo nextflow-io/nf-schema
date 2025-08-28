@@ -13,8 +13,10 @@ It is used as a test fixture in the nf-schema package [here](https://github.com/
 
 !!! note
 
-    More examples can be found in the plugin [`testResources` directory](https://github.com/nextflow-io/nf-schema/master/plugins/nf-schema/testResources/).
+    More examples can be found in the plugin [`testResources` directory](https://github.com/nextflow-io/nf-schema/tree/master/src/testResources).
 
 ```json
 --8<-- "src/testResources/nextflow_schema.json"
 ```
+
+Even more examples can be found in the plugin [`examples` directory](https://github.com/nextflow-io/nf-schema/tree/master/examples) in the GitHub repository.

@@ -1,6 +1,7 @@
 package nextflow.validation.utils
 
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.LoaderOptions
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONPointer
@@ -9,6 +10,11 @@ import groovy.json.JsonGenerator
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
+import java.util.Scanner
+import java.io.BufferedReader
+import java.io.PrintWriter
+import java.io.FileReader
+import java.io.File
 
 import nextflow.validation.exceptions.SchemaValidationException
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
@@ -80,14 +86,17 @@ public class Files {
         }
 
         if(fileType == "yaml"){
-            return new Yaml().load((file.text))
+            def LoaderOptions yamlLoaderOptions = new LoaderOptions()
+            yamlLoaderOptions.setCodePointLimit(50 * 1024 * 1024)
+            return new Yaml(yamlLoaderOptions).load((file.text))
         }
         else if(fileType == "json"){
             return new JsonSlurper().parseText(file.text)
         }
         else {
             def Boolean header = getValueFromJsonPointer("#/items/properties", new JSONObject(schema.text)) ? true : false
-            def List fileContent = file.splitCsv(header:header, strip:true, sep:delimiter, quote:'\"')
+            def Path cleanFile = header ? sanitize(file) : file
+            def List fileContent = cleanFile.splitCsv(header:header, strip:true, sep:delimiter, quote:'\"')
             if (!header) {
                 // Flatten no header inputs if they contain one value
                 fileContent = fileContent.collect { it instanceof List && it.size() == 1 ? it[0] : it }
@@ -95,6 +104,38 @@ public class Files {
 
             return inferType(fileContent)
         }
+    }
+
+    //
+    // Sanitizes a CSV or TSV file by removing all trailing commas or tabs in the header
+    //
+    private static Path sanitize(Path file) {
+        // Check if sanitization is needed
+        def BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))
+        def String firstLine = reader.readLine()
+        reader.close()
+        if (!firstLine.endsWith(",") && !firstLine.endsWith("\t")) {
+            // No sanitization needed
+            return file
+        }
+        def File tempFile = File.createTempFile("sanitized_", file.getFileName().toString())
+        tempFile.deleteOnExit()
+
+        def Scanner scanner = new Scanner(file.toFile())
+        def PrintWriter writer = new PrintWriter(tempFile)
+        def Boolean headerSanitized = false
+        while (scanner.hasNextLine()) {
+            def String line = scanner.nextLine()
+            // Remove trailing commas or tabs from the line
+            if (!headerSanitized) {
+                line = line.replaceAll("[,\\t]*\$", "")
+                headerSanitized = true
+            }
+            writer.println(line)
+        }
+        writer.close()
+        scanner.close()
+        return tempFile.toPath()
     }
 
     //

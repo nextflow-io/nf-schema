@@ -7,6 +7,7 @@ import java.nio.file.Path
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
+import nextflow.validation.utils.AssetsHelper
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Files.paramsLoad
 import static nextflow.validation.utils.Common.getBasePath
@@ -27,12 +28,16 @@ class HelpMessageCreator {
     private final Map colors
     private Integer hiddenParametersCount = 0
     private Map<String,Map> paramsMap
+    private AssetsHelper assetsHelper
+    private final Integer enumLength
 
     // The length of the terminal
     private Integer terminalLength = System.getenv("COLUMNS")?.toInteger() ?: 100
 
     HelpMessageCreator(ValidationConfig inputConfig, Session session) {
         config = inputConfig
+        this.assetsHelper = new AssetsHelper(session.baseDir.toString(), config.parametersSchema, config.monochromeLogs)
+        enumLength = config.help.enumLength
         colors = getLogColors(config.monochromeLogs)
         paramsMap = paramsLoad( Path.of(getBasePath(session.baseDir.toString(), config.parametersSchema)) )
         addHelpParameters()
@@ -61,6 +66,15 @@ class HelpMessageCreator {
                 paramOptions.properties = removeHidden(paramOptions.properties)
             }
             helpMessage = getDetailedHelpString(param, paramOptions)
+            
+            // Check if this parameter has an associated schema file and append schema help
+            def String schemaPath = assetsHelper.discoverSchemaFile(paramNames[0])
+            if (schemaPath) {
+                def String schemaHelp = assetsHelper.generateSchemaHelp(paramNames[0], schemaPath)
+                if (schemaHelp) {
+                    helpMessage += schemaHelp
+                }
+            }
         } else {
             helpMessage = getGroupHelpString()
         }
@@ -89,6 +103,7 @@ class HelpMessageCreator {
         afterText += config.help.afterText
         return afterText
     }
+
 
     //
     // Get a detailed help string from one parameter
@@ -184,9 +199,13 @@ class HelpMessageCreator {
             if (paramOptions.enum != null) {
                 def List enums = (List) paramOptions.enum
                 def String chopEnums = enums.join(", ")
-                if(chopEnums.length() > terminalLength){
-                    chopEnums = chopEnums.substring(0, terminalLength-5)
-                    chopEnums = chopEnums.substring(0, chopEnums.lastIndexOf(",")) + ", ..."
+                if(chopEnums.length() > enumLength && enumLength >= 0) {
+                    chopEnums = chopEnums.substring(0, enumLength)
+                    if (chopEnums.contains(",")) {
+                        chopEnums = chopEnums.substring(0, chopEnums.lastIndexOf(",")) + ", ..."
+                    } else {
+                        chopEnums = "..."
+                    }
                 }
                 enumsString = " (accepted: " + chopEnums + ") "
             }

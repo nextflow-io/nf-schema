@@ -1,0 +1,26 @@
+
+ N E X T F L O W   ~  version 25.04.6
+
+Launching `examples/helpMessage/pipeline/main.nf` [nauseous_hoover] DSL2 - revision: 629cc11c05
+
+
+This is a help message for the pipeline.
+It provides information about the parameters and usage.
+
+    Typical pipeline command:
+
+  nextflow run my_pipeline --input input_file.csv
+
+--help         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full help message of that parameter will be printed. 
+--helpFull     [boolean]         Show the help message for all non-hidden parameters. 
+--showHidden   [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` or `--helpFull`. 
+
+Input/output options
+  --input      [string]  Path to comma-separated file containing information about the samples in the experiment. 
+  --outdir     [string]  The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure. 
+  --help       [boolean] Show the help message for the pipeline. [default: false] 
+
+------------------------------------------------------
+
+For more information, please refer to the documentation.
+    

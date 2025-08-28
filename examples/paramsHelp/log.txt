@@ -1,12 +1,16 @@
-N E X T F L O W  ~  version 23.04.1
-Launching `pipeline/main.nf` [infallible_turing] DSL2 - revision: 8bf4c8d053
 
-Typical pipeline command:
+ N E X T F L O W   ~  version 25.04.6
 
-  nextflow run my_pipeline --input input_file.csv
+Launching `examples/paramsHelp/pipeline/main.nf` [kickass_miescher] DSL2 - revision: 5c681b32ca
+
+This is a help message for the pipeline.Typical pipeline command:
+
+  nextflow run main.nf
+
 
 Input/output options
-  --input  [string]  Path to comma-separated file containing information about the samples in the experiment.
-  --outdir [string]  The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
-
+  --input      [string]  Path to comma-separated file containing information about the samples in the experiment. 
+  --outdir     [string]  The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure. 
+  --help       [boolean] Show the help message for the pipeline. [default: false] 
 ------------------------------------------------------
+Done with the help message.

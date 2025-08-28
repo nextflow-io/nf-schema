@@ -362,13 +362,19 @@ class SamplesheetConverterTest extends Dsl2Spec{
         '''
 
         when:
-        def config = [:]
+        def config = [
+            "validation": [
+                "logging": [
+                    "unrecognisedHeaders": "warn"
+                ]
+            ]
+        ]
         new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
                 .collect {
-                    it.split("SamplesheetConverter -- ")[-1]
+                    it.split("ValidationLogger -- ")[-1]
                 }
 
         then:
@@ -398,7 +404,10 @@ class SamplesheetConverterTest extends Dsl2Spec{
         when:
         def config = [
             "validation": [
-                "failUnrecognisedHeaders": true
+                "monochromeLogs": true,
+                "logging": [
+                    "unrecognisedHeaders": "error"
+                ]
             ]
         ]
         new MockScriptRunner(config).setScript(SCRIPT).execute()
@@ -641,4 +650,77 @@ class SamplesheetConverterTest extends Dsl2Spec{
         stdout.contains("[[mapMeta:this is in a map, arrayMeta:[metaString45, metaString478], otherArrayMeta:[metaString45, metaString478], meta:metaValue, metaMap:[entry1:entry1String, entry2:12.56]], [[string1, string2], string3, 1, 1, ${getRootString()}/file1.txt], [string4, string5, string6], [[string7, string8], [string9, string10]], test]" as String)
 
     }
+
+    def 'samplesheetToList - correctly sanitize empty header columns CSV' () {
+        given:
+        def SCRIPT_TEXT = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            workflow {
+                Channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.csv", "src/testResources/no_meta_schema.json")).view()       
+            }
+
+        '''
+
+        when:
+        dsl_eval(SCRIPT_TEXT)
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.startsWith('[') ? it : null }
+
+        then:
+        noExceptionThrown()
+        stdout.contains("[file1.txt, file2.txt]")
+
+    }
+
+    def 'samplesheetToList - correctly sanitize empty header columns TSV' () {
+        given:
+        def SCRIPT_TEXT = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            workflow {
+                Channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.tsv", "src/testResources/no_meta_schema.json")).view()       
+            }
+
+        '''
+
+        when:
+        dsl_eval(SCRIPT_TEXT)
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.startsWith('[') ? it : null }
+
+        then:
+        noExceptionThrown()
+        stdout.contains("[file1.txt, file2.txt]")
+
+    }
+
+    def 'samplesheetToList - correctly set defaults' () {
+        given:
+        def SCRIPT_TEXT = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            workflow {
+                Channel.fromList(samplesheetToList("src/testResources/samplesheet_defaults.yaml", "src/testResources/schema_input_defaults.json")).view()       
+            }
+
+        '''
+
+        when:
+        dsl_eval(SCRIPT_TEXT)
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.startsWith('[') ? it : null }
+
+        then:
+        noExceptionThrown()
+        stdout.contains("[[nullValue:null], 25, defaultString, true, test]")
+        stdout.contains("[[nullValue:null], 0, defaultString, true, null]")
+    }
+    
 }

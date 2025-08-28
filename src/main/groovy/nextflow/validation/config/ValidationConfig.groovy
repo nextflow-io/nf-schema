@@ -4,34 +4,69 @@ import groovy.util.logging.Slf4j
 
 import nextflow.validation.exceptions.SchemaValidationException
 
+import nextflow.Session
+import nextflow.config.schema.ConfigOption
+import nextflow.config.schema.ConfigScope
+import nextflow.config.schema.ScopeName
+import nextflow.script.dsl.Description
+
 /**
- * This class allows model an specific configuration, extracting values from a map and converting
+ * This class is used to read, parse and validate the `validation` config block.
  *
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  *
  */
 
 @Slf4j
-class ValidationConfig {
+@ScopeName('validation')
+@Description('''
+    The `validation` scope allows you to configure the `nf-schema` plugin.
+''')
+class ValidationConfig implements ConfigScope {
 
+    @ConfigOption
+    @Description('Toggle lenient mode. In lenient mode, the validation of types will be more lenient (e.g. an integer will pass as a string type).')
     final public Boolean lenientMode = false
+
+    @ConfigOption
+    @Description('Toggle monochrome logs. In monochrome mode, the logs will not be colored.')
     final public Boolean monochromeLogs = false
-    final public Boolean failUnrecognisedParams = false
-    final public Boolean failUnrecognisedHeaders = false
+
+    @ConfigOption
+    @Description('Show hidden parameters in the help message. This is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead.')
     final public Boolean showHiddenParams = false
 
+    @ConfigOption
+    @Description('Maximum size of the value shown in the error message. If the value is larger than this threshold, it will be truncated. Set to -1 to disable truncation.')
     final public Integer maxErrValSize = 150
 
+    @ConfigOption
+    @Description('The JSON schema file to use for parameter validation.')
     final public CharSequence  parametersSchema = "nextflow_schema.json"
 
+    @ConfigOption
+    @Description('A list of default parameters to ignore during validation. This option should only be used by pipeline developers.')
+    final private Set<CharSequence> defaultIgnoreParams
+
+    @ConfigOption
+    @Description('A list of parameters to ignore during validation.')
     final public Set<CharSequence> ignoreParams = ["nf_test_output"] // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
 
+    @Description('Configuration scope for the help message.')
     final public HelpConfig help
 
+    @Description('Configuration scope for the parameter summary.')
     final public SummaryConfig summary
 
-    ValidationConfig(Map map, Map params){
+    @Description('Configuration scope for the logging of the validation plugin.')
+    final public LoggingConfig logging
+
+    // Keep the no-arg constructor in order to be able to use the `@ConfigOption` annotation
+    ValidationConfig(){}
+
+    ValidationConfig(Map map, Session session){
         def config = map ?: Collections.emptyMap()
+        def params = (Map)session.params ?: [:]
 
         // lenientMode
         if(config.containsKey("lenientMode")) {
@@ -44,8 +79,12 @@ class ValidationConfig {
         }
 
         // monochromeLogs
-        if(config.containsKey("monochromeLogs")) {
-            if(config.monochromeLogs instanceof Boolean) {
+        def ansiLog = session?.ansiLog ?: false
+        if(config.containsKey("monochromeLogs") || !ansiLog) {
+            if(!ansiLog) {
+                monochromeLogs = !ansiLog
+                log.debug("Set `validation.monochromeLogs` to ${monochromeLogs} due to the ANSI log settings.")
+            } else if(config.monochromeLogs instanceof Boolean) {
                 monochromeLogs = config.monochromeLogs
                 log.debug("Set `validation.monochromeLogs` to ${monochromeLogs}")
             } else {
@@ -145,5 +184,16 @@ class ValidationConfig {
             }
         }
         summary = new SummaryConfig(summaryConfig, monochromeLogs)
+
+        // logging
+        def Map loggingConfig = [:]
+        if(config.containsKey("logging")) {
+            if(config.logging instanceof Map) {
+                loggingConfig = config.logging
+            } else {
+                log.warn("Incorrect value detected for `validation.logging`, a map with key-value pairs is expected. Setting the defaults for all logging options.")
+            }
+        }
+        logging = new LoggingConfig(loggingConfig, monochromeLogs)
     }
 }

@@ -12,9 +12,11 @@ import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Files.fileToJson
 import static nextflow.validation.utils.Files.fileToObject
 import static nextflow.validation.utils.Common.findDeep
+import static nextflow.validation.utils.Common.hasDeepKey
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
+import nextflow.validation.validators.ValidationResult
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -61,11 +63,7 @@ class SamplesheetConverter {
         if(unrecognisedHeaders.size() > 0) {
             def String processedHeaders = unrecognisedHeaders.collect { "\t- ${it}" }.join("\n")
             def String msg = "Found the following unidentified headers in ${fileName}:\n${processedHeaders}\n" as String
-            if( config.failUnrecognisedHeaders ) {
-                throw new SchemaValidationException(msg)
-            } else {
-                log.warn(msg)
-            }
+            config.logging.unrecognisedHeaders.log(msg)
         }
     }
 
@@ -101,8 +99,8 @@ class SamplesheetConverter {
         // Validate
         final validator = new JsonSchemaValidator(config)
         def JSONArray samplesheet = fileToJson(samplesheetFile, schemaFile) as JSONArray
-        def Tuple2<List<String>,List<String>> validationResults = validator.validate(samplesheet, schemaFile.text)
-        def validationErrors = validationResults[0]
+        def ValidationResult validationResult = validator.validate(samplesheet, schemaFile.toString())
+        def validationErrors = validationResult.getErrors('field')
         if (validationErrors) {
             def msg = "${colors.red}The following errors have been detected in ${samplesheetFile.toString()}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
             log.error("Validation of samplesheet failed!")
@@ -139,7 +137,7 @@ class SamplesheetConverter {
     private Object formatEntry(Object input, Map schema, String headerPrefix = "") {
 
         // Add default values for missing entries
-        input = input != null ? input : findDeep(schema, "default") != null ? findDeep(schema, "default") : []
+        input = input != null ? input : hasDeepKey(schema, "default") ? findDeep(schema, "default") : []
 
         if (input instanceof Map) {
             def List result = []
@@ -248,7 +246,7 @@ class SamplesheetConverter {
     */
     private Object processMeta(Object input, Map schema, String headerPrefix) {
         // Add default values for missing entries
-        input = input != null ? input : findDeep(schema, "default") != null ? findDeep(schema, "default") : []
+        input = input != null ? input : hasDeepKey(schema, "default") ? findDeep(schema, "default") : []
 
         if (input instanceof Map) {
             def Map result = [:]

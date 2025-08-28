@@ -1,5 +1,6 @@
 package nextflow.validation.validators.evaluators
 
+import org.json.JSONObject
 import dev.harrel.jsonschema.Evaluator
 import dev.harrel.jsonschema.EvaluationContext
 import dev.harrel.jsonschema.JsonNode
@@ -7,12 +8,12 @@ import nextflow.Nextflow
 
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
-import java.nio.file.Files
 
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Files.fileToJson
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.validators.JsonSchemaValidator
+import nextflow.validation.validators.ValidationResult
 
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
@@ -53,11 +54,10 @@ class SchemaEvaluator implements Evaluator {
 
         def String schemaFull = getBasePath(this.baseDir, this.schema)
         def Object json = fileToJson(file, Path.of(schemaFull))
-        def String schemaContents = Files.readString( Path.of(schemaFull) )
         def validator = new JsonSchemaValidator(config)
 
-        def Tuple2<List<String>,List<String>> validationResult = validator.validate(json, schemaContents)
-        def validationErrors = validationResult[0]
+        def ValidationResult validationResult = validator.validate(json, schemaFull)
+        def List<String> validationErrors = validationResult.getErrors((json instanceof JSONObject) ? "parameter" : "field")
         if (validationErrors) {
             def List<String> errors = ["Validation of file failed:"] + validationErrors.collect { "\t${it}" as String}
             return Evaluator.Result.failure(errors.join("\n"))

@@ -15,7 +15,7 @@ import java.nio.file.Path
 @Slf4j
 class FormatDirectoryPathEvaluator implements Evaluator {
     // The string should be a directory
-  
+
     @Override
     public Evaluator.Result evaluate(EvaluationContext ctx, JsonNode node) {
         // To stay consistent with other keywords, types not applicable to this keyword should succeed
@@ -24,15 +24,18 @@ class FormatDirectoryPathEvaluator implements Evaluator {
         }
 
         def String value = node.asString()
+        def Path file
 
-        // Skip validation of blob storage paths
-        if (value.startsWith('s3://') || value.startsWith('az://') || value.startsWith('gs://')) {
-            log.debug("Cloud blob storage paths are not supported by 'FormatDirectoryPathEvaluator': '${value}'")
-            return Evaluator.Result.success()
+        try {
+            file = Nextflow.file(value) as Path
+            if (!(file instanceof List)) {
+                file.exists() // Do an exists check to see if the file can be correctly accessed
+            }
+        } catch (Exception e) {
+            return Evaluator.Result.failure("could not validate file format of '${value}': ${e.message}" as String)
         }
-       
+
         // Actual validation logic
-        def Path file = Nextflow.file(value) as Path
         if (file instanceof List) {
             return Evaluator.Result.failure("'${value}' is not a directory, but a file path pattern" as String)
         }

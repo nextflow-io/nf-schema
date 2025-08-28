@@ -1,0 +1,21 @@
+
+ N E X T F L O W   ~  version 25.04.6
+
+Launching `examples/helpMessage/pipeline/main.nf` [fabulous_boyd] DSL2 - revision: 629cc11c05
+
+
+This is a help message for the pipeline.
+It provides information about the parameters and usage.
+
+    Typical pipeline command:
+
+  nextflow run my_pipeline --input input_file.csv
+
+--outdir
+    type       : string
+    format     : directory-path
+    description: The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
+------------------------------------------------------
+
+For more information, please refer to the documentation.
+    

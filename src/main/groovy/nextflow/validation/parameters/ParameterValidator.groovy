@@ -3,8 +3,6 @@ package nextflow.validation.parameters
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
-import java.nio.file.Files
-import java.nio.file.Path
 import nextflow.Nextflow
 import nextflow.util.Duration
 import nextflow.util.MemoryUnit
@@ -16,6 +14,7 @@ import nextflow.validation.validators.JsonSchemaValidator
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
+import nextflow.validation.validators.ValidationResult
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -134,39 +133,34 @@ class ParameterValidator {
 
         //=====================================================================//
         // Validate parameters against the schema
-        def String schema_string = Files.readString( Path.of(getBasePath(baseDir, schemaFilename)) )
         def validator = new JsonSchemaValidator(config)
 
         // Colors
         def colors = getLogColors(config.monochromeLogs)
 
         // Validate
-        Tuple2<List<String>,List<String>> validationResult = validator.validate(paramsJSON, schema_string)
-        def validationErrors = validationResult[0]
-        def unevaluatedParams = validationResult[1]
-        this.errors.addAll(validationErrors)
+        def ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
+        def List<String> paramErrors = validationResult.getErrors('parameter')
+        this.errors.addAll(paramErrors)
 
         //=====================================================================//
         // Check for nextflow core params and unexpected params
         //=====================================================================//
-        unevaluatedParams.each{ param ->
-            def String dotParam = param.replaceAll("/", ".")
-            if (NF_OPTIONS.contains(param)) {
-                errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
-            }
-            else if (!config.ignoreParams.any { dotParam == it || dotParam.startsWith(it + ".") } ) { // Check if an ignore param is present
-                def String text = "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
-                if(config.failUnrecognisedParams) {
-                    errors << text
-                } else {
-                    warnings << text
+        def List<String> unexpectedParams = []
+        if(paramErrors.size() == 0) {
+            validationResult.getUnevaluated().each{ param ->
+                def String dotParam = param.replaceAll("/", ".")
+                if (NF_OPTIONS.contains(param)) {
+                    errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
+                }
+                else if (!config.ignoreParams.any { dotParam == it || dotParam.startsWith(it + ".") } ) { // Check if an ignore param is present
+                    unexpectedParams << "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
                 }
             }
         }
-        // check for warnings
-        if( this.hasWarnings() ) {
-            def msg = "The following invalid input values have been detected:\n\n" + this.getWarnings().join('\n').trim() + "\n\n"
-            log.warn(msg)
+
+        if (unexpectedParams.size() > 0) {
+            config.logging.unrecognisedParams.log("The following invalid input values have been detected:\n\n" + unexpectedParams.join("\n").trim() + "\n\n")
         }
 
         def List<String> modifiedIgnoreParams = config.ignoreParams.collect { param -> "* --${param}" as String }
