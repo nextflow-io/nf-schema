@@ -111,7 +111,7 @@ public class Files {
     //
     private static Path sanitize(Path file) {
         // Check if sanitization is needed
-        def BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))
+        def reader = file.newReader()
         def String firstLine = reader.readLine()
         reader.close()
         if (!firstLine.endsWith(",") && !firstLine.endsWith("\t")) {
@@ -123,18 +123,15 @@ public class Files {
 
         def Scanner scanner = new Scanner(file.toFile())
         def PrintWriter writer = new PrintWriter(tempFile)
-        def Boolean headerSanitized = false
-        while (scanner.hasNextLine()) {
-            def String line = scanner.nextLine()
+        file.withReader {
+            def String line
             // Remove trailing commas or tabs from the line
-            if (!headerSanitized) {
-                line = line.replaceAll("[,\\t]*\$", "")
-                headerSanitized = true
+            while( line = it.readLine() ) {
+                def String sanitized_line = line.replaceAll("[,\\t]*\$", "")
+                writer.println(sanitized_line)
             }
-            writer.println(line)
         }
         writer.close()
-        scanner.close()
         return tempFile.toPath()
     }
 

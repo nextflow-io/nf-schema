@@ -31,4 +31,10 @@ nextflowPlugin {
             indexUrl = 'https://github.com/nextflow-io/plugins/blob/main/plugins.json'
         }
     }
+
+    test {
+        jvmArgs += [
+            '--add-opens', 'java.base/sun.net.www.protocol.ftp=ALL-UNNAMED'
+        ]
+    }
 }
