@@ -8,7 +8,7 @@ dependencies {
     implementation 'com.sanctionco.jmail:jmail:1.6.3' // Needed for e-mail format validation
 }
 
-version = '2.5.0'
+version = '2.5.1'
 
 nextflowPlugin {
     nextflowVersion = '25.04.0'
