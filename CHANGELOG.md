@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.5.1
+
+## Bug fixes
+
+1. Fixed a bug where non-local samplesheets couldn't be validated and converted.
+
 # Version 2.5.0
 
 ## New features
