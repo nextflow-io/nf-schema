@@ -17,6 +17,8 @@ import java.io.FileReader
 import java.io.File
 
 import nextflow.validation.exceptions.SchemaValidationException
+import nextflow.validation.utils.WorkbookConverter
+import nextflow.validation.config.ValidationConfig
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
 import static nextflow.validation.utils.Types.inferType
 
@@ -32,11 +34,19 @@ import static nextflow.validation.utils.Types.inferType
 public class Files {
 
     //
-    // Function to detect if a file is a CSV, TSV, JSON or YAML file
+    // Function to get file extension from filename
+    //
+    public static String getFileExtension(String filename) {
+        int lastDotIndex = filename.lastIndexOf('.')
+        return lastDotIndex >= 0 ? filename.substring(lastDotIndex + 1) : ""
+    }
+
+    //
+    // Function to detect if a file is a CSV, TSV, JSON, YAML or Excel file
     //
     public static String getFileType(Path file) {
         def String extension = file.getExtension()
-        if (extension in ["csv", "tsv", "yml", "yaml", "json"]) {
+        if (extension in ["csv", "tsv", "yml", "yaml", "json", "xlsx", "xlsm", "xlsb", "xls"]) {
             return extension == "yml" ? "yaml" : extension
         }
 
@@ -46,7 +56,7 @@ public class Files {
         def Integer tabCount = header.count("\t")
 
         if ( commaCount == tabCount ){
-            log.error("Could not derive file type from ${file}. Please specify the file extension (CSV, TSV, YML, YAML and JSON are supported).".toString())
+            log.error("Could not derive file type from ${file}. Please specify the file extension (CSV, TSV, YML, YAML, JSON, and Excel formats are supported).".toString())
         }
         if ( commaCount > tabCount ){
             return "csv"

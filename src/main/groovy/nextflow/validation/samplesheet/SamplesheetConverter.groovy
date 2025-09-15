@@ -11,10 +11,12 @@ import nextflow.Nextflow
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Files.fileToJson
 import static nextflow.validation.utils.Files.fileToObject
+import static nextflow.validation.utils.Files.getFileType
 import static nextflow.validation.utils.Common.findDeep
 import static nextflow.validation.utils.Common.hasDeepKey
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
+import nextflow.validation.utils.WorkbookConverter
 import nextflow.validation.validators.JsonSchemaValidator
 import nextflow.validation.validators.ValidationResult
 
@@ -96,9 +98,29 @@ class SamplesheetConverter {
             throw new SchemaValidationException(msg)
         }
 
+        // Check if this is an Excel file and process accordingly
+        def String fileType = getFileType(samplesheetFile)
+        def JSONArray samplesheet
+        def List samplesheetList
+
+        if (fileType in ['xlsx', 'xlsm', 'xlsb', 'xls']) {
+            // Process Excel file using WorkbookConverter
+            def WorkbookConverter workbookConverter = new WorkbookConverter(config)
+            samplesheetList = workbookConverter.convertToList(samplesheetFile, options) as List
+
+            // Convert to JSON for validation - same as other formats
+            def jsonGenerator = new groovy.json.JsonGenerator.Options()
+                .excludeNulls()
+                .build()
+            samplesheet = new JSONArray(jsonGenerator.toJson(samplesheetList))
+        } else {
+            // Process other file formats
+            samplesheet = fileToJson(samplesheetFile, schemaFile) as JSONArray
+            samplesheetList = fileToObject(samplesheetFile, schemaFile) as List
+        }
+
         // Validate
         final validator = new JsonSchemaValidator(config)
-        def JSONArray samplesheet = fileToJson(samplesheetFile, schemaFile) as JSONArray
         def ValidationResult validationResult = validator.validate(samplesheet, schemaFile.toString())
         def validationErrors = validationResult.getErrors('field')
         if (validationErrors) {
@@ -107,8 +129,7 @@ class SamplesheetConverter {
             throw new SchemaValidationException(msg, validationErrors)
         }
 
-        // Convert
-        def List samplesheetList = fileToObject(samplesheetFile, schemaFile) as List
+        // Convert (already done above for Excel files)
         this.rows = []
 
         def List channelFormat = samplesheetList.collect { entry ->
