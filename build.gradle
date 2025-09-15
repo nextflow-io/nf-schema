@@ -6,6 +6,11 @@ dependencies {
     implementation 'org.json:json:20240303'
     implementation 'dev.harrel:json-schema:1.5.0'
     implementation 'com.sanctionco.jmail:jmail:1.6.3' // Needed for e-mail format validation
+
+    // Apache POI dependencies for Excel support
+    implementation 'org.apache.poi:poi:5.4.1'
+    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+    implementation 'org.apache.poi:poi-scratchpad:5.4.1'
 }
 
 version = '2.5.1'
