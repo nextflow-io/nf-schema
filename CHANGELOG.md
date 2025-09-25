@@ -5,6 +5,7 @@
 ## Bug fixes
 
 1. Fixed a bug where non-local samplesheets couldn't be validated and converted.
+2. Fixed a bug where Azure blob storage paths were incorrectly validated as directories.
 
 # Version 2.5.0
 
