@@ -35,10 +35,6 @@ class FormatFilePathEvaluator implements Evaluator {
                 file.exists() // Do an exists check to see if the file can be correctly accessed (skip for Azure paths)
             }
         } catch (Exception e) {
-            // For Azure paths, if the plugin is missing, just validate the format
-            if (isAzurePath && e.message.contains("Missing plugin 'nf-azure'")) {
-                return Evaluator.Result.success()
-            }
             return Evaluator.Result.failure("could not validate file format of '${value}': ${e.message}" as String)
         }
 

@@ -37,10 +37,6 @@ class FormatFilePathPatternEvaluator implements Evaluator {
                 }
             }
         } catch (Exception e) {
-            // For Azure patterns, if the plugin is missing, just validate the format
-            if (isAzurePattern && e.message.contains("Missing plugin 'nf-azure'")) {
-                return Evaluator.Result.success()
-            }
             return Evaluator.Result.failure("could not validate file format of '${value}': ${e.message}" as String)
         }
         // Actual validation logic

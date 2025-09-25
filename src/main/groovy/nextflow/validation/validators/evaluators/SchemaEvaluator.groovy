@@ -46,17 +46,7 @@ class SchemaEvaluator implements Evaluator {
         def boolean isAzurePath = value.startsWith('az://')
 
         // Actual validation logic
-        def Path file
-        try {
-            file = Nextflow.file(value)
-        } catch (Exception e) {
-            // For Azure paths, if the plugin is missing, just skip validation
-            if (isAzurePath && e.message.contains("Missing plugin 'nf-azure'")) {
-                log.debug("Could not validate Azure file ${value} - nf-azure plugin not available")
-                return Evaluator.Result.success()
-            }
-            throw e
-        }
+        def Path file = Nextflow.file(value)
 
         // Don't validate if the file does not exist
         if(!file.exists()) {
