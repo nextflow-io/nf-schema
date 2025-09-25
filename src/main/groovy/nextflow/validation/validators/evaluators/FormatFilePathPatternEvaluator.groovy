@@ -24,17 +24,12 @@ class FormatFilePathPatternEvaluator implements Evaluator {
         }
 
         def String value = node.asString()
-        
-        // Check if this is an Azure storage path pattern early
-        def boolean isAzurePattern = value.startsWith('az://')
-        
+
         def List<Path> files
         try {
             files = Nextflow.files(value)
-            if (!isAzurePattern) {
-                files.each { file ->
-                    file.exists() // Do an exists check to see if the file can be correctly accessed (skip for Azure paths)
-                }
+            files.each { file ->
+                file.exists() // Do an exists check to see if the file can be correctly accessed
             }
         } catch (Exception e) {
             return Evaluator.Result.failure("could not validate file format of '${value}': ${e.message}" as String)
@@ -46,12 +41,8 @@ class FormatFilePathPatternEvaluator implements Evaluator {
             return Evaluator.Result.failure("No files were found using the glob pattern '${value}'" as String)
         }
         files.each { file ->
-            // Check if this is an Azure storage path
-            def String scheme = file.scheme
-            def boolean isAzurePath = scheme == 'az'
-            
-            // For Azure paths, skip the directory check as Azure blob storage doesn't have true directories
-            if (!isAzurePath && file.isDirectory()) {
+            // If it's an Azure storage path, skip directory validation
+            if (file.isDirectory() && !file.toString().startsWith('az://')) {
                 errors.add("'${file.toString()}' is not a file, but a directory" as String)
             }
         }

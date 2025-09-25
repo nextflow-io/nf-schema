@@ -24,15 +24,11 @@ class FormatFilePathEvaluator implements Evaluator {
         }
 
         def String value = node.asString()
-        
-        // Check if this is an Azure storage path early
-        def boolean isAzurePath = value.startsWith('az://')
-        
         def Path file
         try {
             file = Nextflow.file(value) as Path
-            if (!(file instanceof List) && !isAzurePath) {
-                file.exists() // Do an exists check to see if the file can be correctly accessed (skip for Azure paths)
+            if (!(file instanceof List)) {
+                file.exists() // Do an exists check to see if the file can be correctly accessed
             }
         } catch (Exception e) {
             return Evaluator.Result.failure("could not validate file format of '${value}': ${e.message}" as String)
@@ -42,9 +38,12 @@ class FormatFilePathEvaluator implements Evaluator {
         if (file instanceof List) {
             return Evaluator.Result.failure("'${value}' is not a file, but a file path pattern" as String)
         }
-        
-        // For Azure paths, skip the directory check as Azure blob storage doesn't have true directories
-        if (!isAzurePath && file.exists() && file.isDirectory()) {
+
+        if (file.exists() && file.isDirectory()) {
+            // If it's an Azure storage path, skip directoryvalidation
+            if(value.startsWith('az://')) {
+                return Evaluator.Result.success()
+            }
             return Evaluator.Result.failure("'${value}' is not a file, but a directory" as String)
         }
         return Evaluator.Result.success()

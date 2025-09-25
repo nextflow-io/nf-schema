@@ -41,9 +41,6 @@ class SchemaEvaluator implements Evaluator {
         }
 
         def String value = node.asString()
-        
-        // Check if this is an Azure storage path early
-        def boolean isAzurePath = value.startsWith('az://')
 
         // Actual validation logic
         def Path file = Nextflow.file(value)
@@ -53,9 +50,9 @@ class SchemaEvaluator implements Evaluator {
             log.debug("Could not validate the file ${file.toString()} - file does not exist")
             return Evaluator.Result.success()
         }
-        
-        // For non-Azure paths, skip validation if it's a directory
-        if(!isAzurePath && file.isDirectory()) {
+
+        // Skip validation if it's a directory
+        if(file.isDirectory() || value.startsWith('az://')) {
             log.debug("Could not validate the file ${file.toString()} - path is a directory")
             return Evaluator.Result.success()
         }
