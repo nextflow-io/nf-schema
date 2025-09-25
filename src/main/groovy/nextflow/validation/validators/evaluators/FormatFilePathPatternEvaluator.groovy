@@ -24,8 +24,8 @@ class FormatFilePathPatternEvaluator implements Evaluator {
         }
 
         def String value = node.asString()
-        def List<Path> files
 
+        def List<Path> files
         try {
             files = Nextflow.files(value)
             files.each { file ->
@@ -41,7 +41,8 @@ class FormatFilePathPatternEvaluator implements Evaluator {
             return Evaluator.Result.failure("No files were found using the glob pattern '${value}'" as String)
         }
         files.each { file ->
-            if (file.isDirectory()) {
+            // If it's an Azure storage path, skip directory validation
+            if (file.isDirectory() && !file.toString().startsWith('az://')) {
                 errors.add("'${file.toString()}' is not a file, but a directory" as String)
             }
         }

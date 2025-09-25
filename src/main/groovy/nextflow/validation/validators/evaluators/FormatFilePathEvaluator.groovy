@@ -25,7 +25,6 @@ class FormatFilePathEvaluator implements Evaluator {
 
         def String value = node.asString()
         def Path file
-
         try {
             file = Nextflow.file(value) as Path
             if (!(file instanceof List)) {
@@ -39,7 +38,12 @@ class FormatFilePathEvaluator implements Evaluator {
         if (file instanceof List) {
             return Evaluator.Result.failure("'${value}' is not a file, but a file path pattern" as String)
         }
+
         if (file.exists() && file.isDirectory()) {
+            // If it's an Azure storage path, skip directoryvalidation
+            if(value.startsWith('az://')) {
+                return Evaluator.Result.success()
+            }
             return Evaluator.Result.failure("'${value}' is not a file, but a directory" as String)
         }
         return Evaluator.Result.success()

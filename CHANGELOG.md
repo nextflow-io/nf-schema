@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.6.0
+
+## Bug fixes
+
+1. Fixed a bug where Azure blob storage paths were incorrectly validated as directories.
+
 # Version 2.5.1
 
 ## Bug fixes

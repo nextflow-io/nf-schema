@@ -1,0 +1,19 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/nf-schema/master/examples/azurepath/nextflow_schema.json",
+    "title": "Azure path validation test",
+    "description": "Test schema for Azure path validation",
+    "type": "object",
+    "properties": {
+        "az_file": {
+            "type": "string",
+            "format": "file-path",
+            "description": "Azure storage file path"
+        },
+        "az_directory": {
+            "type": "string", 
+            "format": "directory-path",
+            "description": "Azure storage directory path"
+        }
+    }
+}
