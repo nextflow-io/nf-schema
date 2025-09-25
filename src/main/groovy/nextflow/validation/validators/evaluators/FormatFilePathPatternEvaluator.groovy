@@ -41,7 +41,12 @@ class FormatFilePathPatternEvaluator implements Evaluator {
             return Evaluator.Result.failure("No files were found using the glob pattern '${value}'" as String)
         }
         files.each { file ->
-            if (file.isDirectory()) {
+            // Check if this is an Azure storage path
+            def String scheme = file.scheme
+            def boolean isAzurePath = scheme == 'az'
+            
+            // For Azure paths, skip the directory check as Azure blob storage doesn't have true directories
+            if (!isAzurePath && file.isDirectory()) {
                 errors.add("'${file.toString()}' is not a file, but a directory" as String)
             }
         }

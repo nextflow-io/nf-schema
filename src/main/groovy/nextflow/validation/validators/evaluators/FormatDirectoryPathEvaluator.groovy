@@ -39,7 +39,13 @@ class FormatDirectoryPathEvaluator implements Evaluator {
         if (file instanceof List) {
             return Evaluator.Result.failure("'${value}' is not a directory, but a file path pattern" as String)
         }
-        if (file.exists() && !file.isDirectory()) {
+        
+        // Check if this is an Azure storage path
+        def String scheme = file.scheme
+        def boolean isAzurePath = scheme == 'az'
+        
+        // For Azure paths, skip the directory check as Azure blob storage doesn't have true directories
+        if (!isAzurePath && file.exists() && !file.isDirectory()) {
             return Evaluator.Result.failure("'${value}' is not a directory, but a file" as String)
         }
         return Evaluator.Result.success()

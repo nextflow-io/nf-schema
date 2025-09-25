@@ -1397,4 +1397,28 @@ class ValidateParametersTest extends Dsl2Spec{
         noExceptionThrown()
         stdout == ["* --testing: test", "* --genomebutlonger: true"]
     }
+
+    def 'should validate Azure storage file paths' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_azure_path.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.az_file = 'az://mycontainer/myfile.txt'
+            params.az_directory = 'az://mycontainer/mydir/'
+            include { validateParameters } from 'plugin/nf-schema'
+            
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
 }
