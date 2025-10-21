@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.6.0
+
+This is a small release to enable compatibility with Nextflow 25.10.0. No new features or bug fixes have been added.
+
+This release is only compatible with Nextflow 25.10.0 and later versions.
+
 # Version 2.5.1
 
 ## Bug fixes

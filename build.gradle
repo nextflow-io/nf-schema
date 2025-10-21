@@ -1,5 +1,5 @@
 plugins {
-    id 'io.nextflow.nextflow-plugin' version '0.0.1-alpha3'
+    id 'io.nextflow.nextflow-plugin' version '1.0.0-beta.10'
 }
 
 dependencies {
@@ -8,10 +8,10 @@ dependencies {
     implementation 'com.sanctionco.jmail:jmail:1.6.3' // Needed for e-mail format validation
 }
 
-version = '2.5.1'
+version = '2.6.0'
 
 nextflowPlugin {
-    nextflowVersion = '25.04.0'
+    nextflowVersion = '25.10.0'
 
     provider = 'nextflow'
     className = 'nextflow.validation.ValidationPlugin'
@@ -20,17 +20,6 @@ nextflowPlugin {
         'nextflow.validation.ValidationExtension',
         'nextflow.validation.ValidationObserverFactory'
     ]
-
-    publishing {
-        github {
-            repository = 'nextflow-io/nf-schema'
-            userName = project.findProperty('github_username')
-            authToken = project.findProperty('github_access_token')
-            email = project.findProperty('github_commit_email')
-
-            indexUrl = 'https://github.com/nextflow-io/plugins/blob/main/plugins.json'
-        }
-    }
 
     test {
         jvmArgs += [
