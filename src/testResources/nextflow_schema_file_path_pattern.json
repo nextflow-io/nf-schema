@@ -12,7 +12,8 @@
             "properties": {
                 "glob": {
                     "type": "string",
-                    "format": "file-path-pattern"
+                    "format": "file-path-pattern",
+                    "exists": true
                 }
             }
         }
