@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.6.0
+
+## Bug fixes
+
+1. Fixed a bug where the `exists` evaluator would fail on globbing patterns. The `exists` evaluator will now skip evaluation when a globbing pattern contains more than one file.
+
 # Version 2.5.1
 
 ## Bug fixes
