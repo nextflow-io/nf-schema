@@ -1,5 +1,9 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.6.1
+
+This is a quick patch release to bump the Nextflow Gradle plugin to `1.0.0-beta.11`. This will enable support for the configuration options in the Nextflow language server.
+
 # Version 2.6.0
 
 This is a small release to enable compatibility with Nextflow 25.10.0 and thus the minimal compatible Nextflow version is 25.10.0 now.
