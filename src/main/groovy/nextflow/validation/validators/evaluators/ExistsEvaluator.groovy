@@ -31,18 +31,22 @@ class ExistsEvaluator implements Evaluator {
 
         def String value = node.asString()
         def Boolean exists
-        def Path file
 
         try {
-            file = Nextflow.file(value) as Path
-            exists = file.exists()
+            def List<Path> files = Nextflow.files(value) as List<Path>
+
+            def Integer fileCount = files.size()
+            if (fileCount == 0) {
+                exists = false
+            } else if (fileCount == 1) {
+                exists = files[0].exists()
+            } else {
+                // Always return true if multiple files are found (only happens in patterns)
+                exists = true
+            }
+
         } catch (Exception e) {
             return Evaluator.Result.failure("could not check existence of '${value}': ${e.message}" as String)
-        }
-
-        // Don't evaluate file path patterns
-        if (file instanceof List) {
-            return Evaluator.Result.success()
         }
 
         if (!exists && this.shouldExist == true) {

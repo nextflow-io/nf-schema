@@ -2,11 +2,16 @@
 
 # Version 2.6.0
 
-This is a small release to enable compatibility with Nextflow 25.10.0. No new features or bug fixes have been added.
+This is a small release to enable compatibility with Nextflow 25.10.0 and thus the minimal compatible Nextflow version is 25.10.0 now.
 
-This release is only compatible with Nextflow 25.10.0 and later versions.
+## Changes
 
-Additionaly, support for Java 11 has been dropped and support for Java 25 has been added.
+1. Removed Java 11 support, it might still work, but we don't test for that version anymore.
+2. Added support for Java 25, which is supported starting from Nextflow 25.10.0.
+
+## Bug fixes
+
+1. Fixed a bug where the `exists` evaluator would fail on globbing patterns. The `exists` evaluator will now correctly validate globbing patterns.
 
 # Version 2.5.1
 
