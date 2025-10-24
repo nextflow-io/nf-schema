@@ -4,7 +4,7 @@
 
 ## Bug fixes
 
-1. Fixed a bug where the `exists` evaluator would fail on globbing patterns. The `exists` evaluator will now skip evaluation when a globbing pattern contains more than one file.
+1. Fixed a bug where the `exists` evaluator would fail on globbing patterns. The `exists` evaluator will now correctly validate globbing patterns.
 
 # Version 2.5.1
 

@@ -35,13 +35,16 @@ class ExistsEvaluator implements Evaluator {
         try {
             def List<Path> files = Nextflow.files(value) as List<Path>
 
-            // Don't evaluate file path patterns
             def Integer fileCount = files.size()
-            if (fileCount > 1) {
-                return Evaluator.Result.success()
+            if (fileCount == 0) {
+                exists = false
+            } else if (fileCount == 1) {
+                exists = files[0].exists()
+            } else {
+                // Always return true if multiple files are found (only happens in patterns)
+                exists = true
             }
 
-            exists = fileCount == 1 ? files[0].exists() : false
         } catch (Exception e) {
             return Evaluator.Result.failure("could not check existence of '${value}': ${e.message}" as String)
         }
