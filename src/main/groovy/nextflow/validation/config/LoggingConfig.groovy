@@ -5,8 +5,8 @@ import groovy.util.logging.Slf4j
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.logging.ValidationLogger
 
-import nextflow.config.schema.ConfigOption
-import nextflow.config.schema.ConfigScope
+import nextflow.config.spec.ConfigOption
+import nextflow.config.spec.ConfigScope
 import nextflow.script.dsl.Description
 
 /**
