@@ -1,5 +1,5 @@
 plugins {
-    id 'io.nextflow.nextflow-plugin' version '1.0.0-beta.11'
+    id 'io.nextflow.nextflow-plugin' version '1.0.0-beta.12'
 }
 
 dependencies {
@@ -9,11 +9,6 @@ dependencies {
 
     // Ensure the platform launcher is available at test runtime
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.0'
-}
-
-// Ensure compileTestGroovy runs after buildSpec and include generated sources
-tasks.named('compileTestGroovy') {
-    dependsOn tasks.named('buildSpec')
 }
 
 version = '2.6.1'
