@@ -16,7 +16,7 @@ version = '2.6.1'
 nextflowPlugin {
     nextflowVersion = '25.10.0'
 
-    provider = 'nextflow'
+    provider = 'nextflow-io'
     className = 'nextflow.validation.ValidationPlugin'
     extensionPoints = [
         'nextflow.validation.config.ValidationConfig',
