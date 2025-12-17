@@ -58,8 +58,7 @@ class FormatFilePathPatternEvaluator implements Evaluator {
             return Evaluator.Result.failure("No files were found using the glob pattern '${value}'" as String)
         }
         files.each { file ->
-            // Cloud storage paths may not have true directory semantics
-            if (file.isDirectory() && !isCloudStoragePath(file.toString())) {
+            if (file.isDirectory()) {
                 errors.add("'${file.toString()}' is not a file, but a directory" as String)
             }
         }

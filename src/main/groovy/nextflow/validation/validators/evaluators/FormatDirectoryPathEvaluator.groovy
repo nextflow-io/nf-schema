@@ -52,10 +52,6 @@ class FormatDirectoryPathEvaluator implements Evaluator {
             return Evaluator.Result.failure("'${value}' is not a directory, but a file path pattern" as String)
         }
         if (file.exists() && !file.isDirectory()) {
-            // Cloud storage paths may not have true directory semantics
-            if (isCloudStoragePath(value)) {
-                return Evaluator.Result.success()
-            }
             return Evaluator.Result.failure("'${value}' is not a directory, but a file" as String)
         }
         return Evaluator.Result.success()
