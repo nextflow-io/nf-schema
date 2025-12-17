@@ -19,6 +19,15 @@ import java.util.stream.IntStream
 @Slf4j
 public class Common {
 
+    private static final List<String> CLOUD_STORAGE_SCHEMES = ['s3://', 'az://', 'gs://']
+
+    //
+    // Check if a path string is a cloud storage path (S3, Azure, GCS)
+    //
+    public static boolean isCloudStoragePath(String value) {
+        return CLOUD_STORAGE_SCHEMES.any { value.startsWith(it) }
+    }
+
     //
     // Get full path based on the base directory of the pipeline run
     //

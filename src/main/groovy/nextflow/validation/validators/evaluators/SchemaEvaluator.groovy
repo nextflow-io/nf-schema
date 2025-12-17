@@ -10,6 +10,7 @@ import groovy.util.logging.Slf4j
 import java.nio.file.Path
 
 import static nextflow.validation.utils.Common.getBasePath
+import static nextflow.validation.utils.Common.isCloudStoragePath
 import static nextflow.validation.utils.Files.fileToJson
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.validators.JsonSchemaValidator
@@ -22,12 +23,6 @@ import nextflow.validation.validators.ValidationResult
 @Slf4j
 class SchemaEvaluator implements Evaluator {
     // Evaluate the file using the given schema
-
-    private static final List<String> CLOUD_STORAGE_SCHEMES = ['s3://', 'az://', 'gs://']
-
-    private static boolean isCloudStoragePath(String value) {
-        return CLOUD_STORAGE_SCHEMES.any { value.startsWith(it) }
-    }
 
     private final String schema
     private final String baseDir

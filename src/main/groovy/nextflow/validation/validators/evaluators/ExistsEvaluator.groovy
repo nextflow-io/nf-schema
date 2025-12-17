@@ -8,6 +8,8 @@ import nextflow.Nextflow
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
 
+import static nextflow.validation.utils.Common.isCloudStoragePath
+
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
@@ -15,12 +17,6 @@ import java.nio.file.Path
 @Slf4j
 class ExistsEvaluator implements Evaluator {
     // The file should or should not exist
-
-    private static final List<String> CLOUD_STORAGE_SCHEMES = ['s3://', 'az://', 'gs://']
-
-    private static boolean isCloudStoragePath(String value) {
-        return CLOUD_STORAGE_SCHEMES.any { value.startsWith(it) }
-    }
 
     private final Boolean shouldExist // true if the file should exist, false if it should not
 

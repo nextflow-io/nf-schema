@@ -8,6 +8,8 @@ import nextflow.Nextflow
 import groovy.util.logging.Slf4j
 import java.nio.file.Path
 
+import static nextflow.validation.utils.Common.isCloudStoragePath
+
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
@@ -15,12 +17,6 @@ import java.nio.file.Path
 @Slf4j
 class FormatFilePathEvaluator implements Evaluator {
     // The string should be a file
-
-    private static final List<String> CLOUD_STORAGE_SCHEMES = ['s3://', 'az://', 'gs://']
-
-    private static boolean isCloudStoragePath(String value) {
-        return CLOUD_STORAGE_SCHEMES.any { value.startsWith(it) }
-    }
 
     @Override
     public Evaluator.Result evaluate(EvaluationContext ctx, JsonNode node) {
