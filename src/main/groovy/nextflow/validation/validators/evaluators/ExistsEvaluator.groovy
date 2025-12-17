@@ -51,7 +51,7 @@ class ExistsEvaluator implements Evaluator {
             // For cloud storage paths, skip validation gracefully if we can't access them
             // (e.g., due to missing credentials or permissions)
             if (isCloudStoragePath(value)) {
-                log.debug("Skipping existence validation for inaccessible cloud storage path '${value}': ${e.message}")
+                log.debug("Skipping existence validation for cloud storage path '${value}' due to exception: ${e.message}")
                 return Evaluator.Result.success()
             }
             return Evaluator.Result.failure("could not check existence of '${value}': ${e.message}" as String)

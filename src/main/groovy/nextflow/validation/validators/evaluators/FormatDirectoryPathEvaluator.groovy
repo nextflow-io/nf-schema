@@ -37,7 +37,7 @@ class FormatDirectoryPathEvaluator implements Evaluator {
             // For cloud storage paths, skip validation gracefully if we can't access them
             // (e.g., due to missing credentials or permissions)
             if (isCloudStoragePath(value)) {
-                log.debug("Skipping validation for inaccessible cloud storage path '${value}': ${e.message}")
+                log.debug("Skipping validation for cloud storage path '${value}' due to exception: ${e.message}")
                 return Evaluator.Result.success()
             }
             return Evaluator.Result.failure("could not validate directory format of '${value}': ${e.message}" as String)

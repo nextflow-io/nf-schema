@@ -50,7 +50,7 @@ class SchemaEvaluator implements Evaluator {
         } catch (Exception e) {
             // For cloud storage paths, skip validation gracefully if we can't access them
             if (isCloudStoragePath(value)) {
-                log.debug("Skipping schema validation for inaccessible cloud storage path '${value}': ${e.message}")
+                log.debug("Skipping schema validation for cloud storage path '${value}' due to exception: ${e.message}")
                 return Evaluator.Result.success()
             }
             throw e
@@ -65,7 +65,7 @@ class SchemaEvaluator implements Evaluator {
         } catch (Exception e) {
             // For cloud storage paths, skip validation gracefully if we can't check existence
             if (isCloudStoragePath(value)) {
-                log.debug("Skipping schema validation for inaccessible cloud storage path '${value}': ${e.message}")
+                log.debug("Skipping schema validation for cloud storage path '${value}' due to exception: ${e.message}")
                 return Evaluator.Result.success()
             }
             throw e
