@@ -16,6 +16,12 @@ import java.nio.file.Path
 class ExistsEvaluator implements Evaluator {
     // The file should or should not exist
 
+    private static final List<String> CLOUD_STORAGE_SCHEMES = ['s3://', 'az://', 'gs://']
+
+    private static boolean isCloudStoragePath(String value) {
+        return CLOUD_STORAGE_SCHEMES.any { value.startsWith(it) }
+    }
+
     private final Boolean shouldExist // true if the file should exist, false if it should not
 
     ExistsEvaluator(Boolean exists) {
@@ -46,6 +52,12 @@ class ExistsEvaluator implements Evaluator {
             }
 
         } catch (Exception e) {
+            // For cloud storage paths, skip validation gracefully if we can't access them
+            // (e.g., due to missing credentials or permissions)
+            if (isCloudStoragePath(value)) {
+                log.debug("Skipping existence validation for inaccessible cloud storage path '${value}': ${e.message}")
+                return Evaluator.Result.success()
+            }
             return Evaluator.Result.failure("could not check existence of '${value}': ${e.message}" as String)
         }
 
