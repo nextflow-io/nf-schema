@@ -16,6 +16,12 @@ import java.nio.file.Path
 class FormatFilePathEvaluator implements Evaluator {
     // The string should be a file
 
+    private static final List<String> CLOUD_STORAGE_SCHEMES = ['s3://', 'az://', 'gs://']
+
+    private static boolean isCloudStoragePath(String value) {
+        return CLOUD_STORAGE_SCHEMES.any { value.startsWith(it) }
+    }
+
     @Override
     public Evaluator.Result evaluate(EvaluationContext ctx, JsonNode node) {
         // To stay consistent with other keywords, types not applicable to this keyword should succeed
@@ -32,6 +38,12 @@ class FormatFilePathEvaluator implements Evaluator {
                 file.exists() // Do an exists check to see if the file can be correctly accessed
             }
         } catch (Exception e) {
+            // For cloud storage paths, skip validation gracefully if we can't access them
+            // (e.g., due to missing credentials or permissions)
+            if (isCloudStoragePath(value)) {
+                log.debug("Skipping validation for inaccessible cloud storage path '${value}': ${e.message}")
+                return Evaluator.Result.success()
+            }
             return Evaluator.Result.failure("could not validate file format of '${value}': ${e.message}" as String)
         }
 
@@ -40,6 +52,10 @@ class FormatFilePathEvaluator implements Evaluator {
             return Evaluator.Result.failure("'${value}' is not a file, but a file path pattern" as String)
         }
         if (file.exists() && file.isDirectory()) {
+            // Cloud storage paths may not have true directory semantics
+            if (isCloudStoragePath(value)) {
+                return Evaluator.Result.success()
+            }
             return Evaluator.Result.failure("'${value}' is not a file, but a directory" as String)
         }
         return Evaluator.Result.success()

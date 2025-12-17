@@ -1397,4 +1397,76 @@ class ValidateParametersTest extends Dsl2Spec{
         noExceptionThrown()
         stdout == ["* --testing: test", "* --genomebutlonger: true"]
     }
+
+    def 'should validate S3 storage paths without errors' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_cloud_path.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.s3_file = 's3://my-bucket/path/to/file.txt'
+            params.s3_directory = 's3://my-bucket/path/to/directory/'
+            include { validateParameters } from 'plugin/nf-schema'
+
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should validate Google Cloud Storage paths without errors' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_cloud_path.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.gs_file = 'gs://my-bucket/path/to/file.txt'
+            params.gs_directory = 'gs://my-bucket/path/to/directory/'
+            include { validateParameters } from 'plugin/nf-schema'
+
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    def 'should validate Azure storage paths without errors' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_cloud_path.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            params.az_file = 'az://my-container/path/to/file.txt'
+            params.az_directory = 'az://my-container/path/to/directory/'
+            include { validateParameters } from 'plugin/nf-schema'
+
+            validateParameters(parameters_schema: '$schema')
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
 }

@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.6.2 (Unreleased)
+
+## Bug fixes
+
+1. Fixed a bug where cloud storage paths (S3, Azure, Google Cloud Storage) would fail validation with "could not validate file format" errors when the paths could not be accessed due to missing credentials or permissions. Cloud storage paths now gracefully skip validation when inaccessible, while still validating when access is available.
+
 # Version 2.6.1
 
 This is a quick patch release to bump the Nextflow Gradle plugin to `1.0.0-beta.11`. This will enable support for the configuration options in the Nextflow language server.

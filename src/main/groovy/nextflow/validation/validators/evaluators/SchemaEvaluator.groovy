@@ -23,6 +23,12 @@ import nextflow.validation.validators.ValidationResult
 class SchemaEvaluator implements Evaluator {
     // Evaluate the file using the given schema
 
+    private static final List<String> CLOUD_STORAGE_SCHEMES = ['s3://', 'az://', 'gs://']
+
+    private static boolean isCloudStoragePath(String value) {
+        return CLOUD_STORAGE_SCHEMES.any { value.startsWith(it) }
+    }
+
     private final String schema
     private final String baseDir
     private final ValidationConfig config
@@ -43,11 +49,31 @@ class SchemaEvaluator implements Evaluator {
         def String value = node.asString()
 
         // Actual validation logic
-        def Path file = Nextflow.file(value)
+        def Path file
+        try {
+            file = Nextflow.file(value)
+        } catch (Exception e) {
+            // For cloud storage paths, skip validation gracefully if we can't access them
+            if (isCloudStoragePath(value)) {
+                log.debug("Skipping schema validation for inaccessible cloud storage path '${value}': ${e.message}")
+                return Evaluator.Result.success()
+            }
+            throw e
+        }
+
         // Don't validate if the file does not exist or is a directory
-        if(!file.exists() || file.isDirectory()) {
-            log.debug("Could not validate the file ${file.toString()}")
-            return Evaluator.Result.success()
+        try {
+            if(!file.exists() || file.isDirectory()) {
+                log.debug("Could not validate the file ${file.toString()}")
+                return Evaluator.Result.success()
+            }
+        } catch (Exception e) {
+            // For cloud storage paths, skip validation gracefully if we can't check existence
+            if (isCloudStoragePath(value)) {
+                log.debug("Skipping schema validation for inaccessible cloud storage path '${value}': ${e.message}")
+                return Evaluator.Result.success()
+            }
+            throw e
         }
 
         log.debug("Started validating ${file.toString()}")

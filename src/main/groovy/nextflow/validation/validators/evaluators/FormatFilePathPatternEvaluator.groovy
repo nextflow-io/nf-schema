@@ -15,7 +15,13 @@ import java.nio.file.Path
 @Slf4j
 class FormatFilePathPatternEvaluator implements Evaluator {
     // The string should be a path pattern
-  
+
+    private static final List<String> CLOUD_STORAGE_SCHEMES = ['s3://', 'az://', 'gs://']
+
+    private static boolean isCloudStoragePath(String value) {
+        return CLOUD_STORAGE_SCHEMES.any { value.startsWith(it) }
+    }
+
     @Override
     public Evaluator.Result evaluate(EvaluationContext ctx, JsonNode node) {
         // To stay consistent with other keywords, types not applicable to this keyword should succeed
@@ -32,16 +38,28 @@ class FormatFilePathPatternEvaluator implements Evaluator {
                 file.exists() // Do an exists check to see if the file can be correctly accessed
             }
         } catch (Exception e) {
+            // For cloud storage paths, skip validation gracefully if we can't access them
+            // (e.g., due to missing credentials or permissions)
+            if (isCloudStoragePath(value)) {
+                log.debug("Skipping validation for inaccessible cloud storage path '${value}': ${e.message}")
+                return Evaluator.Result.success()
+            }
             return Evaluator.Result.failure("could not validate file format of '${value}': ${e.message}" as String)
         }
         // Actual validation logic
         def List<String> errors = []
 
         if(files.size() == 0) {
+            // For cloud storage paths, empty results may just mean we can't list the bucket
+            if (isCloudStoragePath(value)) {
+                log.debug("Skipping validation for cloud storage glob pattern '${value}': no files found (may be due to permissions)")
+                return Evaluator.Result.success()
+            }
             return Evaluator.Result.failure("No files were found using the glob pattern '${value}'" as String)
         }
         files.each { file ->
-            if (file.isDirectory()) {
+            // Cloud storage paths may not have true directory semantics
+            if (file.isDirectory() && !isCloudStoragePath(file.toString())) {
                 errors.add("'${file.toString()}' is not a file, but a directory" as String)
             }
         }

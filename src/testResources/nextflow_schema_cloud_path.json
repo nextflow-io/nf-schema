@@ -1,0 +1,39 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/nf-schema/master/examples/cloudpath/nextflow_schema.json",
+    "title": "Cloud storage path validation test",
+    "description": "Test schema for cloud storage path validation",
+    "type": "object",
+    "properties": {
+        "s3_file": {
+            "type": "string",
+            "format": "file-path",
+            "description": "S3 storage file path"
+        },
+        "s3_directory": {
+            "type": "string",
+            "format": "directory-path",
+            "description": "S3 storage directory path"
+        },
+        "gs_file": {
+            "type": "string",
+            "format": "file-path",
+            "description": "Google Cloud Storage file path"
+        },
+        "gs_directory": {
+            "type": "string",
+            "format": "directory-path",
+            "description": "Google Cloud Storage directory path"
+        },
+        "az_file": {
+            "type": "string",
+            "format": "file-path",
+            "description": "Azure storage file path"
+        },
+        "az_directory": {
+            "type": "string",
+            "format": "directory-path",
+            "description": "Azure storage directory path"
+        }
+    }
+}
