@@ -16,10 +16,16 @@ This function returns a string that can be logged to the terminal, summarizing t
     This feature is essential for users to verify their configurations, like checking for typos or confirming proper resolution,
     without wading through an array of default settings.
 
-The function takes two arguments:
+The function takes one required argument:
 
 - The `WorkflowMetadata` object, `workflow` (required)
-- File name of a schema file (optional, default: `nextflow_schema.json`).
+
+And four optional arguments:
+
+- `parameters_schema`: File name of a schema file (optional, default: `nextflow_schema.json`).
+- `monochrome_logs`: Boolean to disable coloured logs (optional, default: `false`).
+- `beforeText`: String to add before the summary log (optional, default: `''`).
+- `afterText`: String to add after the summary log (optional, default: `''`).
 
 Typical usage:
 
