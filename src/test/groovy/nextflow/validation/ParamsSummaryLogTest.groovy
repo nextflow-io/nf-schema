@@ -195,6 +195,50 @@ class ParamsSummaryLogTest extends Dsl2Spec{
         stdout ==~ /.*outdir     : outDir.*/
     }
 
+    def 'should print params summary - adds before and after text via arguments' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
+        def  SCRIPT = """
+            params.outdir = "outDir"
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            
+            def summary_params = paramsSummaryLog(
+                workflow,
+                parameters_schema: '$schema',
+                beforeText: 'This text is printed before \\n',
+                afterText: '\\nThis text is printed after'
+            )
+            log.info summary_params
+        """
+
+        when:
+        def config = [:]
+        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults { !it.contains("DEBUG") && !it.contains("after]]") ? it : null }
+                .findResults {it.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    it.contains('Core Nextflow options') ||
+                    it.contains('runName') ||
+                    it.contains('launchDir') ||
+                    it.contains('workDir') ||
+                    it.contains('projectDir') ||
+                    it.contains('userName') ||
+                    it.contains('profile') ||
+                    it.contains('configFiles') ||
+                    it.contains('Input/output options') ||
+                    it.contains('outdir') ||
+                    it.contains('This text is printed before') ||
+                    it.contains('This text is printed after')
+                    ? it : null }
+        
+        then:
+        noExceptionThrown()
+        stdout.size() == 13
+        stdout ==~ /.*outdir     : outDir.*/
+    }
+
     def 'should print params summary - nested parameters - hide params' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath().toString()

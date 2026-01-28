@@ -220,11 +220,19 @@ class ValidationExtension extends PluginExtensionPoint {
         def Map params = session.params
 
         def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
+        def String beforeText = options?.get('beforeText') as String ?: config.summary.beforeText ?: ''
+        def String afterText = options?.get('afterText') as String ?: config.summary.afterText ?: ''
 
         def colors = getLogColors(config.monochromeLogs)
         String output  = ''
-        output += config.summary.beforeText
+        output += beforeText
         def Map paramsMap = paramsSummaryMap(workflow, parameters_schema: schemaFilename)
+        def Map containers = paramsMap.get('Core Nextflow options')?.get('container')
+        if (containers) {
+            log.debug "Containers specified in config:\n${containers.collect { "    ${it.key}: ${it.value}" }.join('\n')}"
+            paramsMap['Core Nextflow options'] = paramsMap['Core Nextflow options'].findAll { it.key != 'container' }
+        }
+
         paramsMap.each { key, value ->
             paramsMap[key] = flattenNestedParamsMap(value as Map)
         }
@@ -241,7 +249,7 @@ class ValidationExtension extends PluginExtensionPoint {
         }
         output += "!! Only displaying parameters that differ from the pipeline defaults !!\n"
         output += "-${colors.dim}----------------------------------------------------${colors.reset}-"
-        output += config.summary.afterText
+        output += afterText
         return output
     }
 
