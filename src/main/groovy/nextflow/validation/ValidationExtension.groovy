@@ -227,6 +227,12 @@ class ValidationExtension extends PluginExtensionPoint {
         String output  = ''
         output += beforeText
         def Map paramsMap = paramsSummaryMap(workflow, parameters_schema: schemaFilename)
+        def Map containers = paramsMap.get('Core Nextflow options')?.get('container')
+        if (containers) {
+            log.debug "Containers specified in config:\n${containers.collect { "    ${it.key}: ${it.value}" }.join('\n')}"
+            paramsMap['Core Nextflow options'] = paramsMap['Core Nextflow options'].findAll { it.key != 'container' }
+        }
+
         paramsMap.each { key, value ->
             paramsMap[key] = flattenNestedParamsMap(value as Map)
         }
