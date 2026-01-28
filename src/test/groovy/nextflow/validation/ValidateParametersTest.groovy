@@ -1397,4 +1397,29 @@ class ValidateParametersTest extends Dsl2Spec{
         noExceptionThrown()
         stdout == ["* --testing: test", "* --genomebutlonger: true"]
     }
+
+    def 'should correctly validate static types paths' () {
+        given:
+        def schema = Path.of('src/testResources/nextflow_schema_no_type.json').toAbsolutePath().toString()
+        def SCRIPT = """
+            include { validateParameters } from 'plugin/nf-schema'
+            params {
+                input = file('src/testResources/correct.csv')
+                outdir = file('src/testResources/testDir')
+            }
+            workflow {
+                validateParameters(parameters_schema: '$schema')
+            }
+        """
+
+        when:
+        def result = new MockScriptRunner([:]).setScript(SCRIPT).execute()
+        def stdout = capture
+                .toString()
+                .readLines()
+                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+
+        then:
+        noExceptionThrown()
+    }
 }

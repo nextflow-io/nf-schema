@@ -1,6 +1,7 @@
 package nextflow.validation.parameters
 
-import groovy.json.JsonBuilder
+import java.nio.file.Path
+import groovy.json.JsonGenerator
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import nextflow.Nextflow
@@ -129,7 +130,10 @@ class ParameterValidator {
         // Clean the parameters
         def cleanedParams = cleanParameters(params)
         // Convert to JSONObject
-        def paramsJSON = new JSONObject(new JsonBuilder(cleanedParams).toString())
+        def generator = new JsonGenerator.Options()
+            .addConverter(Path) { Path path -> path.toUri().toString() }
+            .build()
+        def paramsJSON = new JSONObject(generator.toJson(cleanedParams))
 
         //=====================================================================//
         // Validate parameters against the schema
