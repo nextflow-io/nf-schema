@@ -6,6 +6,7 @@ import static nextflow.validation.utils.Common.getLongestKeyLength
 
 import groovy.json.JsonBuilder
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 
 import org.json.JSONObject
 import org.json.JSONArray
@@ -34,7 +35,7 @@ import nextflow.validation.validators.ValidationResult
  */
 
 @Slf4j
-@CompileStatic
+@CompileDynamic
 class ValidationExtension extends PluginExtensionPoint {
 
     // The configuration class
