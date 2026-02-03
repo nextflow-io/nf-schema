@@ -15,4 +15,6 @@ class ValidationPlugin extends BasePlugin {
     ValidationPlugin(PluginWrapper wrapper) {
         super(wrapper)
     }
+
 }
+
