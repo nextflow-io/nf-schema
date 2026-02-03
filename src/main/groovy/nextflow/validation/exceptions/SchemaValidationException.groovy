@@ -2,6 +2,7 @@ package nextflow.validation.exceptions
 
 import groovy.transform.CompileStatic
 import nextflow.exception.AbortOperationException
+
 /**
  * Exception thrown to notify invalid input schema validation
  *
@@ -10,9 +11,9 @@ import nextflow.exception.AbortOperationException
 @CompileStatic
 class SchemaValidationException extends AbortOperationException {
 
-    private List<String> errors
+    final private List<String> errors
 
-    List<String> getErrors() { errors }
+    List<String> getErrors() { return errors }
 
     SchemaValidationException(String message, List<String> errors=[]) {
         super(message)
