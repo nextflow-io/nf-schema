@@ -5,7 +5,7 @@ import static nextflow.validation.utils.Common.getBasePath
 
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileStatic
+import groovy.transform.CompileDynamic
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.Files
@@ -17,7 +17,7 @@ import java.nio.file.Files
  */
 
 @Slf4j
-@CompileStatic
+@CompileDynamic
 class AssetsHelper {
 
     private final String baseDir

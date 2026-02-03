@@ -1,6 +1,6 @@
 package nextflow.validation.summary
 
-import static nextflow.validation.utils.Files.paramsLoad
+import static nextflow.validation.utils.FilesHelper.paramsLoad
 import static nextflow.validation.utils.Common.getBasePath
 
 import groovy.util.logging.Slf4j

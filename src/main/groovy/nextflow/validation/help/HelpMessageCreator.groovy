@@ -1,7 +1,7 @@
 package nextflow.validation.help
 
 import static nextflow.validation.utils.Colors.getLogColors
-import static nextflow.validation.utils.Files.paramsLoad
+import static nextflow.validation.utils.FilesHelper.paramsLoad
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.longestStringLength
 import static nextflow.validation.utils.Common.getLongestKeyLength

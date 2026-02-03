@@ -10,7 +10,7 @@ import groovy.util.logging.Slf4j
 import java.nio.file.Path
 
 import static nextflow.validation.utils.Common.getBasePath
-import static nextflow.validation.utils.Files.fileToJson
+import static nextflow.validation.utils.FilesHelper.fileToJson
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.validators.JsonSchemaValidator
 import nextflow.validation.validators.ValidationResult
