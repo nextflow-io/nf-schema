@@ -1,8 +1,8 @@
 package nextflow.validation.config
 
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 
-import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.logging.ValidationLogger
 
 import nextflow.config.spec.ConfigOption
@@ -13,47 +13,52 @@ import nextflow.script.dsl.Description
  * This class is used to define logging of the nf-schema plugin
  *
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
- *
  */
 
 @Slf4j
+@CompileDynamic
 class LoggingConfig implements ConfigScope {
 
     @ConfigOption
     @Description('Define the logging level of unrecognised parameters. Defaults to `warn`.')
-    final public ValidationLogger unrecognisedParams
+    final ValidationLogger unrecognisedParams
 
     @ConfigOption
-    @Description('Define the logging level of unrecognised headers that are found in the samplesheets. Defaults to `warn`.')
-    final public ValidationLogger unrecognisedHeaders
+    @Description('''
+Define the logging level of unrecognised headers that are found in the samplesheets. Defaults to `warn`.
+''')
+    final ValidationLogger unrecognisedHeaders
 
-    final private OPTIONS = ['skip', 'debug', 'info', 'warn', 'error']
+    final private List<String> options = ['skip', 'debug', 'info', 'warn', 'error']
 
     LoggingConfig(Map map, Boolean monochromeLogs = false) {
-        def config = map ?: [:]
+        Map config = map ?: [:]
 
         // unrecognisedParams
-        def String level = config.get("unrecognisedParams") instanceof CharSequence ? config.get("unrecognisedParams") : "warn"
-        if(OPTIONS.contains(level)) {
-            if(config.get("unrecognisedParams")) {
+        String level = config.get('unrecognisedParams') in CharSequence ? config.get('unrecognisedParams') : 'warn'
+        if (options.contains(level)) {
+            if (config.get('unrecognisedParams')) {
                 log.debug("Set `validation.unrecognisedParams` to ${level}")
             }
             unrecognisedParams = new ValidationLogger(level, monochromeLogs)
         } else {
-            log.warn("Incorrect value detected for `validation.unrecognisedParams`, one of (${OPTIONS.join(', ')}) is expected. Defaulting to `warn`")
-            unrecognisedParams = new ValidationLogger("warn", monochromeLogs)
+            /* groovylint-disable-next-line LineLength */
+            log.warn("Incorrect value detected for `validation.unrecognisedParams`, one of (${options.join(', ')}) is expected. Defaulting to `warn`")
+            unrecognisedParams = new ValidationLogger('warn', monochromeLogs)
         }
 
         // unrecognisedHeaders
-        level = config.get("unrecognisedHeaders") instanceof CharSequence ? config.get("unrecognisedHeaders") : "warn"
-        if(OPTIONS.contains(level)) {
-            if(config.get("unrecognisedHeaders")) {
+        level = config.get('unrecognisedHeaders') in CharSequence ? config.get('unrecognisedHeaders') : 'warn'
+        if (options.contains(level)) {
+            if (config.get('unrecognisedHeaders')) {
                 log.debug("Set `validation.unrecognisedHeaders` to ${level}")
             }
             unrecognisedHeaders = new ValidationLogger(level, monochromeLogs)
         } else {
-            log.warn("Incorrect value detected for `validation.unrecognisedHeaders`, one of (${OPTIONS.join(', ')}) is expected. Defaulting to `warn`")
-            unrecognisedHeaders = new ValidationLogger("warn", monochromeLogs)
+            /* groovylint-disable-next-line LineLength */
+            log.warn("Incorrect value detected for `validation.unrecognisedHeaders`, one of (${options.join(', ')}) is expected. Defaulting to `warn`")
+            unrecognisedHeaders = new ValidationLogger('warn', monochromeLogs)
         }
     }
+
 }
