@@ -1,9 +1,13 @@
 package nextflow.validation.parameters
 
+import static nextflow.validation.utils.Colors.getLogColors
+import static nextflow.validation.utils.Common.getBasePath
+import static nextflow.validation.utils.Common.getValueFromJsonPointer
+
 import java.nio.file.Path
 import groovy.json.JsonGenerator
-import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 import nextflow.Nextflow
 import nextflow.util.Duration
 import nextflow.util.MemoryUnit
@@ -12,9 +16,6 @@ import org.json.JSONObject
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
-import static nextflow.validation.utils.Colors.getLogColors
-import static nextflow.validation.utils.Common.getBasePath
-import static nextflow.validation.utils.Common.getValueFromJsonPointer
 import nextflow.validation.validators.ValidationResult
 
 /**
@@ -24,15 +25,16 @@ import nextflow.validation.validators.ValidationResult
  */
 
 @Slf4j
+@CompileDynamic
 class ParameterValidator {
 
-    private ValidationConfig config
+    final private ValidationConfig config
 
     ParameterValidator(ValidationConfig config) {
         this.config = config
     }
 
-    final List<String> NF_OPTIONS = [
+    final List<String> nextflowOptions = [
             // Options for base `nextflow` command
             'bg',
             'c',
@@ -102,139 +104,121 @@ class ParameterValidator {
             'work-dir'
     ]
 
-    private List<String> errors = []
-    private List<String> warnings = []
+    final private List<String> errors = []
+    final private List<String> warnings = []
 
-    // The amount of parameters hidden (for help messages)
-    private Integer hiddenParametersCount = 0
-
-    // The length of the terminal
-    private Integer terminalLength = System.getenv("COLUMNS")?.toInteger() ?: 100
-
-
-    private boolean hasErrors() { errors.size()>0 }
-    private List<String> getErrors() { errors }
-
-    private boolean hasWarnings() { warnings.size()>0 }
-    private List<String> getWarnings() { warnings }
-
-    public validateParametersMap(
+    void validateParametersMap(
         Map options = null,
         Map inputParams = [:],
         String baseDir
     ) {
-        def Map params = initialiseExpectedParams(inputParams)
-        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
-        log.debug "Starting parameters validation"
+        Map params = initialiseExpectedParams(inputParams)
+        String schemaFilename = options?.containsKey('parameters_schema') ?
+            options.parameters_schema as String :
+            config.parametersSchema
+        log.debug 'Starting parameters validation'
 
         // Clean the parameters
-        def cleanedParams = cleanParameters(params)
+        Map cleanedParams = cleanParameters(params)
         // Convert to JSONObject
-        def generator = new JsonGenerator.Options()
+        JsonGenerator generator = new JsonGenerator.Options()
             .addConverter(Path) { Path path -> path.toUri().toString() }
             .build()
-        def paramsJSON = new JSONObject(generator.toJson(cleanedParams))
+        JSONObject paramsJSON = new JSONObject(generator.toJson(cleanedParams))
 
         //=====================================================================//
         // Validate parameters against the schema
-        def validator = new JsonSchemaValidator(config)
+        JsonSchemaValidator validator = new JsonSchemaValidator(config)
 
         // Colors
-        def colors = getLogColors(config.monochromeLogs)
+        Map<String,String> colors = getLogColors(config.monochromeLogs)
 
         // Validate
-        def ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
-        def List<String> paramErrors = validationResult.getErrors('parameter')
-        this.errors.addAll(paramErrors)
+        ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
+        List<String> paramErrors = validationResult.getErrors('parameter')
+        errors.addAll(paramErrors)
 
         //=====================================================================//
         // Check for nextflow core params and unexpected params
         //=====================================================================//
-        def List<String> unexpectedParams = []
-        if(paramErrors.size() == 0) {
-            validationResult.getUnevaluated().each{ param ->
-                def String dotParam = param.replaceAll("/", ".")
-                if (NF_OPTIONS.contains(param)) {
+        List<String> unexpectedParams = []
+        if (paramErrors.size() == 0) {
+            validationResult.unevaluated.each { param ->
+                String dotParam = param.replaceAll('/', '.')
+                if (nextflowOptions.contains(param)) {
+                    /* groovylint-disable-next-line LineLength */
                     errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
                 }
-                else if (!config.ignoreParams.any { dotParam == it || dotParam.startsWith(it + ".") } ) { // Check if an ignore param is present
-                    unexpectedParams << "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
+                else if (!config.ignoreParams.any { ignoreParam ->
+                    dotParam == ignoreParam || dotParam.startsWith(ignoreParam + '.')
+                }) {
+                    // Check if an ignore param is present
+                    /* groovylint-disable-next-line LineLength */
+                    unexpectedParams << "* --${param.replaceAll('/', '.')}: ${getValueFromJsonPointer('/' + param, paramsJSON)}".toString()
                 }
             }
         }
 
         if (unexpectedParams.size() > 0) {
-            config.logging.unrecognisedParams.log("The following invalid input values have been detected:\n\n" + unexpectedParams.join("\n").trim() + "\n\n")
+            config.logging.unrecognisedParams.log(
+                'The following invalid input values have been detected:\n\n' +
+                unexpectedParams.join('\n').trim() + '\n\n'
+            )
         }
 
-        def List<String> modifiedIgnoreParams = config.ignoreParams.collect { param -> "* --${param}" as String }
-        def List<String> filteredErrors = errors.findAll { error -> 
+        List<String> modifiedIgnoreParams = config.ignoreParams.collect { param -> "* --${param}" as String }
+        List<String> filteredErrors = errors.findAll { error ->
             return modifiedIgnoreParams.find { param -> error.startsWith(param) } == null
         }
         if (filteredErrors.size() > 0) {
-            def msg = "${colors.red}The following invalid input values have been detected:\n\n" + filteredErrors.join('\n').trim() + "\n${colors.reset}\n"
-            log.error("Validation of pipeline parameters failed!")
+            /* groovylint-disable-next-line LineLength */
+            String msg = "${colors.red}The following invalid input values have been detected:\n\n" + filteredErrors.join('\n').trim() + "\n${colors.reset}\n"
+            log.error('Validation of pipeline parameters failed!')
             throw new SchemaValidationException(msg, this.getErrors())
         }
 
-        log.debug "Finishing parameters validation"
+        log.debug 'Finishing parameters validation'
     }
 
-    //
-    // Function to collect enums (options) of a parameter and expected parameters (present in the schema)
-    //
-    private Tuple collectEnums(Map schemaParams) {
-        def expectedParams = []
-        def enums = [:]
-        for (group in schemaParams) {
-            def Map properties = (Map) group.value['properties']
-            for (p in properties) {
-                def String key = (String) p.key
-                expectedParams.push(key)
-                def Map property = properties[key] as Map
-                if (property.containsKey('enum')) {
-                    enums[key] = property['enum']
-                }
-            }
-        }
-        return new Tuple (expectedParams, enums)
-    }
+    private List<String> getErrors() { return errors }
+
+    private List<String> getWarnings() { return warnings }
 
     //
     // Clean and check parameters relative to Nextflow native classes
     //
     private Map cleanParameters(Map params) {
-        def Map new_params = (Map) params.getClass().newInstance(params)
+        Map newParams = (Map) params.getClass().newInstance(params)
         for (p in params) {
             // remove anything evaluating to false
             if (!p['value'] && p['value'] != 0) {
-                new_params.remove(p.key)
+                newParams.remove(p.key)
             }
             // Cast MemoryUnit to String
-            if (p['value'] instanceof MemoryUnit) {
-                new_params.replace(p.key, p['value'].toString())
+            else if (p['value'] in MemoryUnit) {
+                newParams.replace(p.key, p['value'].toString())
             }
             // Cast Duration to String
-            if (p['value'] instanceof Duration) {
-                new_params.replace(p.key, p['value'].toString())
+            else if (p['value'] in Duration) {
+                newParams.replace(p.key, p['value'].toString())
             }
             // Cast LinkedHashMap to String
-            if (p['value'] instanceof LinkedHashMap) {
-                new_params.replace(p.key, p['value'].toString())
+            else if (p['value'] in LinkedHashMap) {
+                newParams.replace(p.key, p['value'].toString())
             }
             // Parsed nested parameters
-            if (p['value'] instanceof Map) {
-                new_params.replace(p.key, cleanParameters(p['value'] as Map))
+            else if (p['value'] in Map) {
+                newParams.replace(p.key, cleanParameters(p['value'] as Map))
             }
         }
-        return new_params
+        return newParams
     }
 
     //
     // Initialise expected params if not present
     //
     private Map initialiseExpectedParams(Map params) {
-        getExpectedParams().each { param ->
+        expectedParams.each { param ->
             params[param] = false
         }
         return params
@@ -244,7 +228,7 @@ class ParameterValidator {
     // Add expected params
     //
     private List getExpectedParams() {
-        def List expectedParams = [
+        List expectedParams = [
             config.help.shortParameter,
             config.help.fullParameter,
             config.help.showHiddenParameter
@@ -252,4 +236,5 @@ class ParameterValidator {
 
         return expectedParams
     }
+
 }
