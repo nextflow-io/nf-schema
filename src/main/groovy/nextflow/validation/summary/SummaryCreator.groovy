@@ -1,14 +1,15 @@
 package nextflow.validation.summary
 
+import static nextflow.validation.utils.Files.paramsLoad
+import static nextflow.validation.utils.Common.getBasePath
+
 import groovy.util.logging.Slf4j
-import java.nio.file.Files
+import groovy.transform.CompileDynamic
 import java.nio.file.Path
 import nextflow.Nextflow
 import nextflow.script.WorkflowMetadata
 
 import nextflow.validation.config.ValidationConfig
-import static nextflow.validation.utils.Files.paramsLoad
-import static nextflow.validation.utils.Common.getBasePath
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -17,6 +18,7 @@ import static nextflow.validation.utils.Common.getBasePath
  */
 
 @Slf4j
+@CompileDynamic
 class SummaryCreator {
 
     final private ValidationConfig config
@@ -25,16 +27,18 @@ class SummaryCreator {
         this.config = config
     }
 
-    public Map getSummaryMap(
+    Map getSummaryMap(
         Map options,
         WorkflowMetadata workflow,
         String baseDir,
         Map params
     ) {
-        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
-        
+        String schemaFilename = options?.containsKey('parameters_schema') ?
+            options.parameters_schema as String :
+            config.parametersSchema
+
         // Get a selection of core Nextflow workflow options
-        def Map workflowSummary = [:]
+        Map workflowSummary = [:]
         if (workflow.revision) {
             workflowSummary['revision'] = workflow.revision
         }
@@ -54,20 +58,19 @@ class SummaryCreator {
         workflowSummary['configFiles']  = workflow.configFiles ? workflow.configFiles.join(', ') : ''
 
         // Get pipeline parameters defined in JSON Schema
-        def Map paramsSummary = [:]
-        def Map paramsMap = paramsLoad( Path.of(getBasePath(baseDir, schemaFilename)) )
+        Map paramsSummary = [:]
+        Map paramsMap = paramsLoad(Path.of(getBasePath(baseDir, schemaFilename)))
         for (group in paramsMap.keySet()) {
-            def Map groupSummary = getSummaryMapFromParams(params, paramsMap.get(group) as Map)
+            Map groupSummary = getSummaryMapFromParams(params, paramsMap.get(group) as Map)
             config.summary.hideParams.each { hideParam ->
-                def List<String> hideParamList = hideParam.tokenize(".") as List<String>
-                def Integer indexCounter = 0
-                def Map nestedSummary = groupSummary
-                if(hideParamList.size() >= 2 ) {
-                    hideParamList[0..-2].each { it ->
-                        nestedSummary = nestedSummary?.get(it, null)
+                List<String> hideParamList = hideParam.tokenize('.') as List<String>
+                Map nestedSummary = groupSummary
+                if (hideParamList.size() >= 2) {
+                    hideParamList[0..-2].each { param ->
+                        nestedSummary = nestedSummary?.get(param, null)
                     }
                 }
-                if(nestedSummary != null ) {
+                if (nestedSummary != null) {
                     nestedSummary.remove(hideParamList[-1])
                 }
             }
@@ -81,33 +84,37 @@ class SummaryCreator {
     // Create a summary map for the given parameters
     //
     private Map getSummaryMapFromParams(Map params, Map paramsSchema) {
-        def Map summary = [:]
+        Map summary = [:]
         for (String param in paramsSchema.keySet()) {
             if (params.containsKey(param)) {
-                def Map schema = paramsSchema.get(param) as Map 
-                if (params.get(param) instanceof Map && schema.containsKey("properties")) {
-                    summary.put(param, getSummaryMapFromParams(params.get(param) as Map, schema.get("properties") as Map))
+                Map schema = paramsSchema.get(param) as Map
+                if (params.get(param) in Map && schema.containsKey('properties')) {
+                    summary.put(
+                        param,
+                        getSummaryMapFromParams(params.get(param) as Map, schema.get('properties') as Map)
+                    )
                     continue
                 }
-                def String value = params.get(param)
-                def String defaultValue = schema.get("default")
-                def String type = schema.type
-                if (defaultValue != null) {
-                    if (type == 'string') {
-                        // TODO rework this in a more flexible way
-                        if (defaultValue.contains('$projectDir') || defaultValue.contains('${projectDir}')) {
-                            def sub_string = defaultValue.replace('\$projectDir', '')
-                            sub_string     = sub_string.replace('\${projectDir}', '')
-                            if (value.contains(sub_string)) {
-                                defaultValue = value
-                            }
+                String value = params.get(param)
+                String defaultValue = schema.get('default')
+                String type = schema.type
+                if (defaultValue != null && type == 'string') {
+                    // TODO rework this in a more flexible way
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    if (defaultValue.contains('$projectDir') || defaultValue.contains('${projectDir}')) {
+                        /* groovylint-disable-next-line GStringExpressionWithinString */
+                        String subString = defaultValue.replace('\$projectDir', '').replace('\${projectDir}', '')
+                        if (value.contains(subString)) {
+                            defaultValue = value
                         }
-                        if (defaultValue.contains('$params.outdir') || defaultValue.contains('${params.outdir}')) {
-                            def sub_string = defaultValue.replace('\$params.outdir', '')
-                            sub_string     = sub_string.replace('\${params.outdir}', '')
-                            if ("${params.outdir}${sub_string}" == value) {
-                                defaultValue = value
-                            }
+                    }
+                    /* groovylint-disable-next-line GStringExpressionWithinString */
+                    if (defaultValue.contains('$params.outdir') || defaultValue.contains('${params.outdir}')) {
+                        String subString = defaultValue.replace('\$params.outdir', '')
+                            /* groovylint-disable-next-line GStringExpressionWithinString */
+                            .replace('\${params.outdir}', '')
+                        if ("${params.outdir}${subString}" == value) {
+                            defaultValue = value
                         }
                     }
                 }
@@ -117,7 +124,7 @@ class SummaryCreator {
                     summary.put(param, value)
                 }
                 // No default in the schema, and this isn't empty or false
-                else if (defaultValue == null && value != "" && value != null && value != false && value != 'false') {
+                else if (defaultValue == null && value != '' && value != null && value != false && value != 'false') {
                     summary.put(param, value)
                 }
             }

@@ -112,14 +112,14 @@ class ParameterValidator {
         Map inputParams = [:],
         String baseDir
     ) {
-        Map params = initialiseExpectedParams(inputParams)
+        Map<String, Object> params = initialiseExpectedParams(inputParams)
         String schemaFilename = options?.containsKey('parameters_schema') ?
             options.parameters_schema as String :
             config.parametersSchema
         log.debug 'Starting parameters validation'
 
         // Clean the parameters
-        Map cleanedParams = cleanParameters(params)
+        Map<String, Object> cleanedParams = cleanParameters(params)
         // Convert to JSONObject
         JsonGenerator generator = new JsonGenerator.Options()
             .addConverter(Path) { Path path -> path.toUri().toString() }
@@ -154,7 +154,7 @@ class ParameterValidator {
                 }) {
                     // Check if an ignore param is present
                     /* groovylint-disable-next-line LineLength */
-                    unexpectedParams << "* --${param.replaceAll('/', '.')}: ${getValueFromJsonPointer('/' + param, paramsJSON)}".toString()
+                    unexpectedParams << "* --${dotParam}: ${getValueFromJsonPointer('/' + param, paramsJSON)}".toString()
                 }
             }
         }
@@ -174,7 +174,7 @@ class ParameterValidator {
             /* groovylint-disable-next-line LineLength */
             String msg = "${colors.red}The following invalid input values have been detected:\n\n" + filteredErrors.join('\n').trim() + "\n${colors.reset}\n"
             log.error('Validation of pipeline parameters failed!')
-            throw new SchemaValidationException(msg, this.getErrors())
+            throw new SchemaValidationException(msg, errors)
         }
 
         log.debug 'Finishing parameters validation'

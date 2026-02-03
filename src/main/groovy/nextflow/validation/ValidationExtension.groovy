@@ -47,42 +47,38 @@ class ValidationExtension extends PluginExtensionPoint {
     @Function
     List samplesheetToList(
         final CharSequence samplesheet,
-        final CharSequence schema,
-        final Map options = null
+        final CharSequence schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
-        return samplesheetToList(samplesheetFile, schema, options)
+        return samplesheetToList(samplesheetFile, schema)
     }
 
     @Function
     List samplesheetToList(
         final Path samplesheet,
-        final CharSequence schema,
-        final Map options = null
+        final CharSequence schema
     ) {
         String fullPathSchema = getBasePath(session.baseDir.toString(), schema as String)
         Path schemaFile = Nextflow.file(fullPathSchema) as Path
-        return samplesheetToList(samplesheet, schemaFile, options)
+        return samplesheetToList(samplesheet, schemaFile)
     }
 
     @Function
     List samplesheetToList(
         final CharSequence samplesheet,
-        final Path schema,
-        final Map options = null
+        final Path schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
-        return samplesheetToList(samplesheetFile, schema, options)
+        return samplesheetToList(samplesheetFile, schema)
     }
 
     @Function
     List samplesheetToList(
         final Path samplesheet,
-        final Path schema,
-        final Map options = null
+        final Path schema
     ) {
         SamplesheetConverter converter = new SamplesheetConverter(config)
-        List output = converter.validateAndConvertToList(samplesheet, schema, options)
+        List output = converter.validateAndConvertToList(samplesheet, schema)
         return output
     }
 

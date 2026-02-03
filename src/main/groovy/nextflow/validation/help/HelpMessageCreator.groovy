@@ -74,7 +74,7 @@ class HelpMessageCreator {
             // Check if this parameter has an associated schema file and append schema help
             String schemaPath = assetsHelper.discoverSchemaFile(paramNames[0])
             if (schemaPath) {
-                String schemaHelp = assetsHelper.generateSchemaHelp(paramNames[0], schemaPath)
+                String schemaHelp = assetsHelper.generateSchemaHelp(schemaPath)
                 if (schemaHelp) {
                     helpMessage += schemaHelp
                 }
