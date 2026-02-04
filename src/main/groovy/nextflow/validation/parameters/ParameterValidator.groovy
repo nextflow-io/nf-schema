@@ -189,26 +189,22 @@ class ParameterValidator {
     //
     private Map cleanParameters(Map params) {
         Map newParams = (Map) params.getClass().newInstance(params)
-        for (p in params) {
+        params.each { String key, Object value ->
             // remove anything evaluating to false
-            if (!p['value'] && p['value'] != 0) {
-                newParams.remove(p.key)
+            if (!value && value != 0) {
+                newParams.remove(key)
             }
             // Cast MemoryUnit to String
-            else if (p['value'] in MemoryUnit) {
-                newParams.replace(p.key, p['value'].toString())
+            else if (value in MemoryUnit) {
+                newParams.replace(key, value.toString())
             }
             // Cast Duration to String
-            else if (p['value'] in Duration) {
-                newParams.replace(p.key, p['value'].toString())
-            }
-            // Cast LinkedHashMap to String
-            else if (p['value'] in LinkedHashMap) {
-                newParams.replace(p.key, p['value'].toString())
+            else if (value in Duration) {
+                newParams.replace(key, value.toString())
             }
             // Parsed nested parameters
-            else if (p['value'] in Map) {
-                newParams.replace(p.key, cleanParameters(p['value'] as Map))
+            else if (value in Map) {
+                newParams.replace(key, cleanParameters(value as Map))
             }
         }
         return newParams

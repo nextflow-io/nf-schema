@@ -81,9 +81,10 @@ class AssetsHelper {
      * Recursively search for a specific parameter's schema reference in JSON structure
      */
     private String findSchemaReference(Object obj, String targetParam, String currentPath) {
+        String result
         if (obj in Map) {
             Map map = obj as Map
-            map.each { entry ->
+            map.any { entry ->
                 String key = entry.key
                 Object value = entry.value
                 String newPath = currentPath ? "${currentPath}.${key}" : key
@@ -92,30 +93,30 @@ class AssetsHelper {
                     // Extract the argument name from the current path
                     String argumentName = currentPath.split('\\.').last()
                     if (argumentName == targetParam) {
-                        return value as String
+                        result = value as String
                     }
                 } else if (key == 'properties' && value in Map) {
                     // When we find properties, we're at the level where argument names are defined
                     Map properties = value as Map
-                    properties.each { propEntry ->
+                    properties.any { propEntry ->
                         String propKey = propEntry.key
                         Object propValue = propEntry.value
-                        String result = findSchemaReference(propValue, targetParam, propKey)
-                        if (result) { return result }
+                        result = findSchemaReference(propValue, targetParam, propKey)
+                        return result
                     }
                 } else {
-                    String result = findSchemaReference(value, targetParam, newPath)
-                    if (result) { return result }
+                    result = findSchemaReference(value, targetParam, newPath)
                 }
+                return result
             }
         } else if (obj in List) {
             List list = obj as List
-            for (item in list) {
-                String result = findSchemaReference(item, targetParam, currentPath)
-                if (result) { return result }
+            list.any { item ->
+                result = findSchemaReference(item, targetParam, currentPath)
+                return result
             }
         }
-        return null
+        return result
     }
 
     /**
