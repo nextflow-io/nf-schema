@@ -5,14 +5,17 @@ import dev.harrel.jsonschema.EvaluationContext
 import dev.harrel.jsonschema.JsonNode
 
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 
 /**
+ * Checks if the use of this value is deprecated
+ *
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
 
 @Slf4j
+@CompileDynamic
 class DeprecatedEvaluator implements Evaluator {
-    // Checks if the use of this value is deprecated
 
     private final Boolean deprecated
 
@@ -21,13 +24,13 @@ class DeprecatedEvaluator implements Evaluator {
     }
 
     @Override
-    public Evaluator.Result evaluate(EvaluationContext ctx, JsonNode node) {
+    Evaluator.Result evaluate(EvaluationContext ctx, JsonNode node) {
         // Checks if the value should be deprecated
         if (!this.deprecated) {
             return Evaluator.Result.success()
         }
 
-        return Evaluator.Result.failure("This option is deprecated")
-
+        return Evaluator.Result.failure('This option is deprecated')
     }
+
 }
