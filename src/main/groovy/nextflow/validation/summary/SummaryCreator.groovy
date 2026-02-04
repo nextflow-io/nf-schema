@@ -50,12 +50,12 @@ class SummaryCreator {
             workflowSummary['container'] = workflow.container
         }
 
-        workflowSummary['launchDir']    = workflow.launchDir
-        workflowSummary['workDir']      = workflow.workDir
-        workflowSummary['projectDir']   = workflow.projectDir
+        workflowSummary['launchDir']    = maybeMask(workflow.launchDir)
+        workflowSummary['workDir']      = maybeMask(workflow.workDir)
+        workflowSummary['projectDir']   = maybeMask(workflow.projectDir)
         workflowSummary['userName']     = workflow.userName
         workflowSummary['profile']      = workflow.profile
-        workflowSummary['configFiles']  = workflow.configFiles ? workflow.configFiles.join(', ') : ''
+        workflowSummary['configFiles']  = maybeMask(workflow.configFiles ? workflow.configFiles.join(', ') : '')
 
         // Get pipeline parameters defined in JSON Schema
         Map paramsSummary = [:]
@@ -121,18 +121,26 @@ class SummaryCreator {
 
                 // We have a default in the schema, and this isn't it
                 if (defaultValue != null && value != defaultValue) {
-                    summary.put(param, maybeMaskFusionMount(maybeMaskBucketNames((value))))
+                    summary.put(param, maybeMask(value))
                 }
                 // No default in the schema, and this isn't empty or false
                 else if (defaultValue == null && value != '' && value != null && value != false && value != 'false') {
-                    summary.put(param, maybeMaskFusionMount(maybeMaskBucketNames((value))))
+                    summary.put(param, maybeMask(value))
                 }
             }
         }
         return summary
     }
 
-    private String maybeMaskFusionMount(String value) {
+    private CharSequence maybeMask(Path value) {
+        return maybeMask(value.toString())
+    }
+
+    private CharSequence maybeMask(CharSequence value) {
+        return maybeMaskFusionMount(maybeMaskBucketNames(maybeMaskFromPaths(value)))
+    }
+
+    private CharSequence maybeMaskFusionMount(CharSequence value) {
         if(config.summary.maskFusionMount) {
             return value.replace('/fusion', '')
         }
@@ -140,13 +148,22 @@ class SummaryCreator {
     }
 
     // see https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
-    static final String S3_BUCKET_PATH_PREFIX = '\\/s3\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
-    static final String S3_BUCKET_URI_PREFIX = 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+    static final CharSequence S3_BUCKET_PATH_PREFIX = '\\/s3\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+    static final CharSequence S3_BUCKET_URI_PREFIX = 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
 
-    private String maybeMaskBucketNames(String value) {
-        if (config.summary.maskBucketNames) {
-            value.replaceAll(S3_BUCKET_PATH_PREFIX, '')
-            value.replaceAll(S3_BUCKET_URI_PREFIX, '')
+    private CharSequence maybeMaskBucketNames(CharSequence value) {
+        if(config.summary.maskBucketNames) {
+            value = value.replaceAll(S3_BUCKET_PATH_PREFIX, '/[** masked **]/')
+            value = value.replaceAll(S3_BUCKET_URI_PREFIX, '[** masked **]/')
+        }
+        return value
+    }
+
+    private CharSequence maybeMaskFromPaths(CharSequence value) {
+        if(config.summary.maskFromPaths != null && config.summary.maskFromPaths.size() > 0) {
+            for (CharSequence toReplace : config.summary.maskFromPaths) {
+                value = value.replace(toReplace, '[** masked **]')
+            }
         }
         return value
     }
