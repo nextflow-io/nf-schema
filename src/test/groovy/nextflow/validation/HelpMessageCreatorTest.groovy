@@ -1,13 +1,12 @@
-/* groovylint-disable LineLength, TrailingWhitespace */
+/* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
+
+import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
 
 import nextflow.Session
 import spock.lang.Specification
-import spock.lang.Shared
-import org.junit.Rule
-import test.OutputCapture
 
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.help.HelpMessageCreator
@@ -15,43 +14,30 @@ import nextflow.validation.help.HelpMessageCreator
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
+
+@CompileDynamic
 class HelpMessageCreatorTest extends Specification {
 
-    @Rule
-    OutputCapture capture = new OutputCapture()
+    final private Session session = Mock(Session)
 
-    @Shared String pluginsMode
-
-    Path root = Path.of('.').toAbsolutePath().normalize()
-    Path getRoot() { this.root }
-    String getRootString() { this.root.toString() }
-
-    private Session session
-
-    def setup() {
-        session = Mock(Session)
-        session.getBaseDir() >> getRoot()
-    }
-
-    def 'should get a short help message' () {
+    void 'should get a short help message'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
                 enabled: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('')
+        String help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        String expectedHelp = '''--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull        [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden      [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -69,17 +55,17 @@ Reference genome options
   --fasta         [string] Path to FASTA genome file. 
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a short help message with hidden params - config' () {
+    void 'should get a short help message with hidden params - config'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
@@ -87,16 +73,16 @@ Reference genome options
                 showHidden: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('')
+        String help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''--help                         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        /* groovylint-disable-next-line GStringExpressionWithinString */
+        String expectedHelp = '''--help                         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull                     [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden                   [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -145,17 +131,17 @@ copyNoFollow, move) [default: copy]
   --testCamelCase              [string]          A camelCase param 
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a short help message with hidden params - param' () {
+    void 'should get a short help message with hidden params - param'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
@@ -163,22 +149,22 @@ copyNoFollow, move) [default: copy]
                 showHiddenParameter: 'showMeThoseHiddenParams'
             ]
         ]
-        def params = [
+        Map params = [
             showMeThoseHiddenParams:true
         ]
         // Create new session to use the parameter
-        def newSession = Mock(Session)
-        newSession.getBaseDir() >> getRoot()
+        Session newSession = Mock(Session)
         newSession.params >> params
-        def config = new ValidationConfig(validationConfig, newSession)
-        def helpCreator = new HelpMessageCreator(config, newSession)
+        ValidationConfig config = new ValidationConfig(validationConfig, newSession)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, newSession)
 
         when:
-        def help = helpCreator.getShortMessage('')
+        String help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = """--help                         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        /* groovylint-disable-next-line GStringExpressionWithinString */
+        String expectedHelp = """--help                         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull                     [boolean]         Show the help message for all non-hidden parameters. 
 --showMeThoseHiddenParams      [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -227,33 +213,32 @@ copyNoFollow, move) [default: copy]
   --testCamelCase              [string]          A camelCase param 
 
 """
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a full help message' () {
+    void 'should get a full help message'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema_nested_parameters.json',
             help: [
                 enabled: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getFullMessage()
+        String help = helpCreator.fullMessage
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''--help              [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        String expectedHelp = '''--help              [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull          [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden        [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -263,65 +248,63 @@ Nested Parameters
   --this.is.so.deep [boolean] so deep [default: true] 
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a detailed help message - nested' () {
+    void 'should get a detailed help message - nested'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema_nested_parameters.json',
             help: [
                 enabled: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('this')
+        String help = helpCreator.getShortMessage('this')
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''--this
+        String expectedHelp = '''--this
     description: this is this
     options    : 
       --this.is.so.deep [boolean] so deep [default: true] 
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a detailed help message - not nested' () {
+    void 'should get a detailed help message - not nested'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
                 enabled: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('input')
+        String help = helpCreator.getShortMessage('input')
 
         then:
         noExceptionThrown()
-        def expectedHelp = """--input
+        String expectedHelp = """--input
     type       : string
     format     : file-path
     mimetype   : text/csv
@@ -333,17 +316,17 @@ file with 3 columns, and a header row. See [usage
 docs](https://nf-co.re/testpipeline/usage#samplesheet-input). 
 
 """
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a before text - with command' () {
+    void 'should get a before text - with command'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
@@ -354,33 +337,32 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
 '''
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getBeforeText()
+        String help = helpCreator.beforeText
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+        String expectedHelp = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
 Typical pipeline command:
 
   nextflow run test/test --profile test,docker --outdir results
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a before text - without command' () {
+    void 'should get a before text - without command'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
@@ -390,30 +372,29 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
 '''
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getBeforeText()
+        String help = helpCreator.beforeText
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+        String expectedHelp = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get an after text' () {
+    void 'should get an after text'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
@@ -423,47 +404,45 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
 '''
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getAfterText()
+        String help = helpCreator.afterText
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''------------------------------------------------------
+        String expectedHelp = '''------------------------------------------------------
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a short help message with after text' () {
+    void 'should get a short help message with after text'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
                 enabled: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('') + helpCreator.getAfterText()
+        String help = helpCreator.getShortMessage('') + helpCreator.afterText
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        String expectedHelp = '''--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull        [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden      [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -484,33 +463,32 @@ Reference genome options
 ------------------------------------------------------
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get a help message when missing the type keyword' () {
+    void 'should get a help message when missing the type keyword'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema_no_type.json',
             help: [
                 enabled: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('') + helpCreator.getAfterText()
+        String help = helpCreator.getShortMessage('') + helpCreator.afterText
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''--input        [string]          Path to comma-separated file containing information about the samples in the experiment. 
+        String expectedHelp = '''--input        [string]          Path to comma-separated file containing information about the samples in the experiment. 
 --help         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull     [boolean]         Show the help message for all non-hidden parameters. 
@@ -520,33 +498,32 @@ or `--helpFull`.
 ------------------------------------------------------
 
 '''
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should get integrated schema help with parameter help' () {
+    void 'should get integrated schema help with parameter help'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema_with_samplesheet.json',
             help: [
                 enabled: true
             ]
         ]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('input')
+        String help = helpCreator.getShortMessage('input')
 
         then:
-        println help
         noExceptionThrown()
-        def expectedHelp = """--input
+        String expectedHelp = """--input
     type       : string
     format     : file-path
     mimetype   : text/csv
@@ -573,17 +550,17 @@ Fields:
       Note: Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'
 
 """
-        def resultHelp = help.readLines()
-        expectedHelp.readLines().each {
-            assert help.contains(it)
-            resultHelp.removeElement(it)
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
         }
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-    def 'should be able to limit the enum length' () {
+    void 'should be able to limit the enum length'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
@@ -592,22 +569,21 @@ Fields:
                 showHidden: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('')
+        String help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = '  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, ...) [default: copy] '
-        assert help.readLines().find { it.startsWith('  --publish_dir_mode') } == expectedHelp
+        String expectedHelp = '  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, ...) [default: copy] '
+        assert help.readLines().find { line -> line.startsWith('  --publish_dir_mode') } == expectedHelp
     }
 
-    def 'should be able to set unlimited enum length' () {
+    void 'should be able to set unlimited enum length'() {
         given:
-        def validationConfig = [
+        Map validationConfig = [
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
@@ -616,18 +592,17 @@ Fields:
                 showHidden: true
             ]
         ]
-        def params = [:]
-        def config = new ValidationConfig(validationConfig, session)
-        def helpCreator = new HelpMessageCreator(config, session)
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage('')
+        String help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = '''  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, rellink, link, copy, 
+        String expectedHelp = '''  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, rellink, link, copy, 
 copyNoFollow, move) [default: copy] '''
-        assert help.readLines()[35..36].join("\n") == expectedHelp
+        assert help.readLines()[35..36].join('\n') == expectedHelp
     }
 
 }

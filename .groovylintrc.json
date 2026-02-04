@@ -6,6 +6,15 @@
         },
         "DuplicateStringLiteral": {
             "enabled": false
+        },
+        "JUnitLostTest": {
+            "enabled": false
+        },
+        "JUnitPublicNonTestMethod": {
+            "enabled": false
+        },
+        "JUnitTestMethodWithoutAssert": {
+            "enabled": false
         }
     }
 }

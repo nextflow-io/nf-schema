@@ -1,5 +1,7 @@
-/* groovylint-disable LineLength, TrailingWhitespace */
+/* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
+
+import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
 
@@ -22,26 +24,26 @@ import java.util.jar.Manifest
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  * @author : KevinMenden
  */
+
+@CompileDynamic
 class ParamsHelpTest extends Dsl2Spec {
 
     @Rule
-    OutputCapture capture = new OutputCapture()
+    final private OutputCapture capture = new OutputCapture()
 
-    @Shared String pluginsMode
+    @Shared 
+    private String pluginsMode
 
-    Path root = Path.of('.').toAbsolutePath().normalize()
-    Path getRoot() { this.root }
-    String getRootString() { this.root.toString() }
+    final private Path root = Path.of('.').toAbsolutePath().normalize()
 
-    def setup() {
+    void setup() {
         // reset previous instances
         PluginExtensionProvider.reset()
         // this need to be set *before* the plugin manager class is created
         pluginsMode = System.getProperty('pf4j.mode')
         System.setProperty('pf4j.mode', 'dev')
         // the plugin root should
-        def root = this.getRoot()
-        def manager = new TestPluginManager(root){
+        TestPluginManager manager = new TestPluginManager(root){
 
             @Override
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
@@ -49,8 +51,8 @@ class ParamsHelpTest extends Dsl2Spec {
 
                     @Override
                     protected Manifest readManifestFromDirectory(Path pluginPath) {
-                        def manifestPath = getManifestPath(pluginPath)
-                        final input = Files.newInputStream(manifestPath)
+                        Path manifestPath = getManifestPath(pluginPath)
+                        InputStream input = Files.newInputStream(manifestPath)
                         return new Manifest(input)
                     }
                     protected Path getManifestPath(Path pluginPath) {
@@ -64,16 +66,16 @@ class ParamsHelpTest extends Dsl2Spec {
         Plugins.init(root, 'dev', manager)
     }
 
-    def cleanup() {
+    void cleanup() {
         Plugins.stop()
         PluginExtensionProvider.reset()
         pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
-    def 'should print a help message' () {
+    void 'should print a help message'() {
         when:
-        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
             include { paramsHelp } from 'plugin/nf-schema'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
@@ -83,31 +85,33 @@ class ParamsHelpTest extends Dsl2Spec {
         """
 
         and:
-        def result = new MockScriptRunner([:]).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner([:]).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('Typical pipeline command:') ||
-                    it.contains('nextflow run') ||
-                    it.contains('Input/output options') ||
-                    it.contains('--input') ||
-                    it.contains('--outdir') ||
-                    it.contains('--email') ||
-                    it.contains('--multiqc_title') ||
-                    it.contains('Reference genome options') ||
-                    it.contains('--genome') ||
-                    it.contains('--fasta')
-                    ? it : null }
+                .findResults { line ->
+                    line.contains('Typical pipeline command:') ||
+                    line.contains('nextflow run') ||
+                    line.contains('Input/output options') ||
+                    line.contains('--input') ||
+                    line.contains('--outdir') ||
+                    line.contains('--email') ||
+                    line.contains('--multiqc_title') ||
+                    line.contains('Reference genome options') ||
+                    line.contains('--genome') ||
+                    line.contains('--fasta')
+                    ? line : null
+                }
 
         then:
         noExceptionThrown()
         stdout.size() == 12
     }
 
-    def 'should print a help message with argument options' () {
+    void 'should print a help message with argument options'() {
         given:
-        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
             include { paramsHelp } from 'plugin/nf-schema'
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
@@ -116,23 +120,25 @@ class ParamsHelpTest extends Dsl2Spec {
         """
 
         when:
-        def result = new MockScriptRunner([:]).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner([:]).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('publish_dir_mode') &&
-                    it.contains('(accepted: symlink, rellink')
-                    ? it : null }
+                .findResults { line -> 
+                    line.contains('publish_dir_mode') && line.contains('(accepted: symlink, rellink') ?
+                    line : 
+                    null
+                }
 
         then:
         noExceptionThrown()
         stdout.size() == 1
     }
 
-    def 'should print a help message of one parameter' () {
+    void 'should print a help message of one parameter'() {
         given:
-        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
             include { paramsHelp } from 'plugin/nf-schema'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
@@ -142,29 +148,31 @@ class ParamsHelpTest extends Dsl2Spec {
         """
 
         when:
-        def result = new MockScriptRunner([validation:[monochromeLogs:true]]).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner([validation:[monochromeLogs:true]]).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.startsWith('--publish_dir_mode') ||
-                    it.contains('type       :') ||
-                    it.contains('default    :') ||
-                    it.contains('description:') ||
-                    it.contains('help_text  :') ||
-                    it.contains('fa_icon    :') || // fa_icon shouldn't be printed
-                    it.contains('enum       :') ||
-                    it.contains('hidden     :')
-                    ? it : null }
+                .findResults { line ->
+                    line.startsWith('--publish_dir_mode') ||
+                    line.contains('type       :') ||
+                    line.contains('default    :') ||
+                    line.contains('description:') ||
+                    line.contains('help_text  :') ||
+                    line.contains('fa_icon    :') || // fa_icon shouldn't be printed
+                    line.contains('enum       :') ||
+                    line.contains('hidden     :')
+                    ? line : null
+                }
 
         then:
         noExceptionThrown()
         stdout.size() == 7
     }
 
-    def 'should fail when help param doesnt exist' () {
+    void 'should fail when help param doesnt exist'() {
         given:
-        def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
             include { paramsHelp } from 'plugin/nf-schema'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
@@ -174,22 +182,22 @@ class ParamsHelpTest extends Dsl2Spec {
         """
 
         when:
-        def result = new MockScriptRunner([:]).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner([:]).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.startsWith('--no_exist') ? it : null }
+                .findResults { line -> line.startsWith('--no_exist') ? line : null }
 
         then:
-        def error = thrown(Exception)
+        Exception error = thrown(Exception)
         error.message == "Unable to create help message: Specified param 'no_exist' does not exist in JSON schema."
         !stdout
     }
 
-    def 'should print a help message of nested parameter' () {
+    void 'should print a help message of nested parameter'() {
         given:
-        def schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        String schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath()
+        String script = """
             include { paramsHelp } from 'plugin/nf-schema'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
@@ -199,15 +207,17 @@ class ParamsHelpTest extends Dsl2Spec {
         """
 
         when:
-        def result = new MockScriptRunner([validation:[monochromeLogs:true]]).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner([validation:[monochromeLogs:true]]).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.startsWith('--this.is') ||
-                    it.contains('description:') ||
-                    it.contains('options    :') ||
-                    it.contains('this.is.so.deep')
-                    ? it : null }
+                .findResults { line ->
+                    line.startsWith('--this.is') ||
+                    line.contains('description:') ||
+                    line.contains('options    :') ||
+                    line.contains('this.is.so.deep')
+                    ? line : null
+                }
 
         then:
         noExceptionThrown()

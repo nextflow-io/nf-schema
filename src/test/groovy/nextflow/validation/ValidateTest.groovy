@@ -1,5 +1,7 @@
-/* groovylint-disable LineLength, TrailingWhitespace */
+/* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
+
+import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
 
@@ -23,26 +25,26 @@ import java.util.jar.Manifest
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  * @author : jorgeaguileraseqera
  */
+
+@CompileDynamic
 class ValidateTest extends Dsl2Spec {
 
     @Rule
-    OutputCapture capture = new OutputCapture()
+    final private OutputCapture capture = new OutputCapture()
 
-    @Shared String pluginsMode
+    @Shared 
+    private String pluginsMode
 
-    Path root = Path.of('.').toAbsolutePath().normalize()
-    Path getRoot() { this.root }
-    String getRootString() { this.root.toString() }
+    final private Path root = Path.of('.').toAbsolutePath().normalize()
 
-    def setup() {
+    void setup() {
         // reset previous instances
         PluginExtensionProvider.reset()
         // this need to be set *before* the plugin manager class is created
         pluginsMode = System.getProperty('pf4j.mode')
         System.setProperty('pf4j.mode', 'dev')
         // the plugin root should
-        def root = this.getRoot()
-        def manager = new TestPluginManager(root){
+        TestPluginManager manager = new TestPluginManager(root){
 
             @Override
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
@@ -50,8 +52,8 @@ class ValidateTest extends Dsl2Spec {
 
                     @Override
                     protected Manifest readManifestFromDirectory(Path pluginPath) {
-                        def manifestPath = getManifestPath(pluginPath)
-                        final input = Files.newInputStream(manifestPath)
+                        Path manifestPath = getManifestPath(pluginPath)
+                        InputStream input = Files.newInputStream(manifestPath)
                         return new Manifest(input)
                     }
                     protected Path getManifestPath(Path pluginPath) {
@@ -65,15 +67,15 @@ class ValidateTest extends Dsl2Spec {
         Plugins.init(root, 'dev', manager)
     }
 
-    def cleanup() {
+    void cleanup() {
         Plugins.stop()
         PluginExtensionProvider.reset()
         pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
-    def 'should validate a map - success' () {
+    void 'should validate a map - success'() {
         given:
-        def SCRIPT = """
+        String script = """
             include { validate } from 'plugin/nf-schema'
 
             def input = [
@@ -90,23 +92,23 @@ class ValidateTest extends Dsl2Spec {
         """
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a map - failure' () {
+    void 'should validate a map - failure'() {
         given:
-        def SCRIPT = """
+        String script = """
             include { validate } from 'plugin/nf-schema'
 
             def input = [
@@ -123,24 +125,24 @@ class ValidateTest extends Dsl2Spec {
         """
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "/this/is/so/deep (a wrong string): Value is [string] but should be [boolean]\n({\"this\":{\"is\":{\"so\":{\"deep\":\"a wrong string\"}}}}): Value does not match against the schemas at indexes [0]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '/this/is/so/deep (a wrong string): Value is [string] but should be [boolean]\n({"this":{"is":{"so":{"deep":"a wrong string"}}}}): Value does not match against the schemas at indexes [0]\n'
         !stdout
     }
 
-    def 'should validate a list - success' () {
+    void 'should validate a list - success'() {
         given:
-        def SCRIPT = '''
+        String script = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = ["value"]
@@ -149,23 +151,23 @@ class ValidateTest extends Dsl2Spec {
         '''
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a list - failure' () {
+    void 'should validate a list - failure'() {
         given:
-        def SCRIPT = '''
+        String script = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = [12]
@@ -174,24 +176,24 @@ class ValidateTest extends Dsl2Spec {
         '''
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "/0 (12): Value is [integer] but should be [string]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '/0 (12): Value is [integer] but should be [string]\n'
         !stdout
     }
 
-    def 'should validate a string - success' () {
+    void 'should validate a string - success'() {
         given:
-        def SCRIPT = '''
+        String script = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = "value"
@@ -200,23 +202,23 @@ class ValidateTest extends Dsl2Spec {
         '''
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a string - failure' () {
+    void 'should validate a string - failure'() {
         given:
-        def SCRIPT = '''
+        String script = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = 12
@@ -225,24 +227,24 @@ class ValidateTest extends Dsl2Spec {
         '''
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "(12): Value is [integer] but should be [string]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '(12): Value is [integer] but should be [string]\n'
         !stdout
     }
 
-    def 'should validate a integer - success' () {
+    void 'should validate a integer - success'() {
         given:
-        def SCRIPT = '''
+        String script = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = 12
@@ -251,23 +253,23 @@ class ValidateTest extends Dsl2Spec {
         '''
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a integer - failure' () {
+    void 'should validate a integer - failure'() {
         given:
-        def SCRIPT = '''
+        String script = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = "value"
@@ -276,24 +278,24 @@ class ValidateTest extends Dsl2Spec {
         '''
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "(value): Value is [string] but should be [integer]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '(value): Value is [string] but should be [integer]\n'
         !stdout
     }
 
-    def 'should validate a boolean - success' () {
+    void 'should validate a boolean - success'() {
         given:
-        def SCRIPT = '''
+        String script = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = true
@@ -302,23 +304,23 @@ class ValidateTest extends Dsl2Spec {
         '''
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a boolean - failure' () {
+    void 'should validate a boolean - failure'() {
         given:
-        def SCRIPT = '''
+        String script = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = "value"
@@ -327,18 +329,18 @@ class ValidateTest extends Dsl2Spec {
         '''
 
         when:
-        def config = ['validation': [
+        Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "(value): Value is [string] but should be [boolean]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '(value): Value is [string] but should be [boolean]\n'
         !stdout
     }
 
