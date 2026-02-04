@@ -12,6 +12,7 @@
 ## Changes
 
 1. The `paramsSummaryLog()` function will now not log the container configuration options. Instead, these will be logged in the Nextflow log file. This is to reduce clutter in the summary log since these options can be numerous.
+2. Implemented Groovy linting and applied the linting rules on the whole codebase
 
 ## Bug fixes
 
