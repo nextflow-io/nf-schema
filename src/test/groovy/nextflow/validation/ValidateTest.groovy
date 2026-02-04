@@ -165,13 +165,13 @@ class ValidateTest extends Dsl2Spec {
 
     def 'should validate a list - failure' () {
         given:
-        def SCRIPT = """
+        def SCRIPT = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = [12]
 
             validate(input, 'src/testResources/no_header_schema.json')
-        """
+        '''
 
         when:
         def config = ['validation': [
@@ -216,13 +216,13 @@ class ValidateTest extends Dsl2Spec {
 
     def 'should validate a string - failure' () {
         given:
-        def SCRIPT = """
+        def SCRIPT = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = 12
 
             validate(input, 'src/testResources/string_schema.json')
-        """
+        '''
 
         when:
         def config = ['validation': [
@@ -267,13 +267,13 @@ class ValidateTest extends Dsl2Spec {
 
     def 'should validate a integer - failure' () {
         given:
-        def SCRIPT = """
+        def SCRIPT = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = "value"
 
             validate(input, 'src/testResources/integer_schema.json')
-        """
+        '''
 
         when:
         def config = ['validation': [
@@ -318,13 +318,13 @@ class ValidateTest extends Dsl2Spec {
 
     def 'should validate a boolean - failure' () {
         given:
-        def SCRIPT = """
+        def SCRIPT = '''
             include { validate } from 'plugin/nf-schema'
 
             def input = "value"
 
             validate(input, 'src/testResources/boolean_schema.json')
-        """
+        '''
 
         when:
         def config = ['validation': [

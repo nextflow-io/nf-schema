@@ -75,11 +75,11 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate when no params' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = '''
             include { validateParameters } from 'plugin/nf-schema'
 
             validateParameters(parameters_schema: 'src/testResources/nextflow_schema.json')
-        """
+        '''
 
         when:
         def config = ['validation': [
@@ -107,13 +107,13 @@ class ValidateParametersTest extends Dsl2Spec {
         def schema_dest   = new File('nextflow_schema.json')
         schema_dest << schema_source.text
 
-        def SCRIPT = """
+        def SCRIPT = '''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
             validateParameters()
-        """
+        '''
 
         when:
         def config = [:]
@@ -134,13 +134,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema - CSV' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -158,13 +158,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema - TSV' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.tsv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -182,13 +182,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema - YAML' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.yaml'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -206,13 +206,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema - JSON' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.json'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -230,13 +230,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema with failures - CSV' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/wrong.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -264,13 +264,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema with failures - TSV' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/wrong.tsv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -298,13 +298,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema with failures - YAML' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/wrong.yaml'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -332,13 +332,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema with failures - JSON' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/wrong.json'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -366,15 +366,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should find unexpected params' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
-
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
         when:
         def config = [:]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
@@ -392,14 +391,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should not find unexpected params patternProperties' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.pattern_xyz = 'abc'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -417,14 +416,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should ignore unexpected param kebab-case like camelCase' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.testCamelCase = 'aCamelBug'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -442,14 +441,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should find unexpected param kebab-case not like camelCase' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params['test-kebab-bug'] = 'a real kebab bug'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -468,14 +467,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should ignore unexpected param' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -495,14 +494,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should ignore default unexpected param' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -522,14 +521,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should ignore nf_test_output param' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.nf_test_output = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -547,15 +546,15 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should ignore default unexpected param' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             params.abc = '/some/other/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -576,13 +575,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should ignore wrong expected params' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 1
             params.outdir = 2
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -603,14 +602,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should fail for unexpected param' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -634,13 +633,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should find validation errors' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 10
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -665,15 +664,15 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should correctly validate duration and memory objects' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def  SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.max_memory = '10.GB'
             params.max_time = '10.day'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -691,14 +690,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'correct validation of integers' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.max_cpus = 12
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -716,15 +715,15 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'correct validation of numerics - 0' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_required_numerics.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.integer = 0
             params.number = 0
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -744,13 +743,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'fail validation of numerics - null' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_required_numerics.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -775,12 +774,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'correct validation of file-path-pattern - glob' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_file_path_pattern.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.glob = 'src/testResources/*.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -798,12 +797,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'correct validation of file-path-pattern - single file' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_file_path_pattern.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.glob = 'src/testResources/correct.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -821,13 +820,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'correct validation of numbers with lenient mode' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 1
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -847,14 +846,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should fail because of incorrect integer' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.max_cpus = 1.2
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -875,13 +874,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a schema from an input file' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/samplesheet.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
-
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
         when:
         def config = [:]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
@@ -898,12 +896,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should fail because of wrong file pattern' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/samplesheet_wrong_pattern.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -928,12 +926,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should fail because of missing required value' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/samplesheet_no_required.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -961,11 +959,11 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should fail because of wrong draft' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_draft7.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -985,12 +983,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should fail because of existing file' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_exists_false.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.outdir = "src/testResources/"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -1015,12 +1013,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should fail because of non-unique entries' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet_uniqueEntries.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = "src/testResources/samplesheet_non_unique.csv"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -1037,7 +1035,7 @@ class ValidateParametersTest extends Dsl2Spec {
         error.message == '''The following invalid input values have been detected:
 
 * --input (src/testResources/samplesheet_non_unique.csv): Validation of file failed:
-	-> Entry 3: Detected duplicate entries: [sample:test_2, fastq_1:test2_fastq1.fastq.gz]
+\t-> Entry 3: Detected duplicate entries: [sample:test_2, fastq_1:test2_fastq1.fastq.gz]
 
 '''
         !stdout
@@ -1046,12 +1044,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should not fail because of non-unique empty entries' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet_uniqueEntries.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = "src/testResources/samplesheet_non_unique_empty.csv"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -1070,11 +1068,11 @@ class ValidateParametersTest extends Dsl2Spec {
 
     def 'should validate nested params - pass' () {
         given:
-        def SCRIPT = """
+        def SCRIPT = '''
             include { validateParameters } from 'plugin/nf-schema'
 
             validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
-        """
+        '''
 
         when:
         def config = [
@@ -1104,12 +1102,12 @@ class ValidateParametersTest extends Dsl2Spec {
 
     def 'should validate nested params - fail' () {
         given:
-        def SCRIPT = """
+        def SCRIPT = '''
             params.this.is.so.deep = "this shouldn't be a string"
             include { validateParameters } from 'plugin/nf-schema'
 
             validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
-        """
+        '''
 
         when:
         def config = [
@@ -1134,25 +1132,25 @@ class ValidateParametersTest extends Dsl2Spec {
 
         then:
         def error = thrown(SchemaValidationException)
-        error.message == """The following invalid input values have been detected:
+        error.message == '''The following invalid input values have been detected:
 
 * --this.is.so.deep (this shouldn't be a string): Value is [string] but should be [boolean]
 
-"""
+'''
         !stdout
     }
 
     def 'should validate an email' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/samplesheet.csv'
             params.outdir = 'src/testResources/testDir'
             params.email = "test@domain.com"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -1170,14 +1168,14 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate an email - failure' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/samplesheet.csv'
             params.outdir = 'src/testResources/testDir'
             params.email = "thisisnotanemail"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -1196,13 +1194,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should give an error when a file-path-pattern is used with a file-path format' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/*.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -1221,13 +1219,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should give an error when a file-path-pattern is used with a directory-path format' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/samplesheet.csv'
             params.outdir = 'src/testResources/testDi*'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -1246,12 +1244,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a map file - yaml' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.map_file = 'src/testResources/map_file.yaml'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -1269,12 +1267,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should validate a map file - json' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.map_file = 'src/testResources/map_file.json'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -1292,12 +1290,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should give an error when a map file is wrong - yaml' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.map_file = 'src/testResources/map_file_wrong.yaml'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -1317,12 +1315,12 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should give an error when a map file is wrong - json' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.map_file = 'src/testResources/map_file_wrong.json'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = [:]
@@ -1342,13 +1340,13 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should truncate long values in errors' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.input = 'src/testResources/wrong_samplesheet_with_a_super_long_name.and_a_weird_extension'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '${schema}')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
         when:
         def config = ['validation': [
             'maxErrValSize': 20
@@ -1368,7 +1366,7 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should correctly detect invalid parameters' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_no_type.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             params.genome = [
                 "test": "test"
             ]
@@ -1376,8 +1374,8 @@ class ValidateParametersTest extends Dsl2Spec {
             params.testing = "test"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '$schema')
-        """
+            validateParameters(parameters_schema: '%s')
+        ''', schema)
 
         when:
         def config = ['validation': [
@@ -1397,16 +1395,16 @@ class ValidateParametersTest extends Dsl2Spec {
     def 'should correctly validate static types paths' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_no_type.json').toAbsolutePath().toString()
-        def SCRIPT = """
+        def SCRIPT = String.format('''
             include { validateParameters } from 'plugin/nf-schema'
             params {
                 input = file('src/testResources/correct.csv')
                 outdir = file('src/testResources/testDir')
             }
             workflow {
-                validateParameters(parameters_schema: '$schema')
+                validateParameters(parameters_schema: '%s')
             }
-        """
+        ''', schema)
 
         when:
         def result = new MockScriptRunner([:]).setScript(SCRIPT).execute()
