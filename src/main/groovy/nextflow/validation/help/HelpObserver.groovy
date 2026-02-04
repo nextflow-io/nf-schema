@@ -36,7 +36,7 @@ class HelpObserver implements TraceObserverV2 {
                 help += helpCreator.fullMessage
             } else if (containsShortParameter) {
                 log.debug('Printing out the short help message')
-                String paramValue = params.get(config.help.shortParameter)
+                Object paramValue = params.get(config.help.shortParameter)
                 help += helpCreator.getShortMessage(paramValue in String ? paramValue : '')
             }
             help += helpCreator.afterText
