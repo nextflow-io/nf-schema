@@ -31,6 +31,14 @@ class SummaryConfig implements ConfigScope {
     @Description('A list of parameters to hide in the summary message.')
     final Set<CharSequence> hideParams = []
 
+    @ConfigOption
+    @Description('Mask /fusion from path values.')
+    final public boolean maskFusionMount
+
+    @ConfigOption
+    @Description('Mask /s3/bucket/ and s3://bucket/ from path values.')
+    final public boolean maskBucketNames
+
     SummaryConfig(Map map, Boolean monochromeLogs) {
         Map config = map ?: Collections.emptyMap()
 
@@ -74,6 +82,17 @@ class SummaryConfig implements ConfigScope {
                 log.warn("Incorrect value detected for `validation.summary.hideParams`, a list of strings is expected. Defaulting to `${hideParams}`")
             }
         }
-    }
 
+        // maskFusionMount
+        if(config.containsKey("maskFusionMount")) {
+            maskFusionMount = config.maskFusionMount
+            log.debug("Set `maskFusionMount` to ${maskFusionMount}")
+        }
+
+        // maskBucketNames
+        if(config.containsKey("maskBucketNames")) {
+            maskBucketNames = config.maskBucketNames
+            log.debug("Set `maskBucketNames` to ${maskBucketNames}")
+        }
+    }
 }

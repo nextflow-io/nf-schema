@@ -121,15 +121,33 @@ class SummaryCreator {
 
                 // We have a default in the schema, and this isn't it
                 if (defaultValue != null && value != defaultValue) {
-                    summary.put(param, value)
+                    summary.put(param, maybeMaskFusionMount(maybeMaskBucketNames((value))))
                 }
                 // No default in the schema, and this isn't empty or false
                 else if (defaultValue == null && value != '' && value != null && value != false && value != 'false') {
-                    summary.put(param, value)
+                    summary.put(param, maybeMaskFusionMount(maybeMaskBucketNames((value))))
                 }
             }
         }
         return summary
     }
 
+    private String maybeMaskFusionMount(String value) {
+        if(config.summary.maskFusionMount) {
+            return value.replace("/fusion", "")
+        }
+        return value
+    }
+
+    // see https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+    static final String S3_BUCKET_PATH_PREFIX = '\\/s3\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+    static final String S3_BUCKET_URI_PREFIX = 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+
+    private String maybeMaskBucketNames(String value) {
+        if (config.summary.maskBucketNames) {
+            value.replaceAll(S3_BUCKET_PATH_PREFIX, '')
+            value.replaceAll(S3_BUCKET_URI_PREFIX, '')
+        }
+        return value
+    }
 }
