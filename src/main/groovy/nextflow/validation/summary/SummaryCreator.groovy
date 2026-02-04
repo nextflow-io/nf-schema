@@ -134,7 +134,7 @@ class SummaryCreator {
 
     private String maybeMaskFusionMount(String value) {
         if(config.summary.maskFusionMount) {
-            return value.replace("/fusion", "")
+            return value.replace('/fusion', '')
         }
         return value
     }
