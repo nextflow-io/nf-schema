@@ -1,3 +1,4 @@
+/* groovylint-disable LineLength, TrailingWhitespace */
 package nextflow.validation
 
 import java.nio.file.Path
@@ -16,7 +17,6 @@ import test.MockScriptRunner
 import nextflow.validation.exceptions.SchemaValidationException
 
 import java.nio.file.Files
-import java.nio.file.Path
 import java.util.jar.Manifest
 
 /**
@@ -24,11 +24,10 @@ import java.util.jar.Manifest
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  * @author : jorgeaguileraseqera
  */
-class ValidateParametersTest extends Dsl2Spec{
+class ValidateParametersTest extends Dsl2Spec {
 
     @Rule
     OutputCapture capture = new OutputCapture()
-
 
     @Shared String pluginsMode
 
@@ -45,9 +44,11 @@ class ValidateParametersTest extends Dsl2Spec{
         // the plugin root should
         def root = this.getRoot()
         def manager = new TestPluginManager(root){
+
             @Override
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
                 return new TestPluginDescriptorFinder(){
+
                     @Override
                     protected Manifest readManifestFromDirectory(Path pluginPath) {
                         def manifestPath = getManifestPath(pluginPath)
@@ -57,8 +58,10 @@ class ValidateParametersTest extends Dsl2Spec{
                     protected Path getManifestPath(Path pluginPath) {
                         return pluginPath.resolve('build/tmp/jar/MANIFEST.MF')
                     }
+
                 }
             }
+
         }
         Plugins.init(root, 'dev', manager)
     }
@@ -66,7 +69,7 @@ class ValidateParametersTest extends Dsl2Spec{
     def cleanup() {
         Plugins.stop()
         PluginExtensionProvider.reset()
-        pluginsMode ? System.setProperty('pf4j.mode',pluginsMode) : System.clearProperty('pf4j.mode')
+        pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
     def 'should validate when no params' () {
@@ -74,27 +77,27 @@ class ValidateParametersTest extends Dsl2Spec{
         def schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath().toString()
         def SCRIPT = """
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: 'src/testResources/nextflow_schema.json')
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
-        error.message == """The following invalid input values have been detected:
+        error.message == '''The following invalid input values have been detected:
 
 * Missing required parameter(s): input, outdir
 
-"""
+'''
         !stdout
     }
 
@@ -108,7 +111,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters()
         """
 
@@ -118,7 +121,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -135,7 +138,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -145,7 +148,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -159,7 +162,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/correct.tsv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -169,7 +172,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -183,7 +186,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/correct.yaml'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -193,7 +196,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -207,7 +210,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/correct.json'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -217,7 +220,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -231,7 +234,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/wrong.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -241,14 +244,14 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
         def errorMessages = error.message.readLines()
-        errorMessages[0] == "The following invalid input values have been detected:"
-        errorMessages[1] == ""
-        errorMessages[2] == "* --input (src/testResources/wrong.csv): Validation of file failed:"
+        errorMessages[0] == 'The following invalid input values have been detected:'
+        errorMessages[1] == ''
+        errorMessages[2] == '* --input (src/testResources/wrong.csv): Validation of file failed:'
         errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
         errorMessages[4] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$]"
         errorMessages[5] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" is longer than 0 characters"
@@ -265,8 +268,8 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/wrong.tsv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
+
+            validateParameters(parameters_schema: '${schema}')
         """
 
         when:
@@ -275,14 +278,14 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
         def errorMessages = error.message.readLines()
-        errorMessages[0] == "The following invalid input values have been detected:"
-        errorMessages[1] == ""
-        errorMessages[2] == "* --input (src/testResources/wrong.tsv): Validation of file failed:"
+        errorMessages[0] == 'The following invalid input values have been detected:'
+        errorMessages[1] == ''
+        errorMessages[2] == '* --input (src/testResources/wrong.tsv): Validation of file failed:'
         errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
         errorMessages[4] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$]"
         errorMessages[5] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" is longer than 0 characters"
@@ -299,8 +302,8 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/wrong.yaml'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
+
+            validateParameters(parameters_schema: '${schema}')
         """
 
         when:
@@ -309,14 +312,14 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
         def errorMessages = error.message.readLines()
-        errorMessages[0] == "The following invalid input values have been detected:"
-        errorMessages[1] == ""
-        errorMessages[2] == "* --input (src/testResources/wrong.yaml): Validation of file failed:"
+        errorMessages[0] == 'The following invalid input values have been detected:'
+        errorMessages[1] == ''
+        errorMessages[2] == '* --input (src/testResources/wrong.yaml): Validation of file failed:'
         errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
         errorMessages[4] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$]"
         errorMessages[5] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" is longer than 0 characters"
@@ -333,8 +336,8 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/wrong.json'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
+
+            validateParameters(parameters_schema: '${schema}')
         """
 
         when:
@@ -343,14 +346,14 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
         def errorMessages = error.message.readLines()
-        errorMessages[0] == "The following invalid input values have been detected:"
-        errorMessages[1] == ""
-        errorMessages[2] == "* --input (src/testResources/wrong.json): Validation of file failed:"
+        errorMessages[0] == 'The following invalid input values have been detected:'
+        errorMessages[1] == ''
+        errorMessages[2] == '* --input (src/testResources/wrong.json): Validation of file failed:'
         errorMessages[3] == "\t-> Entry 1: Error for field 'strandedness' (weird): Expected any of [[forward, reverse, unstranded]] (Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded')"
         errorMessages[4] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$]"
         errorMessages[5] == "\t-> Entry 1: Error for field 'fastq_2' (test1_fastq2.fasta): \"test1_fastq2.fasta\" is longer than 0 characters"
@@ -368,8 +371,8 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
+
+            validateParameters(parameters_schema: '${schema}')
         """
 
         when:
@@ -378,12 +381,12 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.size() >= 1
-        stdout.contains("* --xyz: /some/path")
+        stdout.contains('* --xyz: /some/path')
     }
 
     def 'should not find unexpected params patternProperties' () {
@@ -394,7 +397,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.pattern_xyz = 'abc'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -404,7 +407,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -419,7 +422,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.testCamelCase = 'aCamelBug'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -429,7 +432,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -444,7 +447,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params['test-kebab-bug'] = 'a real kebab bug'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -454,12 +457,12 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.size() >= 1
-        stdout.contains("* --test-kebab-bug: a real kebab bug")
+        stdout.contains('* --test-kebab-bug: a real kebab bug')
     }
 
     def 'should ignore unexpected param' () {
@@ -470,19 +473,19 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "ignoreParams": ['xyz']
+        def config = ['validation': [
+            'ignoreParams': ['xyz']
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -497,19 +500,19 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "defaultIgnoreParams": ['xyz']
+        def config = ['validation': [
+            'defaultIgnoreParams': ['xyz']
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -524,7 +527,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.nf_test_output = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -534,7 +537,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -550,20 +553,20 @@ class ValidateParametersTest extends Dsl2Spec{
             params.xyz = '/some/path'
             params.abc = '/some/other/path'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "ignoreParams": ['abc'],
-            "defaultIgnoreParams": ['xyz']
+        def config = ['validation': [
+            'ignoreParams': ['abc'],
+            'defaultIgnoreParams': ['xyz']
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -577,20 +580,20 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 1
             params.outdir = 2
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "ignoreParams": ['input'],
-            "defaultIgnoreParams": ['outdir']
+        def config = ['validation': [
+            'ignoreParams': ['input'],
+            'defaultIgnoreParams': ['outdir']
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -605,22 +608,22 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true,
-            "logging": [
-                "unrecognisedParams": "error"
+        def config = ['validation': [
+            'monochromeLogs': true,
+            'logging': [
+                'unrecognisedParams': 'error'
             ]
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -635,27 +638,27 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/correct.csv'
             params.outdir = 10
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
+
+            validateParameters(parameters_schema: '${schema}')
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
-        error.message == """The following invalid input values have been detected:
+        error.message == '''The following invalid input values have been detected:
 
 * --outdir (10): Value is [integer] but should be [string]
 
-"""
+'''
         !stdout
     }
 
@@ -668,7 +671,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.max_memory = '10.GB'
             params.max_time = '10.day'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -678,7 +681,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -693,7 +696,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.max_cpus = 12
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -703,7 +706,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -719,19 +722,19 @@ class ValidateParametersTest extends Dsl2Spec{
             params.integer = 0
             params.number = 0
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -745,27 +748,27 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
-        error.message == """The following invalid input values have been detected:
+        error.message == '''The following invalid input values have been detected:
 
 * Missing required parameter(s): number, integer
 
-"""
+'''
         !stdout
     }
 
@@ -775,7 +778,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def SCRIPT = """
             params.glob = 'src/testResources/*.csv'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -785,7 +788,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -798,7 +801,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def SCRIPT = """
             params.glob = 'src/testResources/correct.csv'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -808,7 +811,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -822,19 +825,19 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/correct.csv'
             params.outdir = 1
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "lenientMode": true
+        def config = ['validation': [
+            'lenientMode': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -849,19 +852,19 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.max_cpus = 1.2
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -869,15 +872,14 @@ class ValidateParametersTest extends Dsl2Spec{
         !stdout
     }
 
-
     def 'should validate a schema from an input file' () {
         given:
         def schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath().toString()
         def SCRIPT = """
             params.input = 'src/testResources/samplesheet.csv'
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
+
+            validateParameters(parameters_schema: '${schema}')
         """
 
         when:
@@ -886,7 +888,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -899,25 +901,25 @@ class ValidateParametersTest extends Dsl2Spec{
         def SCRIPT = """
             params.input = 'src/testResources/samplesheet_wrong_pattern.csv'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
         def errorMessage = error.message.tokenize("\n")
-        errorMessage[0] == "The following invalid input values have been detected:"
-        errorMessage[1] == "* --input (src/testResources/samplesheet_wrong_pattern.csv): Validation of file failed:"
+        errorMessage[0] == 'The following invalid input values have been detected:'
+        errorMessage[1] == '* --input (src/testResources/samplesheet_wrong_pattern.csv): Validation of file failed:'
         errorMessage[2] == "\t-> Entry 1: Error for field 'fastq_1' (test1_fastq1.txt): \"test1_fastq1.txt\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$] (FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz')"
         errorMessage[3] == "\t-> Entry 2: Error for field 'fastq_1' (test2_fastq1.txt): \"test2_fastq1.txt\" does not match regular expression [^\\S+\\.f(ast)?q\\.gz\$] (FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz')"
         !stdout
@@ -934,14 +936,14 @@ class ValidateParametersTest extends Dsl2Spec{
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -966,14 +968,14 @@ class ValidateParametersTest extends Dsl2Spec{
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -991,14 +993,14 @@ class ValidateParametersTest extends Dsl2Spec{
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -1021,14 +1023,14 @@ class ValidateParametersTest extends Dsl2Spec{
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -1052,14 +1054,14 @@ class ValidateParametersTest extends Dsl2Spec{
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        def config = ['validation': [
+            'monochromeLogs': true
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -1070,20 +1072,20 @@ class ValidateParametersTest extends Dsl2Spec{
         given:
         def SCRIPT = """
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
         """
 
         when:
         def config = [
-            "validation": [
-                "monochromeLogs": true
+            'validation': [
+                'monochromeLogs': true
             ],
-            "params": [
-                "this": [
-                    "is": [
-                        "so": [
-                            "deep": true
+            'params': [
+                'this': [
+                    'is': [
+                        'so': [
+                            'deep': true
                         ]
                     ]
                 ]
@@ -1093,7 +1095,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -1105,20 +1107,20 @@ class ValidateParametersTest extends Dsl2Spec{
         def SCRIPT = """
             params.this.is.so.deep = "this shouldn't be a string"
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
         """
 
         when:
         def config = [
-            "validation": [
-                "monochromeLogs": true
+            'validation': [
+                'monochromeLogs': true
             ],
-            "params": [
-                "this": [
-                    "is": [
-                        "so": [
-                            "deep": true
+            'params': [
+                'this': [
+                    'is': [
+                        'so': [
+                            'deep': true
                         ]
                     ]
                 ]
@@ -1128,7 +1130,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -1148,7 +1150,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.email = "test@domain.com"
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -1158,7 +1160,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -1173,7 +1175,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.outdir = 'src/testResources/testDir'
             params.email = "thisisnotanemail"
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -1183,8 +1185,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
-
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -1199,8 +1200,8 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/*.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
+
+            validateParameters(parameters_schema: '${schema}')
         """
 
         when:
@@ -1209,8 +1210,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
-
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -1225,7 +1225,7 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/samplesheet.csv'
             params.outdir = 'src/testResources/testDi*'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -1235,8 +1235,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
-
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -1250,7 +1249,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def SCRIPT = """
             params.map_file = 'src/testResources/map_file.yaml'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -1260,7 +1259,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -1273,7 +1272,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def SCRIPT = """
             params.map_file = 'src/testResources/map_file.json'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -1283,7 +1282,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
@@ -1296,7 +1295,7 @@ class ValidateParametersTest extends Dsl2Spec{
         def SCRIPT = """
             params.map_file = 'src/testResources/map_file_wrong.yaml'
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
@@ -1306,13 +1305,12 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
-
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
-        error.message.contains("* --map_file (src/testResources/map_file_wrong.yaml): Validation of file failed:")
-        error.message.contains("	* --this.is.deep (hello): Value is [string] but should be [integer]")
+        error.message.contains('* --map_file (src/testResources/map_file_wrong.yaml): Validation of file failed:')
+        error.message.contains("\t* --this.is.deep (hello): Value is [string] but should be [integer]")
         !stdout
     }
 
@@ -1322,8 +1320,8 @@ class ValidateParametersTest extends Dsl2Spec{
         def SCRIPT = """
             params.map_file = 'src/testResources/map_file_wrong.json'
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
+
+            validateParameters(parameters_schema: '${schema}')
         """
 
         when:
@@ -1332,13 +1330,12 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
-
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
-        error.message.contains("* --map_file (src/testResources/map_file_wrong.json): Validation of file failed:")
-        error.message.contains("	* --this.is.deep (hello): Value is [string] but should be [integer]")
+        error.message.contains('* --map_file (src/testResources/map_file_wrong.json): Validation of file failed:')
+        error.message.contains("\t* --this.is.deep (hello): Value is [string] but should be [integer]")
         !stdout
     }
 
@@ -1349,19 +1346,18 @@ class ValidateParametersTest extends Dsl2Spec{
             params.input = 'src/testResources/wrong_samplesheet_with_a_super_long_name.and_a_weird_extension'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-            
-            validateParameters(parameters_schema: '$schema')
-        """
 
+            validateParameters(parameters_schema: '${schema}')
+        """
         when:
-        def config = ["validation": [
-            "maxErrValSize": 20
+        def config = ['validation': [
+            'maxErrValSize': 20
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         def error = thrown(SchemaValidationException)
@@ -1379,23 +1375,23 @@ class ValidateParametersTest extends Dsl2Spec{
             params.genomebutlonger = true
             params.testing = "test"
             include { validateParameters } from 'plugin/nf-schema'
-            
+
             validateParameters(parameters_schema: '$schema')
         """
 
         when:
-        def config = ["validation": [
-            "defaultIgnoreParams": [ "genome" ]
+        def config = ['validation': [
+            'defaultIgnoreParams': [ 'genome' ]
         ]]
         def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
-        stdout == ["* --testing: test", "* --genomebutlonger: true"]
+        stdout == ['* --testing: test', '* --genomebutlonger: true']
     }
 
     def 'should correctly validate static types paths' () {
@@ -1417,9 +1413,10 @@ class ValidateParametersTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
     }
+
 }

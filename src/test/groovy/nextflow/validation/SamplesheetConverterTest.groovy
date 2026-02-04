@@ -1,3 +1,4 @@
+/* groovylint-disable LineLength, TrailingWhitespace */
 package nextflow.validation
 
 import java.nio.file.Path
@@ -16,18 +17,16 @@ import test.MockScriptRunner
 import nextflow.validation.exceptions.SchemaValidationException
 
 import java.nio.file.Files
-import java.nio.file.Path
 import java.util.jar.Manifest
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
-class SamplesheetConverterTest extends Dsl2Spec{
+class SamplesheetConverterTest extends Dsl2Spec {
 
     @Rule
     OutputCapture capture = new OutputCapture()
-
 
     @Shared String pluginsMode
 
@@ -44,9 +43,11 @@ class SamplesheetConverterTest extends Dsl2Spec{
         // the plugin root should
         def root = this.getRoot()
         def manager = new TestPluginManager(root){
+
             @Override
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
                 return new TestPluginDescriptorFinder(){
+
                     @Override
                     protected Manifest readManifestFromDirectory(Path pluginPath) {
                         def manifestPath = getManifestPath(pluginPath)
@@ -56,8 +57,10 @@ class SamplesheetConverterTest extends Dsl2Spec{
                     protected Path getManifestPath(Path pluginPath) {
                         return pluginPath.resolve('build/tmp/jar/MANIFEST.MF')
                     }
+
                 }
             }
+
         }
         Plugins.init(root, 'dev', manager)
     }
@@ -65,7 +68,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
     def cleanup() {
         Plugins.stop()
         PluginExtensionProvider.reset()
-        pluginsMode ? System.setProperty('pf4j.mode',pluginsMode) : System.clearProperty('pf4j.mode')
+        pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
     def 'should work fine - CSV' () {
@@ -87,13 +90,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -116,13 +119,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -145,13 +148,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -174,13 +177,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -203,13 +206,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -232,7 +235,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
@@ -260,7 +263,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
@@ -291,8 +294,8 @@ class SamplesheetConverterTest extends Dsl2Spec{
 
         then:
         noExceptionThrown()
-        stdout.contains("test_1")
-        stdout.contains("test_2")
+        stdout.contains('test_1')
+        stdout.contains('test_2')
     }
 
     def 'no header - YAML' () {
@@ -317,8 +320,8 @@ class SamplesheetConverterTest extends Dsl2Spec{
 
         then:
         noExceptionThrown()
-        stdout.contains("test_1")
-        stdout.contains("test_2")
+        stdout.contains('test_1')
+        stdout.contains('test_2')
     }
 
     def 'no header - JSON' () {
@@ -343,8 +346,8 @@ class SamplesheetConverterTest extends Dsl2Spec{
 
         then:
         noExceptionThrown()
-        stdout.contains("test_1")
-        stdout.contains("test_2")
+        stdout.contains('test_1')
+        stdout.contains('test_2')
     }
 
     def 'extra field' () {
@@ -363,9 +366,9 @@ class SamplesheetConverterTest extends Dsl2Spec{
 
         when:
         def config = [
-            "validation": [
-                "logging": [
-                    "unrecognisedHeaders": "warn"
+            'validation': [
+                'logging': [
+                    'unrecognisedHeaders': 'warn'
                 ]
             ]
         ]
@@ -374,7 +377,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
                 .toString()
                 .readLines()
                 .collect {
-                    it.split("ValidationLogger -- ")[-1]
+                    it.split('ValidationLogger -- ')[-1]
                 }
 
         then:
@@ -382,8 +385,8 @@ class SamplesheetConverterTest extends Dsl2Spec{
         stdout.contains("Found the following unidentified headers in ${getRootString()}/src/testResources/extraFields.csv:" as String)
         stdout.contains("\t- extraField")
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, [], unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, [], unique3, 1, itDoesExist]" as String)
     }
 
@@ -403,10 +406,10 @@ class SamplesheetConverterTest extends Dsl2Spec{
 
         when:
         def config = [
-            "validation": [
-                "monochromeLogs": true,
-                "logging": [
-                    "unrecognisedHeaders": "error"
+            'validation': [
+                'monochromeLogs': true,
+                'logging': [
+                    'unrecognisedHeaders': 'error'
                 ]
             ]
         ]
@@ -414,9 +417,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
 
         then:
         def error = thrown(SchemaValidationException)
-        error.message == """Found the following unidentified headers in ${getRootString()}/src/testResources/extraFields.csv:
-\t- extraField
-""" as String
+        error.message == "Found the following unidentified headers in ${getRootString()}/src/testResources/extraFields.csv:\n\t- extraField\n"
     }
 
     def 'no meta' () {
@@ -438,11 +439,11 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[') ? it : null }
+                .findResults { it.startsWith('[') ? it : null }
 
         then:
         noExceptionThrown()
-        stdout.contains("[test1, test2]")
+        stdout.contains('[test1, test2]')
     }
 
     def 'deeply nested samplesheet - YAML' () {
@@ -464,7 +465,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[') ? it : null }
+                .findResults { it.startsWith('[') ? it : null }
 
         then:
         noExceptionThrown()
@@ -490,7 +491,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[') ? it : null }
+                .findResults { it.startsWith('[') ? it : null }
 
         then:
         noExceptionThrown()
@@ -510,13 +511,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -533,13 +534,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -556,13 +557,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -579,13 +580,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
@@ -595,13 +596,13 @@ class SamplesheetConverterTest extends Dsl2Spec{
             include { samplesheetToList } from 'plugin/nf-schema'
 
             Channel.of("src/testResources/correct.csv")
-                .flatMap { it -> 
+                .flatMap { it ->
                     samplesheetToList(it, "src/testResources/schema_input.json")
                 }
                 .map { it -> println("first: ${it}") }
 
             Channel.of("src/testResources/correct_arrays.json")
-                .flatMap { it -> 
+                .flatMap { it ->
                     samplesheetToList(it, "src/testResources/schema_input_with_arrays.json")
                 }
                 .map { it -> println("second: ${it}") }
@@ -613,18 +614,17 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('first') || it.startsWith('second') ? it : null }
+                .findResults { it.startsWith('first') || it.startsWith('second') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("first: [[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("first: [[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("first: [[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('first: [[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('first: [[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("first: [[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
         stdout.contains("second: [[array_meta:[]], [${getRootString()}/src/testResources/testDir/testFile.txt, ${getRootString()}/src/testResources/testDir2/testFile2.txt], [${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir2], [${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir2/testFile2.txt], [string1, string2], [25, 26], [25, 26.5], [false, true], [1, 2, 3], [true], [${getRootString()}/src/testResources/testDir/testFile.txt], [[${getRootString()}/src/testResources/testDir/testFile.txt]]]" as String)
         stdout.contains("second: [[array_meta:[look, an, array, in, meta]], [], [], [], [string1, string2], [25, 26], [25, 26.5], [], [1, 2, 3], [false, true, false], [${getRootString()}/src/testResources/testDir/testFile.txt], [[${getRootString()}/src/testResources/testDir/testFile.txt]]]" as String)
         stdout.contains("second: [[array_meta:[]], [], [], [], [string1, string2], [25, 26], [25, 26.5], [], [1, 2, 3], [false, true, false], [${getRootString()}/src/testResources/testDir/testFile.txt], [[${getRootString()}/src/testResources/testDir/testFile.txt], [${getRootString()}/src/testResources/testDir/testFile.txt, ${getRootString()}/src/testResources/testDir2/testFile2.txt]]]" as String)
-
     }
 
     def 'samplesheetToList - nested schema with oneOf/anyOf/allOf' () {
@@ -633,7 +633,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
             include { samplesheetToList } from 'plugin/nf-schema'
 
             workflow {
-                Channel.fromList(samplesheetToList("src/testResources/deeply_nested.yaml", "src/testResources/samplesheet_schema_deeply_nested_anyof.json")).view()       
+                Channel.fromList(samplesheetToList("src/testResources/deeply_nested.yaml", "src/testResources/samplesheet_schema_deeply_nested_anyof.json")).view()
             }
 
         '''
@@ -643,12 +643,11 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[') ? it : null }
+                .findResults { it.startsWith('[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[mapMeta:this is in a map, arrayMeta:[metaString45, metaString478], otherArrayMeta:[metaString45, metaString478], meta:metaValue, metaMap:[entry1:entry1String, entry2:12.56]], [[string1, string2], string3, 1, 1, ${getRootString()}/file1.txt], [string4, string5, string6], [[string7, string8], [string9, string10]], test]" as String)
-
     }
 
     def 'samplesheetToList - correctly sanitize empty header columns CSV' () {
@@ -657,7 +656,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
             include { samplesheetToList } from 'plugin/nf-schema'
 
             workflow {
-                Channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.csv", "src/testResources/no_meta_schema.json")).view()       
+                Channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.csv", "src/testResources/no_meta_schema.json")).view()
             }
 
         '''
@@ -667,12 +666,11 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[') ? it : null }
+                .findResults { it.startsWith('[') ? it : null }
 
         then:
         noExceptionThrown()
-        stdout.contains("[file1.txt, file2.txt]")
-
+        stdout.contains('[file1.txt, file2.txt]')
     }
 
     def 'samplesheetToList - correctly sanitize empty header columns TSV' () {
@@ -681,7 +679,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
             include { samplesheetToList } from 'plugin/nf-schema'
 
             workflow {
-                Channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.tsv", "src/testResources/no_meta_schema.json")).view()       
+                Channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.tsv", "src/testResources/no_meta_schema.json")).view()
             }
 
         '''
@@ -691,12 +689,11 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[') ? it : null }
+                .findResults { it.startsWith('[') ? it : null }
 
         then:
         noExceptionThrown()
-        stdout.contains("[file1.txt, file2.txt]")
-
+        stdout.contains('[file1.txt, file2.txt]')
     }
 
     def 'samplesheetToList - correctly set defaults' () {
@@ -705,7 +702,7 @@ class SamplesheetConverterTest extends Dsl2Spec{
             include { samplesheetToList } from 'plugin/nf-schema'
 
             workflow {
-                Channel.fromList(samplesheetToList("src/testResources/samplesheet_defaults.yaml", "src/testResources/schema_input_defaults.json")).view()       
+                Channel.fromList(samplesheetToList("src/testResources/samplesheet_defaults.yaml", "src/testResources/schema_input_defaults.json")).view()
             }
 
         '''
@@ -715,12 +712,12 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[') ? it : null }
+                .findResults { it.startsWith('[') ? it : null }
 
         then:
         noExceptionThrown()
-        stdout.contains("[[nullValue:null], 25, defaultString, true, test]")
-        stdout.contains("[[nullValue:null], 0, defaultString, true, null]")
+        stdout.contains('[[nullValue:null], 25, defaultString, true, test]')
+        stdout.contains('[[nullValue:null], 0, defaultString, true, null]')
     }
 
     def 'should work fine - CSV from URL' () {
@@ -742,14 +739,14 @@ class SamplesheetConverterTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('[[') ? it : null }
+                .findResults { it.startsWith('[[') ? it : null }
 
         then:
         noExceptionThrown()
         stdout.contains("[[string1:fullField, string2:fullField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25.12, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/test.txt, unique1, 1, itDoesExist]" as String)
-        stdout.contains("[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]")
-        stdout.contains("[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]")
+        stdout.contains('[[string1:value, string2:value, integer1:0, integer2:0, boolean1:true, boolean2:true], string1, 25.08, false, [], [], [], [], [], itDoesExist]')
+        stdout.contains('[[string1:dependentRequired, string2:dependentRequired, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, [], [], [], unique2, 1, itDoesExist]')
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${getRootString()}/src/testResources/test.txt, ${getRootString()}/src/testResources/testDir, ${getRootString()}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
-    
+
 }

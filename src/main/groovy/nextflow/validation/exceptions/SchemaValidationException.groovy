@@ -19,4 +19,5 @@ class SchemaValidationException extends AbortOperationException {
         super(message)
         this.errors = new ArrayList<>(errors)
     }
+
 }

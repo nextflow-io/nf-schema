@@ -1,3 +1,4 @@
+/* groovylint-disable LineLength, TrailingWhitespace */
 package nextflow.validation
 
 import java.nio.file.Path
@@ -13,7 +14,6 @@ import test.Dsl2Spec
 import test.OutputCapture
 
 import java.nio.file.Files
-import java.nio.file.Path
 import java.util.jar.Manifest
 
 /**
@@ -21,11 +21,10 @@ import java.util.jar.Manifest
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  * @author : jorgeaguileraseqera
  */
-class NfValidationTest extends Dsl2Spec{
+class NfValidationTest extends Dsl2Spec {
 
     @Rule
     OutputCapture capture = new OutputCapture()
-
 
     @Shared String pluginsMode
 
@@ -38,9 +37,11 @@ class NfValidationTest extends Dsl2Spec{
         // the plugin root should
         def root = Path.of('.').toAbsolutePath().normalize()
         def manager = new TestPluginManager(root){
+
             @Override
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
                 return new TestPluginDescriptorFinder(){
+
                     @Override
                     protected Manifest readManifestFromDirectory(Path pluginPath) {
                         def manifestPath = getManifestPath(pluginPath)
@@ -50,8 +51,10 @@ class NfValidationTest extends Dsl2Spec{
                     protected Path getManifestPath(Path pluginPath) {
                         return pluginPath.resolve('build/tmp/jar/MANIFEST.MF')
                     }
+
                 }
             }
+
         }
         Plugins.init(root, 'dev', manager)
     }
@@ -59,10 +62,10 @@ class NfValidationTest extends Dsl2Spec{
     def cleanup() {
         Plugins.stop()
         PluginExtensionProvider.reset()
-        pluginsMode ? System.setProperty('pf4j.mode',pluginsMode) : System.clearProperty('pf4j.mode')
+        pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
-    // 
+    //
     // Params validation tests
     //
 
@@ -77,10 +80,11 @@ class NfValidationTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
+
 }

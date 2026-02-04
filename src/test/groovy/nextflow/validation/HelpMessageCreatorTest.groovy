@@ -1,18 +1,12 @@
+/* groovylint-disable LineLength, TrailingWhitespace */
 package nextflow.validation
 
 import java.nio.file.Path
 
-import nextflow.plugin.Plugins
-import nextflow.plugin.TestPluginDescriptorFinder
-import nextflow.plugin.TestPluginManager
-import nextflow.plugin.extension.PluginExtensionProvider
-import org.pf4j.PluginDescriptorFinder
 import nextflow.Session
 import spock.lang.Specification
 import spock.lang.Shared
-import org.slf4j.Logger
 import org.junit.Rule
-import test.Dsl2Spec
 import test.OutputCapture
 
 import nextflow.validation.config.ValidationConfig
@@ -21,7 +15,7 @@ import nextflow.validation.help.HelpMessageCreator
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
-class HelpMessageCreatorTest extends Specification{
+class HelpMessageCreatorTest extends Specification {
 
     @Rule
     OutputCapture capture = new OutputCapture()
@@ -53,11 +47,11 @@ class HelpMessageCreatorTest extends Specification{
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("")
+        def help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = """--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        def expectedHelp = '''--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull        [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden      [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -74,7 +68,7 @@ Reference genome options
   --genome        [string] Name of iGenomes reference. 
   --fasta         [string] Path to FASTA genome file. 
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -98,11 +92,11 @@ Reference genome options
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("")
+        def help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = """--help                         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        def expectedHelp = '''--help                         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull                     [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden                   [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -144,13 +138,13 @@ copyNoFollow, move) [default: copy]
   --max_multiqc_email_size     [string]          File size limit when attaching MultiQC reports to summary emails. [default: 25.MB] 
   --monochrome_logs            [boolean]         Do not use coloured log outputs. 
   --multiqc_config             [string]          Custom config file to supply to MultiQC. 
-  --tracedir                   [string]          Directory to keep pipeline Nextflow logs and reports. [default: \${params.outdir}/pipeline_info] 
+  --tracedir                   [string]          Directory to keep pipeline Nextflow logs and reports. [default: ${params.outdir}/pipeline_info] 
   --validate_params            [boolean]         Boolean whether to validate parameters against the schema at runtime [default: true] 
   --validationShowHiddenParams [boolean]         Show all params when using `--help` 
   --enable_conda               [boolean]         Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter. 
   --testCamelCase              [string]          A camelCase param 
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -166,7 +160,7 @@ copyNoFollow, move) [default: copy]
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
                 enabled: true,
-                showHiddenParameter: "showMeThoseHiddenParams"
+                showHiddenParameter: 'showMeThoseHiddenParams'
             ]
         ]
         def params = [
@@ -180,7 +174,7 @@ copyNoFollow, move) [default: copy]
         def helpCreator = new HelpMessageCreator(config, newSession)
 
         when:
-        def help = helpCreator.getShortMessage("")
+        def help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
@@ -259,7 +253,7 @@ copyNoFollow, move) [default: copy]
 
         then:
         noExceptionThrown()
-        def expectedHelp = """--help              [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        def expectedHelp = '''--help              [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull          [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden        [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -268,7 +262,7 @@ or `--helpFull`.
 Nested Parameters
   --this.is.so.deep [boolean] so deep [default: true] 
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -291,16 +285,16 @@ Nested Parameters
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("this")
+        def help = helpCreator.getShortMessage('this')
 
         then:
         noExceptionThrown()
-        def expectedHelp = """--this
+        def expectedHelp = '''--this
     description: this is this
     options    : 
       --this.is.so.deep [boolean] so deep [default: true] 
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -323,7 +317,7 @@ Nested Parameters
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("input")
+        def help = helpCreator.getShortMessage('input')
 
         then:
         noExceptionThrown()
@@ -354,10 +348,10 @@ docs](https://nf-co.re/testpipeline/usage#samplesheet-input).
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
                 enabled: true,
-                command: "nextflow run test/test --profile test,docker --outdir results",
-                beforeText: """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+                command: 'nextflow run test/test --profile test,docker --outdir results',
+                beforeText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
-"""
+'''
             ]
         ]
         def params = [:]
@@ -369,13 +363,13 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
 
         then:
         noExceptionThrown()
-        def expectedHelp = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+        def expectedHelp = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
 Typical pipeline command:
 
   nextflow run test/test --profile test,docker --outdir results
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -391,9 +385,9 @@ Typical pipeline command:
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
                 enabled: true,
-                beforeText: """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+                beforeText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
-"""
+'''
             ]
         ]
         def params = [:]
@@ -405,10 +399,10 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
 
         then:
         noExceptionThrown()
-        def expectedHelp = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+        def expectedHelp = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -424,9 +418,9 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
                 enabled: true,
-                afterText: """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+                afterText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
-"""
+'''
             ]
         ]
         def params = [:]
@@ -438,11 +432,11 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
 
         then:
         noExceptionThrown()
-        def expectedHelp = """------------------------------------------------------
+        def expectedHelp = '''------------------------------------------------------
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -465,11 +459,11 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("") + helpCreator.getAfterText()
+        def help = helpCreator.getShortMessage('') + helpCreator.getAfterText()
 
         then:
         noExceptionThrown()
-        def expectedHelp = """--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        def expectedHelp = '''--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull        [boolean]         Show the help message for all non-hidden parameters. 
 --showHidden      [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
@@ -489,7 +483,7 @@ Reference genome options
  !! Hiding 23 param(s), use the `--showHidden` parameter to show them !!
 ------------------------------------------------------
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -512,11 +506,11 @@ Reference genome options
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("") + helpCreator.getAfterText()
+        def help = helpCreator.getShortMessage('') + helpCreator.getAfterText()
 
         then:
         noExceptionThrown()
-        def expectedHelp = """--input        [string]          Path to comma-separated file containing information about the samples in the experiment. 
+        def expectedHelp = '''--input        [string]          Path to comma-separated file containing information about the samples in the experiment. 
 --help         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
 --helpFull     [boolean]         Show the help message for all non-hidden parameters. 
@@ -525,7 +519,7 @@ or `--helpFull`.
 
 ------------------------------------------------------
 
-"""
+'''
         def resultHelp = help.readLines()
         expectedHelp.readLines().each {
             assert help.contains(it)
@@ -547,7 +541,7 @@ or `--helpFull`.
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("input")
+        def help = helpCreator.getShortMessage('input')
 
         then:
         println help
@@ -587,7 +581,6 @@ Fields:
         assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
     }
 
-
     def 'should be able to limit the enum length' () {
         given:
         def validationConfig = [
@@ -604,12 +597,12 @@ Fields:
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("")
+        def help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = "  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, ...) [default: copy] "
-        assert help.readLines().find { it.startsWith("  --publish_dir_mode")} == expectedHelp
+        def expectedHelp = '  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, ...) [default: copy] '
+        assert help.readLines().find { it.startsWith('  --publish_dir_mode') } == expectedHelp
     }
 
     def 'should be able to set unlimited enum length' () {
@@ -628,12 +621,13 @@ Fields:
         def helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        def help = helpCreator.getShortMessage("")
+        def help = helpCreator.getShortMessage('')
 
         then:
         noExceptionThrown()
-        def expectedHelp = """  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, rellink, link, copy, 
-copyNoFollow, move) [default: copy] """
+        def expectedHelp = '''  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, rellink, link, copy, 
+copyNoFollow, move) [default: copy] '''
         assert help.readLines()[35..36].join("\n") == expectedHelp
     }
+
 }

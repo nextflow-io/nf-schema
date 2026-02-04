@@ -21,11 +21,11 @@ class SummaryConfig implements ConfigScope {
 
     @ConfigOption
     @Description('The text to show before the summary message.')
-    final CharSequence beforeText = ""
+    final CharSequence beforeText = ''
 
     @ConfigOption
     @Description('The text to show after the summary message.')
-    final CharSequence afterText = ""
+    final CharSequence afterText = ''
 
     @ConfigOption
     @Description('A list of parameters to hide in the summary message.')

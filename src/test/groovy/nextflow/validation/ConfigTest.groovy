@@ -1,16 +1,10 @@
+/* groovylint-disable LineLength, TrailingWhitespace */
 package nextflow.validation
 
 import java.nio.file.Path
 
-import nextflow.plugin.Plugins
-import nextflow.plugin.TestPluginDescriptorFinder
-import nextflow.plugin.TestPluginManager
-import nextflow.plugin.extension.PluginExtensionProvider
-import org.pf4j.PluginDescriptorFinder
 import nextflow.Session
-import spock.lang.Specification
 import spock.lang.Shared
-import org.slf4j.Logger
 import org.junit.Rule
 import test.Dsl2Spec
 import test.OutputCapture
@@ -20,7 +14,7 @@ import nextflow.validation.config.ValidationConfig
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
-class ConfigTest extends Dsl2Spec{
+class ConfigTest extends Dsl2Spec {
 
     @Rule
     OutputCapture capture = new OutputCapture()
@@ -130,7 +124,7 @@ class ConfigTest extends Dsl2Spec{
             lenientMode: 'notABoolean',
             monochromeLogs: 12,
             showHiddenParams: 'notABoolean',
-            maxErrValSize: ["notAnInteger"],
+            maxErrValSize: ['notAnInteger'],
             parametersSchema: 42,
             ignoreParams: true,
             help: [
@@ -140,7 +134,7 @@ class ConfigTest extends Dsl2Spec{
                 shortParameter: false,
                 fullParameter: [im:'a_map'],
                 beforeText: true,
-                afterText: ['im','a','list'],
+                afterText: ['im', 'a', 'list'],
                 command: 0
             ],
             summary: [
@@ -166,4 +160,5 @@ class ConfigTest extends Dsl2Spec{
         noExceptionThrown()
         stdout
     }
+
 }

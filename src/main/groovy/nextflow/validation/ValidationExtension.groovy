@@ -203,7 +203,7 @@ class ValidationExtension extends PluginExtensionPoint {
             session.baseDir.toString(),
             session.params
         )
-    }
+        }
 
     //
     // Beautify parameters for summary and return as string

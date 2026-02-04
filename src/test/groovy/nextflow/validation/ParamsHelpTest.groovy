@@ -1,3 +1,4 @@
+/* groovylint-disable LineLength, TrailingWhitespace */
 package nextflow.validation
 
 import java.nio.file.Path
@@ -14,7 +15,6 @@ import test.OutputCapture
 import test.MockScriptRunner
 
 import java.nio.file.Files
-import java.nio.file.Path
 import java.util.jar.Manifest
 
 /**
@@ -22,11 +22,10 @@ import java.util.jar.Manifest
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  * @author : KevinMenden
  */
-class ParamsHelpTest extends Dsl2Spec{
+class ParamsHelpTest extends Dsl2Spec {
 
     @Rule
     OutputCapture capture = new OutputCapture()
-
 
     @Shared String pluginsMode
 
@@ -43,9 +42,11 @@ class ParamsHelpTest extends Dsl2Spec{
         // the plugin root should
         def root = this.getRoot()
         def manager = new TestPluginManager(root){
+
             @Override
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
                 return new TestPluginDescriptorFinder(){
+
                     @Override
                     protected Manifest readManifestFromDirectory(Path pluginPath) {
                         def manifestPath = getManifestPath(pluginPath)
@@ -55,8 +56,10 @@ class ParamsHelpTest extends Dsl2Spec{
                     protected Path getManifestPath(Path pluginPath) {
                         return pluginPath.resolve('build/tmp/jar/MANIFEST.MF')
                     }
+
                 }
             }
+
         }
         Plugins.init(root, 'dev', manager)
     }
@@ -64,7 +67,7 @@ class ParamsHelpTest extends Dsl2Spec{
     def cleanup() {
         Plugins.stop()
         PluginExtensionProvider.reset()
-        pluginsMode ? System.setProperty('pf4j.mode',pluginsMode) : System.clearProperty('pf4j.mode')
+        pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
     def 'should print a help message' () {
@@ -74,7 +77,7 @@ class ParamsHelpTest extends Dsl2Spec{
             include { paramsHelp } from 'plugin/nf-schema'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-            
+
             def help_msg = paramsHelp(parameters_schema: '$schema', command: command)
             log.info help_msg
         """
@@ -84,7 +87,7 @@ class ParamsHelpTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('Typical pipeline command:') ||
+                .findResults { it.contains('Typical pipeline command:') ||
                     it.contains('nextflow run') ||
                     it.contains('Input/output options') ||
                     it.contains('--input') ||
@@ -93,7 +96,7 @@ class ParamsHelpTest extends Dsl2Spec{
                     it.contains('--multiqc_title') ||
                     it.contains('Reference genome options') ||
                     it.contains('--genome') ||
-                    it.contains('--fasta') 
+                    it.contains('--fasta')
                     ? it : null }
 
         then:
@@ -107,7 +110,7 @@ class ParamsHelpTest extends Dsl2Spec{
         def SCRIPT = """
             include { paramsHelp } from 'plugin/nf-schema'
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-            
+
             def help_msg = paramsHelp(parameters_schema: '$schema', command: command, showHidden: true)
             log.info help_msg
         """
@@ -117,8 +120,8 @@ class ParamsHelpTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('publish_dir_mode') && 
-                    it.contains('(accepted: symlink, rellink') 
+                .findResults { it.contains('publish_dir_mode') &&
+                    it.contains('(accepted: symlink, rellink')
                     ? it : null }
 
         then:
@@ -133,7 +136,7 @@ class ParamsHelpTest extends Dsl2Spec{
             include { paramsHelp } from 'plugin/nf-schema'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-            
+
             def help_msg = paramsHelp("publish_dir_mode", parameters_schema: '$schema', command: command)
             log.info help_msg
         """
@@ -143,14 +146,14 @@ class ParamsHelpTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('--publish_dir_mode') ||
+                .findResults { it.startsWith('--publish_dir_mode') ||
                     it.contains('type       :') ||
                     it.contains('default    :') ||
                     it.contains('description:') ||
                     it.contains('help_text  :') ||
                     it.contains('fa_icon    :') || // fa_icon shouldn't be printed
                     it.contains('enum       :') ||
-                    it.contains('hidden     :') 
+                    it.contains('hidden     :')
                     ? it : null }
 
         then:
@@ -165,7 +168,7 @@ class ParamsHelpTest extends Dsl2Spec{
             include { paramsHelp } from 'plugin/nf-schema'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-            
+
             def help_msg = paramsHelp("no_exist", parameters_schema: '$schema', command: command)
             log.info help_msg
         """
@@ -175,7 +178,7 @@ class ParamsHelpTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('--no_exist') ? it : null }
+                .findResults { it.startsWith('--no_exist') ? it : null }
 
         then:
         def error = thrown(Exception)
@@ -190,7 +193,7 @@ class ParamsHelpTest extends Dsl2Spec{
             include { paramsHelp } from 'plugin/nf-schema'
 
             def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-            
+
             def help_msg = paramsHelp("this.is", parameters_schema: '$schema', command: command)
             log.info help_msg
         """
@@ -200,7 +203,7 @@ class ParamsHelpTest extends Dsl2Spec{
         def stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.startsWith('--this.is') ||
+                .findResults { it.startsWith('--this.is') ||
                     it.contains('description:') ||
                     it.contains('options    :') ||
                     it.contains('this.is.so.deep')
@@ -210,4 +213,5 @@ class ParamsHelpTest extends Dsl2Spec{
         noExceptionThrown()
         stdout.size() == 4
     }
+
 }

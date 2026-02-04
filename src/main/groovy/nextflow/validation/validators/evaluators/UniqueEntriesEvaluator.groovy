@@ -50,4 +50,5 @@ class UniqueEntriesEvaluator implements Evaluator {
         }
         return result
     }
+
 }

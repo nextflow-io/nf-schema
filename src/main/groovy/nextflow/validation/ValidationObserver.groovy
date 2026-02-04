@@ -7,7 +7,7 @@ import groovy.util.logging.Slf4j
 import groovy.transform.CompileDynamic
 
 /**
- * An observer for initial checks that always need to be run at the start of the pipeline 
+ * An observer for initial checks that always need to be run at the start of the pipeline
  *
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
