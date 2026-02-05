@@ -44,10 +44,8 @@ plugins {
 To lint the groovy code use the following command:
 
 ```bash
-make lint
+pre-commit run
 ```
-
-You need to install the [`npm-groovy-lint`](https://nvuillam.github.io/npm-groovy-lint/#installation) tool first. There is also a [VSCode extension](https://marketplace.visualstudio.com/items?itemName=NicolasVuillamy.vscode-groovy-lint) available.
 
 ## Change and preview the docs
 
