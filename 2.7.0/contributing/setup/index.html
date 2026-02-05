@@ -1216,6 +1216,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#lint-the-groovy-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lint the groovy code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#change-and-preview-the-docs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1302,6 +1313,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#lint-the-groovy-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lint the groovy code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#change-and-preview-the-docs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1375,13 +1397,17 @@ You can delete all <code>nf-schema</code> versions using this command:
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;nf-schema@x.y.z&#39;</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="o">}</span>
 </code></pre></div>
+<h2 id="lint-the-groovy-code">Lint the groovy code</h2>
+<p>To lint the groovy code use the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pre-commit<span class="w"> </span>run
+</code></pre></div>
 <h2 id="change-and-preview-the-docs">Change and preview the docs</h2>
 <p>The docs are generated using <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a>.
 You can install the required packages as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mkdocs-material<span class="w"> </span>pymdown-extensions<span class="w"> </span>pillow<span class="w"> </span>cairosvg
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mkdocs-material<span class="w"> </span>pymdown-extensions<span class="w"> </span>pillow<span class="w"> </span>cairosvg
 </code></pre></div>
 <p>To change the docs, edit the files in the <a href="https://github.com/nextflow-io/nf-schema/tree/master/docs">docs/</a> folder and run the following command to generate the docs:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mkdocs<span class="w"> </span>serve
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mkdocs<span class="w"> </span>serve
 </code></pre></div>
 <p>To preview the docs, open the URL provided by mkdocs in your browser.</p>
 <h2 id="release-and-publish-the-plugin">Release and publish the plugin</h2>
@@ -1396,7 +1422,7 @@ You can install the required packages as follows:</p>
 <li><code>github_commit_email</code>: The email address associated with your GitHub account.</li>
 <li>Update the <a href="https://github.com/nextflow-io/nf-schema/blob/master/CHANGELOG.md">changelog</a>.</li>
 <li>Build and publish the plugin to your GitHub repository:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>make<span class="w"> </span>release
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>make<span class="w"> </span>release
 </code></pre></div></li>
 <li>Create a pull request against the <a href="https://github.com/nextflow-io/plugins/blob/main/plugins.json">nextflow-io/plugins</a> repository to make the plugin publicly accessible.</li>
 </ol>
