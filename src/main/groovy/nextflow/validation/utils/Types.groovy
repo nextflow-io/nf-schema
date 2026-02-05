@@ -3,6 +3,7 @@ package nextflow.validation.utils
 import org.json.JSONObject
 
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 
 /**
  * A collection of functions related to type casting and type checking
@@ -13,32 +14,31 @@ import groovy.util.logging.Slf4j
  */
 
 @Slf4j
+@CompileDynamic
 public class Types {
 
     //
     // Cast a value to the provided type in a Strict mode
     //
-    public static Object inferType(Object input) {
-        def Set<String> validBooleanValues = ['true', 'false'] as Set
-
-        if (input instanceof Map) {
+    static Object inferType(Object input) {
+        if (input in Map) {
             // Cast all values in the map
-            def Map output = [:]
+            Map output = [:]
             input.each { k, v ->
                 output[k] = inferType(v)
             }
             return output
         }
-        else if (input instanceof List) {
+        else if (input in List) {
             // Cast all values in the list
-            def List output = []
-            for( entry : input ) {
+            List output = []
+            input.each { entry ->
                 output.add(inferType(entry))
             }
             return output
-        } else if (input instanceof String) {
+        } else if (input in String) {
             // Cast the string if there is one
-            if (input == "") {
+            if (input == '') {
                 return null
             }
             return JSONObject.stringToValue(input)
@@ -48,7 +48,7 @@ public class Types {
     //
     // Function to check if a String value is an Integer
     //
-    public static Boolean isInteger(String input) {
+    static Boolean isInteger(String input) {
         try {
             input as Integer
             return true
@@ -60,7 +60,7 @@ public class Types {
     //
     // Function to check if a String value is a Float
     //
-    public static Boolean isFloat(String input) {
+    static Boolean isFloat(String input) {
         try {
             input as Float
             return true
@@ -72,7 +72,7 @@ public class Types {
     //
     // Function to check if a String value is a Double
     //
-    public static Boolean isDouble(String input) {
+    static Boolean isDouble(String input) {
         try {
             input as Double
             return true
@@ -80,4 +80,5 @@ public class Types {
             return false
         }
     }
+
 }

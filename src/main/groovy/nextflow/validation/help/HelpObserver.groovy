@@ -1,40 +1,49 @@
 package nextflow.validation.help
 
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 
-import nextflow.processor.TaskHandler
 import nextflow.trace.TraceObserverV2
-import nextflow.trace.TraceRecord
 import nextflow.Session
 
-import nextflow.validation.help.HelpMessageCreator
 import nextflow.validation.config.ValidationConfig
 
+/**
+ * An observer class to print the help message at the start of the pipeline
+ *
+ * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
+ */
+
 @Slf4j
+@CompileDynamic
 class HelpObserver implements TraceObserverV2 {
-    
+
     @Override
     void onFlowCreate(Session session) {
         // Help message logic
-        def Map params = (Map)session.params ?: [:]
-        def ValidationConfig config = new ValidationConfig(session?.config?.navigate('validation') as Map, session)
-        def Boolean containsFullParameter = params.containsKey(config.help.fullParameter) && params[config.help.fullParameter]
-        def Boolean containsShortParameter = params.containsKey(config.help.shortParameter) && params[config.help.shortParameter]
+        Map params = (Map)session.params ?: [:]
+        ValidationConfig config = new ValidationConfig(session?.config?.navigate('validation') as Map, session)
+        Boolean containsFullParameter = params.containsKey(config.help.fullParameter) &&
+            params[config.help.fullParameter]
+        Boolean containsShortParameter = params.containsKey(config.help.shortParameter) &&
+            params[config.help.shortParameter]
         if (config.help.enabled && (containsFullParameter || containsShortParameter)) {
-            def String help = ""
-            def HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
-            help += helpCreator.getBeforeText()
+            String help = ''
+            HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+            help += helpCreator.beforeText
             if (containsFullParameter) {
-                log.debug("Printing out the full help message")
-                help += helpCreator.getFullMessage()
+                log.debug('Printing out the full help message')
+                help += helpCreator.fullMessage
             } else if (containsShortParameter) {
-                log.debug("Printing out the short help message")
-                def paramValue = params.get(config.help.shortParameter)
-                help += helpCreator.getShortMessage(paramValue instanceof String ? paramValue : "")
+                log.debug('Printing out the short help message')
+                Object paramValue = params.get(config.help.shortParameter)
+                help += helpCreator.getShortMessage(paramValue in String ? paramValue : '')
             }
-            help += helpCreator.getAfterText()
+            help += helpCreator.afterText
             log.info(help)
-            System.exit(0)
+            session.cancel()
         }
     }
+
 }
+

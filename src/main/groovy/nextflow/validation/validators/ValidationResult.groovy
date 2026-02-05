@@ -1,30 +1,38 @@
 package nextflow.validation.validators
 
-import groovy.util.logging.Slf4j
-
-import java.util.regex.Matcher
-
-import org.json.JSONObject
-import dev.harrel.jsonschema.ValidatorFactory
-import dev.harrel.jsonschema.Validator
-
-import nextflow.validation.config.ValidationConfig
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
 import static nextflow.validation.utils.Common.findAllKeys
 import static nextflow.validation.utils.Common.kebabToCamel
 import static nextflow.validation.utils.Types.isInteger
 
+import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
+
+import java.util.regex.Matcher
+
+import org.json.JSONObject
+import dev.harrel.jsonschema.Validator
+
+import nextflow.validation.config.ValidationConfig
+
+/**
+ * The validation result wrapper
+ *
+ * @author : arthur
+ * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
+ */
 
 @Slf4j
+@CompileDynamic
 public class ValidationResult {
 
-    public Validator.Result result
-    private Object rawInput 
-    private String schemaString
-    private JSONObject schemaJson
-    private ValidationConfig config
+    final private Validator.Result result
+    final private Object rawInput
+    final private String schemaString
+    final private JSONObject schemaJson
+    final private ValidationConfig config
 
-    ValidationResult(Validator.Result result, Object rawInput, String schemaString, ValidationConfig config ) {
+    ValidationResult(Validator.Result result, Object rawInput, String schemaString, ValidationConfig config) {
         this.result = result
         this.rawInput = rawInput
         this.schemaString = schemaString
@@ -32,87 +40,96 @@ public class ValidationResult {
         this.config = config
     }
 
-    public List<String> getUnevaluated() {
-        def Set<String> evaluated = []
-        this.result.getAnnotations().each{ anno ->
-            if(anno.keyword in ["properties", "patternProperties", "additionalProperties"]){
+    List<String> getUnevaluated() {
+        Set<String> evaluated = []
+        this.result.annotations.each { anno ->
+            if (anno.keyword in ['properties', 'patternProperties', 'additionalProperties']) {
                 evaluated.addAll(
-                    anno.annotation.collect{ it ->
-                    "${anno.instanceLocation.toString()}/${it.toString()}".replaceAll("^/+", "")
+                    anno.annotation.collect { annotation ->
+                    "${anno.instanceLocation}/${annotation}".replaceAll('^/+', '')
                     }
                 )
             }
         }
-        def Set<String> all_keys = []
-        findAllKeys(this.rawInput, null, all_keys, '/')
-        def unevaluated_ = all_keys - evaluated
-        def unevaluated = unevaluated_.collect{ it -> !evaluated.contains(kebabToCamel(it)) ? it : null }
+        Set<String> allKeys = []
+        findAllKeys(this.rawInput, null, allKeys, '/')
+        Set<String> unevaluatedUnformatted = allKeys - evaluated
+        List<String> unevaluated = unevaluatedUnformatted
+            .collect { key -> evaluated.contains(kebabToCamel(key)) ? null : key }
         return unevaluated - null
     }
 
-    public List<String> getErrors(String validationType) {
-        def List<String> errors = []
-        this.result.getErrors().each { error ->
-            def String errorString = error.getError()
+    List<String> getErrors(String validationType) {
+        List<String> errors = []
+        this.result.errors.each { error ->
+            String errorString = error.error
 
             // Skip double error in the parameter schema
-            if (errorString.startsWith("Value does not match against the schemas at indexes") && validationType == "parameter") {
+            if (
+                errorString.startsWith('Value does not match against the schemas at indexes') &&
+                validationType == 'parameter'
+            ) {
                 return
             }
 
-            def String instanceLocation = error.getInstanceLocation()
-            def String value = getValueFromJsonPointer(instanceLocation, this.rawInput)
-            if(config.maxErrValSize >= 1 && value.size() > config.maxErrValSize) {
-                value = "${value[0..(config.maxErrValSize/2-1)]}...${value[-config.maxErrValSize/2..-1]}" as String
+            String instanceLocation = error.instanceLocation
+            String value = getValueFromJsonPointer(instanceLocation, this.rawInput)
+            if (config.maxErrValSize >= 1 && value.size() > config.maxErrValSize) {
+                /* groovylint-disable-next-line LineLength */
+                value = "${value[0..(config.maxErrValSize / 2 - 1)]}...${value[-config.maxErrValSize / 2..-1]}" as String
             }
 
             // Return a standard error message for object validation
-            if (validationType == "object") {
+            if (validationType == 'object') {
                 errors.add("${instanceLocation ? instanceLocation + ' ' : ''}(${value}): ${errorString}" as String)
                 return
             }
 
-            // Get the custom errorMessage if there is one and the validation errors are not about the content of the file
-            def String schemaLocation = error.getSchemaLocation().replaceFirst(/^[^#]+/, "")
-            def String customError = ""
-            if (!errorString.startsWith("Validation of file failed:")) {
+            // Get the custom errorMessage if there is one and the validation errors are not about the file content
+            String schemaLocation = error.schemaLocation.replaceFirst(/^[^#]+/, '')
+            String customError = ''
+            if (!errorString.startsWith('Validation of file failed:')) {
                 customError = getValueFromJsonPointer("${schemaLocation}/errorMessage", this.schemaJson) as String
             }
 
             // Change some error messages to make them more clear
-            def String keyword = error.getKeyword()
-            if (keyword == "required") {
-                def Matcher matcher = errorString =~ ~/\[\[([^\[\]]*)\]\]$/
-                def String missingKeywords = matcher.findAll().flatten().last()
+            String keyword = error.keyword
+            if (keyword == 'required') {
+                Matcher matcher = errorString =~ ~/\[\[([^\[\]]*)\]\]$/
+                String missingKeywords = matcher.findAll().flatten().last()
                 errorString = "Missing required ${validationType}(s): ${missingKeywords}"
             }
 
-            def List<String> locationList = instanceLocation.split("/").findAll { it != "" } as List
+            List<String> locationList = instanceLocation.split('/').findAll { loc -> loc != '' } as List
 
-            def String printableError = "${validationType == 'field' ? '->' : '*'} ${errorString}" as String
-            if (locationList.size() > 0 && isInteger(locationList[0]) && validationType == "field") {
-                def Integer entryInteger = locationList[0] as Integer
-                def String entryString = "Entry ${entryInteger + 1}" as String
-                def String fieldError = "${errorString}" as String
-                if(locationList.size() > 1) {
-                    fieldError = "Error for ${validationType} '${locationList[1..-1].join("/")}' (${value}): ${errorString}"
+            String printableError = "${validationType == 'field' ? '->' : '*'} ${errorString}" as String
+            if (locationList.size() > 0 && isInteger(locationList[0]) && validationType == 'field') {
+                Integer entryInteger = locationList[0] as Integer
+                String entryString = "Entry ${entryInteger + 1}" as String
+                String fieldError = "${errorString}" as String
+                if (locationList.size() > 1) {
+                    /* groovylint-disable-next-line LineLength */
+                    fieldError = "Error for ${validationType} '${locationList[1..-1].join('/')}' (${value}): ${errorString}"
                 }
                 printableError = "-> ${entryString}: ${fieldError}" as String
-            } else if (validationType == "parameter") {
-                def String fieldName = locationList.join(".")
-                if(fieldName != "") {
+            } else if (validationType == 'parameter') {
+                String fieldName = locationList.join('.')
+                if (fieldName != '') {
                     printableError = "* --${fieldName} (${value}): ${errorString}" as String
                 }
             }
 
-            if(customError != "") {
+            if (customError != '') {
                 printableError = printableError + " (${customError})"
             }
 
             errors.add(printableError)
-
         }
         return errors
+    }
+
+    Validator.Result getResult() {
+        return this.result
     }
 
 }

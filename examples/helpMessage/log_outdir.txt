@@ -19,3 +19,4 @@ It provides information about the parameters and usage.
 
 For more information, please refer to the documentation.
     
+Execution cancelled -- Finishing pending tasks before exit

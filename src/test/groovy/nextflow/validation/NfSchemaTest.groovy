@@ -1,4 +1,7 @@
+/* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
+
+import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
 
@@ -13,7 +16,6 @@ import test.Dsl2Spec
 import test.OutputCapture
 
 import java.nio.file.Files
-import java.nio.file.Path
 import java.util.jar.Manifest
 
 /**
@@ -21,66 +23,73 @@ import java.util.jar.Manifest
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  * @author : jorgeaguileraseqera
  */
-class NfValidationTest extends Dsl2Spec{
+
+@CompileDynamic
+class NfSchemaTest extends Dsl2Spec {
 
     @Rule
-    OutputCapture capture = new OutputCapture()
+    final private OutputCapture capture = new OutputCapture()
 
+    @Shared
+    private String pluginsMode
 
-    @Shared String pluginsMode
-
-    def setup() {
+    void setup() {
         // reset previous instances
         PluginExtensionProvider.reset()
         // this need to be set *before* the plugin manager class is created
         pluginsMode = System.getProperty('pf4j.mode')
         System.setProperty('pf4j.mode', 'dev')
         // the plugin root should
-        def root = Path.of('.').toAbsolutePath().normalize()
-        def manager = new TestPluginManager(root){
+        Path root = Path.of('.').toAbsolutePath().normalize()
+        TestPluginManager manager = new TestPluginManager(root){
+
             @Override
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
                 return new TestPluginDescriptorFinder(){
+
                     @Override
                     protected Manifest readManifestFromDirectory(Path pluginPath) {
-                        def manifestPath = getManifestPath(pluginPath)
-                        final input = Files.newInputStream(manifestPath)
+                        Path manifestPath = getManifestPath(pluginPath)
+                        InputStream input = Files.newInputStream(manifestPath)
                         return new Manifest(input)
                     }
                     protected Path getManifestPath(Path pluginPath) {
                         return pluginPath.resolve('build/tmp/jar/MANIFEST.MF')
                     }
+
                 }
             }
+
         }
         Plugins.init(root, 'dev', manager)
     }
 
-    def cleanup() {
+    void cleanup() {
         Plugins.stop()
         PluginExtensionProvider.reset()
-        pluginsMode ? System.setProperty('pf4j.mode',pluginsMode) : System.clearProperty('pf4j.mode')
+        pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
-    // 
+    //
     // Params validation tests
     //
 
-    def 'should import functions' () {
+    void 'should import functions'() {
         given:
-        def  SCRIPT_TEXT = '''
+        String scriptText = '''
             include { validateParameters } from 'plugin/nf-schema'
         '''
 
         when:
-        dsl_eval(SCRIPT_TEXT)
-        def stdout = capture
+        dsl_eval(scriptText)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('* --') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('* --') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
+
 }

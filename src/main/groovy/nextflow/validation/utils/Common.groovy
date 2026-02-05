@@ -5,6 +5,7 @@ import org.json.JSONArray
 import org.json.JSONPointer
 import org.json.JSONPointerException
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 import java.nio.file.Path
 import java.util.stream.IntStream
 
@@ -17,60 +18,59 @@ import java.util.stream.IntStream
  */
 
 @Slf4j
+@CompileDynamic
 public class Common {
 
     //
     // Get full path based on the base directory of the pipeline run
     //
-    public static String getBasePath(String baseDir, String schemaFilename) {
+    static String getBasePath(String baseDir, String schemaFilename) {
         if (Path.of(schemaFilename).exists()) {
             return schemaFilename
-        } else {
-            return "${baseDir}/${schemaFilename}"
         }
+        return "${baseDir}/${schemaFilename}"
     }
 
     //
     // Function to get the value from a JSON pointer
     //
-    public static Object getValueFromJsonPointer(String jsonPointer, Object json) {
-        def JSONPointer schemaPointer = new JSONPointer(jsonPointer)
+    static Object getValueFromJsonPointer(String jsonPointer, Object json) {
+        JSONPointer schemaPointer = new JSONPointer(jsonPointer)
         try {
-            return schemaPointer.queryFrom(json) ?: ""
+            return schemaPointer.queryFrom(json) ?: ''
         } catch (JSONPointerException e) {
-            return ""
+            return ''
         }
     }
 
     //
     // Get the amount of character of the largest key in a map
     //
-    public static Integer getLongestKeyLength( Map input ) {
-        return Collections.max(input.collect { _, val -> 
-            def Map groupParams = val as Map
-            longestStringLength(groupParams.keySet() as List<String> )
+    static Integer getLongestKeyLength(Map input) {
+        return Collections.max(input.collect { key, val ->
+            Map groupParams = val as Map
+            longestStringLength(groupParams.keySet() as List<String>)
         })
     }
 
     //
     // Get the size of the longest string value in a list of strings
     //
-    public static Integer longestStringLength( List<String> strings ) {
-        return strings ? Collections.max(strings.collect { it.size() }) : 0
+    static Integer longestStringLength(List<String> strings) {
+        return strings ? Collections.max(strings*.size()) : 0
     }
 
     //
     // Find a value in a nested map
     //
-    public static Object findDeep(Object m, String key) {
-        if (m instanceof Map) {
+    static Object findDeep(Object m, String key) {
+        if (m in Map) {
             if (m.containsKey(key)) {
                 return m[key]
-            } else {
-                return m.findResult { k, v -> findDeep(v, key) }
             }
-        } 
-        else if (m instanceof List) {
+            return m.findResult { k, v -> findDeep(v, key) }
+        }
+        else if (m in List) {
             return m.findResult { element -> findDeep(element, key) }
         }
         return null
@@ -79,40 +79,42 @@ public class Common {
     //
     // Check if a key exists in a nested map
     //
-    public static boolean hasDeepKey(Object m, String key) {
-        if (m instanceof Map) {
+    static boolean hasDeepKey(Object m, String key) {
+        if (m in Map) {
             if (m.containsKey(key)) {
                 return true
-            } else {
-                return m.any { k, v -> hasDeepKey(v, key) }
             }
-        } 
-        else if (m instanceof List) {
+            return m.any { k, v -> hasDeepKey(v, key) }
+        }
+        else if (m in List) {
             return m.any { element -> hasDeepKey(element, key) }
         }
         return false
     }
 
-    public static void findAllKeys(Object object, String key, Set<String> finalKeys, String sep) {
-        if (object instanceof JSONObject) {
-            JSONObject jsonObject = (JSONObject) object;
+    static void findAllKeys(Object object, String key, Set<String> finalKeys, String sep) {
+        if (object in JSONObject) {
+            JSONObject jsonObject = (JSONObject) object
 
-            jsonObject.keySet().forEach{ childKey ->
+            jsonObject.keySet().forEach { childKey ->
                 findAllKeys(jsonObject.get(childKey), key != null ? key + sep + childKey : childKey, finalKeys, sep)
-            };
-        } else if (object instanceof JSONArray) {
-            JSONArray jsonArray = (JSONArray) object;
+            }
+        } else if (object in JSONArray) {
+            JSONArray jsonArray = (JSONArray) object
             key != null ? finalKeys.add(key) : ''
 
             IntStream.range(0, jsonArray.length())
                     .mapToObj(jsonArray::get)
-                    .forEach{ jObj -> findAllKeys(jObj, key, finalKeys, sep)};
+                    .forEach { jObj -> findAllKeys(jObj, key, finalKeys, sep) }
         }
-        else{
+        else {
             key != null ? finalKeys.add(key) : ''
         }
     }
-    public static String kebabToCamel(String s) {
-        return s.replaceAll( "(-)([A-Za-z0-9])", { Object[] it -> it[2].toUpperCase() } )
+
+    static String kebabToCamel(String s) {
+        Closure<Object[]> toUpper = { Object[] strs -> strs[2].toUpperCase() }
+        return s.replaceAll('(-)([A-Za-z0-9])', toUpper)
     }
+
 }

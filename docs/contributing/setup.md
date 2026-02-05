@@ -39,6 +39,14 @@ plugins {
 }
 ```
 
+## Lint the groovy code
+
+To lint the groovy code use the following command:
+
+```bash
+pre-commit run
+```
+
 ## Change and preview the docs
 
 The docs are generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
