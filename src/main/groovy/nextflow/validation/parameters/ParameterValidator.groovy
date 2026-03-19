@@ -11,6 +11,7 @@ import groovy.transform.CompileDynamic
 import nextflow.Nextflow
 import nextflow.util.Duration
 import nextflow.util.MemoryUnit
+import nextflow.util.VersionNumber
 import org.json.JSONObject
 
 import nextflow.validation.config.ValidationConfig
@@ -122,11 +123,13 @@ class ParameterValidator {
         Map<String, Object> cleanedParams = cleanParameters(params)
         // Convert to JSONObject
         JsonGenerator generator = new JsonGenerator.Options()
-            .addConverter(Path) { Path path -> path.toUri().toString() }
+            .addConverter(Path) { Path path -> path.toUriString() }
+            .addConverter(Duration) { Duration duration -> duration.toString() }
+            .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toString() }
+            .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
             .build()
         JSONObject paramsJSON = new JSONObject(generator.toJson(cleanedParams))
 
-        //=====================================================================//
         // Validate parameters against the schema
         JsonSchemaValidator validator = new JsonSchemaValidator(config)
 
@@ -138,9 +141,7 @@ class ParameterValidator {
         List<String> paramErrors = validationResult.getErrors('parameter')
         errors.addAll(paramErrors)
 
-        //=====================================================================//
         // Check for nextflow core params and unexpected params
-        //=====================================================================//
         List<String> unexpectedParams = []
         if (paramErrors.size() == 0) {
             validationResult.unevaluated.each { param ->
@@ -193,18 +194,6 @@ class ParameterValidator {
             // remove anything evaluating to false
             if (!value && value != 0) {
                 newParams.remove(key)
-            }
-            // Cast MemoryUnit to String
-            else if (value in MemoryUnit) {
-                newParams.replace(key, value.toString())
-            }
-            // Cast Duration to String
-            else if (value in Duration) {
-                newParams.replace(key, value.toString())
-            }
-            // Parsed nested parameters
-            else if (value in Map) {
-                newParams.replace(key, cleanParameters(value as Map))
             }
         }
         return newParams
