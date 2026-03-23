@@ -124,8 +124,8 @@ class ParameterValidator {
         // Convert to JSONObject
         JsonGenerator generator = new JsonGenerator.Options()
             .addConverter(Path) { Path path -> path.toUriString() }
-            .addConverter(Duration) { Duration duration -> duration.toString() }
-            .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toString() }
+            .addConverter(Duration) { Duration duration -> duration.toMillis() }
+            .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
             .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
             .build()
         JSONObject paramsJSON = new JSONObject(generator.toJson(cleanedParams))
