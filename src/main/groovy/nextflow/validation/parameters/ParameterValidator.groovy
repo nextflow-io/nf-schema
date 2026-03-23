@@ -119,16 +119,15 @@ class ParameterValidator {
             config.parametersSchema
         log.debug 'Starting parameters validation'
 
-        // Clean the parameters
-        Map<String, Object> cleanedParams = cleanParameters(params)
         // Convert to JSONObject
         JsonGenerator generator = new JsonGenerator.Options()
+            .excludeNulls()
             .addConverter(Path) { Path path -> path.toUriString() }
             .addConverter(Duration) { Duration duration -> duration.toMillis() }
             .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
             .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
             .build()
-        JSONObject paramsJSON = new JSONObject(generator.toJson(cleanedParams))
+        JSONObject paramsJSON = new JSONObject(generator.toJson(params))
 
         // Validate parameters against the schema
         JsonSchemaValidator validator = new JsonSchemaValidator(config)
@@ -186,25 +185,11 @@ class ParameterValidator {
     private List<String> getWarnings() { return warnings }
 
     //
-    // Clean and check parameters relative to Nextflow native classes
-    //
-    private Map cleanParameters(Map params) {
-        Map newParams = (Map) params.getClass().newInstance(params)
-        params.each { String key, Object value ->
-            // remove anything evaluating to false
-            if (!value && value != 0) {
-                newParams.remove(key)
-            }
-        }
-        return newParams
-    }
-
-    //
     // Initialise expected params if not present
     //
     private Map initialiseExpectedParams(Map params) {
         expectedParams.each { param ->
-            params[param] = false
+            params[param] = params.get(param, false)
         }
         return params
     }

@@ -198,6 +198,9 @@ A list of default parameters to ignore during validation. This option should onl
         }
         help = new HelpConfig(helpConfig, params, monochromeLogs)
 
+        // Add help parameters to the default ignored parameters
+        ignoreParams += [help.shortParameter, help.fullParameter, help.showHiddenParameter]
+
         // summary
         Map summaryConfig = [:]
         if (config.containsKey('summary')) {
