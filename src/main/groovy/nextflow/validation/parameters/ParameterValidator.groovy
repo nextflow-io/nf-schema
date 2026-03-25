@@ -11,6 +11,7 @@ import groovy.transform.CompileDynamic
 import nextflow.Nextflow
 import nextflow.util.Duration
 import nextflow.util.MemoryUnit
+import nextflow.util.VersionNumber
 import org.json.JSONObject
 
 import nextflow.validation.config.ValidationConfig
@@ -30,8 +31,16 @@ class ParameterValidator {
 
     final private ValidationConfig config
 
+    // A map of expected parameters with their default values
+    final private Map<String, Object> expectedParamsDefaults
+
     ParameterValidator(ValidationConfig config) {
         this.config = config
+        this.expectedParamsDefaults = [
+            (config.help.shortParameter): false,
+            (config.help.fullParameter): false,
+            (config.help.showHiddenParameter): false
+        ]
     }
 
     final List<String> nextflowOptions = [
@@ -118,15 +127,16 @@ class ParameterValidator {
             config.parametersSchema
         log.debug 'Starting parameters validation'
 
-        // Clean the parameters
-        Map<String, Object> cleanedParams = cleanParameters(params)
         // Convert to JSONObject
         JsonGenerator generator = new JsonGenerator.Options()
-            .addConverter(Path) { Path path -> path.toUri().toString() }
+            .excludeNulls()
+            .addConverter(Path) { Path path -> path.toUriString() }
+            .addConverter(Duration) { Duration duration -> duration.toMillis() }
+            .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
+            .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
             .build()
-        JSONObject paramsJSON = new JSONObject(generator.toJson(cleanedParams))
+        JSONObject paramsJSON = new JSONObject(generator.toJson(params))
 
-        //=====================================================================//
         // Validate parameters against the schema
         JsonSchemaValidator validator = new JsonSchemaValidator(config)
 
@@ -138,9 +148,7 @@ class ParameterValidator {
         List<String> paramErrors = validationResult.getErrors('parameter')
         errors.addAll(paramErrors)
 
-        //=====================================================================//
         // Check for nextflow core params and unexpected params
-        //=====================================================================//
         List<String> unexpectedParams = []
         if (paramErrors.size() == 0) {
             validationResult.unevaluated.each { param ->
@@ -185,52 +193,15 @@ class ParameterValidator {
     private List<String> getWarnings() { return warnings }
 
     //
-    // Clean and check parameters relative to Nextflow native classes
-    //
-    private Map cleanParameters(Map params) {
-        Map newParams = (Map) params.getClass().newInstance(params)
-        params.each { String key, Object value ->
-            // remove anything evaluating to false
-            if (!value && value != 0) {
-                newParams.remove(key)
-            }
-            // Cast MemoryUnit to String
-            else if (value in MemoryUnit) {
-                newParams.replace(key, value.toString())
-            }
-            // Cast Duration to String
-            else if (value in Duration) {
-                newParams.replace(key, value.toString())
-            }
-            // Parsed nested parameters
-            else if (value in Map) {
-                newParams.replace(key, cleanParameters(value as Map))
-            }
-        }
-        return newParams
-    }
-
-    //
     // Initialise expected params if not present
     //
     private Map initialiseExpectedParams(Map params) {
-        expectedParams.each { param ->
-            params[param] = false
+        expectedParamsDefaults.each { param, defaultValue ->
+            if (!params.containsKey(param)) {
+                params[param] = defaultValue
+            }
         }
         return params
-    }
-
-    //
-    // Add expected params
-    //
-    private List getExpectedParams() {
-        List expectedParams = [
-            config.help.shortParameter,
-            config.help.fullParameter,
-            config.help.showHiddenParameter
-        ]
-
-        return expectedParams
     }
 
 }
