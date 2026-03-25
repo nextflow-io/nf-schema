@@ -1,5 +1,8 @@
 package nextflow.validation.parameters
 
+import static nextflow.cli.CmdRun.parseParamValue
+import static nextflow.NF.isSyntaxParserV2
+
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
@@ -128,14 +131,20 @@ class ParameterValidator {
         log.debug 'Starting parameters validation'
 
         // Convert to JSONObject
-        JsonGenerator generator = new JsonGenerator.Options()
+        JsonGenerator.Options generatorOptions = new JsonGenerator.Options()
             .excludeNulls()
             .addConverter(Path) { Path path -> path.toUriString() }
             .addConverter(Duration) { Duration duration -> duration.toMillis() }
             .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
             .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
-            .build()
-        JSONObject paramsJSON = new JSONObject(generator.toJson(params))
+
+        // Explicitly cast parameters to the expected values when strict syntax is used
+        /* groovylint-disable-next-line UnnecessaryGetter */
+        if (isSyntaxParserV2()) {
+            generatorOptions.addConverter(String) { String str -> parseParamValue(str) }
+        }
+
+        JSONObject paramsJSON = new JSONObject(generatorOptions.build().toJson(params))
 
         // Validate parameters against the schema
         JsonSchemaValidator validator = new JsonSchemaValidator(config)
