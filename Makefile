@@ -24,4 +24,8 @@ release:
 
 # Lint the groovy code
 lint:
-	npm-groovy-lint "src/**/*.groovy" --fix --format
+	npm-groovy-lint "src/**/*.groovy" --fix
+
+# Format the groovy code
+format:
+	npm-groovy-lint "src/**/*.groovy" --format

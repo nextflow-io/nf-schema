@@ -1,11 +1,11 @@
 package nextflow.validation.parameters
 
-import static nextflow.cli.CmdRun.parseParamValue
 import static nextflow.NF.isSyntaxParserV2
 
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
+import static nextflow.validation.utils.Types.parseParamValue
 
 import java.nio.file.Path
 import groovy.json.JsonGenerator
