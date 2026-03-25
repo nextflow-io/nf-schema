@@ -31,8 +31,16 @@ class ParameterValidator {
 
     final private ValidationConfig config
 
+    // A map of expected parameters with their default values
+    final private Map<String, Object> expectedParamsDefaults
+
     ParameterValidator(ValidationConfig config) {
         this.config = config
+        this.expectedParamsDefaults = [
+            (config.help.shortParameter): false,
+            (config.help.fullParameter): false,
+            (config.help.showHiddenParameter): false
+        ]
     }
 
     final List<String> nextflowOptions = [
@@ -188,23 +196,12 @@ class ParameterValidator {
     // Initialise expected params if not present
     //
     private Map initialiseExpectedParams(Map params) {
-        expectedParams.each { param ->
-            params[param] = params.get(param, false)
+        expectedParamsDefaults.each { param, defaultValue ->
+            if (!params.containsKey(param)) {
+                params[param] = defaultValue
+            }
         }
         return params
-    }
-
-    //
-    // Add expected params
-    //
-    private List getExpectedParams() {
-        List expectedParams = [
-            config.help.shortParameter,
-            config.help.fullParameter,
-            config.help.showHiddenParameter
-        ]
-
-        return expectedParams
     }
 
 }
