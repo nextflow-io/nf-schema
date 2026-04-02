@@ -81,4 +81,22 @@ public class Types {
         }
     }
 
+    //
+    // Function that casts parameters to the correct type, copied from the Nextflow codebase:
+    /* groovylint-disable-next-line LineLength */
+    // https://github.com/nextflow-io/nextflow/blob/eae9f7d09576cbc97107f472d833910e24bcb85c/modules/nextflow/src/main/groovy/nextflow/cli/CmdRun.groovy#L777-L791
+    //
+    static Object parseParamValue(String str) {
+        if (str == null) { return null }
+
+        if (str.toLowerCase() == 'true') { return Boolean.TRUE }
+        if (str.toLowerCase() == 'false') { return Boolean.FALSE }
+
+        if (str ==~ /-?\d+(\.\d+)?/ && str.integer()) { return str.toInteger() }
+        if (str ==~ /-?\d+(\.\d+)?/ && str.long()) { return str.toLong() }
+        if (str ==~ /-?\d+(\.\d+)?/ && str.double()) { return str.toDouble() }
+
+        return str
+    }
+
 }
