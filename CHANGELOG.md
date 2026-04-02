@@ -6,7 +6,7 @@
 
 1. Fixed a the `groovy.lang.MissingMethodException: No signature of method: java.lang.String.integer()` error when validation strict syntax parameters.
 
-# Version 2.7.1
+# Version 2.7.0
 
 ## New features
 
