@@ -92,9 +92,12 @@ public class Types {
         if (str.toLowerCase() == 'true') { return Boolean.TRUE }
         if (str.toLowerCase() == 'false') { return Boolean.FALSE }
 
-        if (str ==~ /-?\d+(\.\d+)?/ && str.integer()) { return str.toInteger() }
-        if (str ==~ /-?\d+(\.\d+)?/ && str.long()) { return str.toLong() }
-        if (str ==~ /-?\d+(\.\d+)?/ && str.double()) { return str.toDouble() }
+        /* groovylint-disable-next-line UnnecessaryGetter */
+        if (str ==~ /-?\d+(\.\d+)?/ && str.isInteger()) { return str.toInteger() }
+        /* groovylint-disable-next-line UnnecessaryGetter */
+        if (str ==~ /-?\d+(\.\d+)?/ && str.isLong()) { return str.toLong() }
+        /* groovylint-disable-next-line UnnecessaryGetter */
+        if (str ==~ /-?\d+(\.\d+)?/ && str.isDouble()) { return str.toDouble() }
 
         return str
     }
