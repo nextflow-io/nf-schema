@@ -32,16 +32,12 @@ class SummaryConfig implements ConfigScope {
     final Set<CharSequence> hideParams = []
 
     @ConfigOption
-    @Description('Mask /fusion from path values.')
-    final public boolean maskFusionMount
-
-    @ConfigOption
-    @Description('Mask /s3/bucket/ and s3://bucket/ from path values.')
-    final public boolean maskBucketNames
+    @Description('Mask value, when replacing bucket names or subpaths. Defaults to [** masked **].')
+    final public CharSequence mask
 
     @ConfigOption
     @Description('A list of subpaths to mask from path values.')
-    final public List<CharSequence> maskFromPaths
+    final public List<CharSequence> maskSubpaths
 
     SummaryConfig(Map map, Boolean monochromeLogs) {
         Map config = map ?: Collections.emptyMap()
@@ -87,33 +83,27 @@ class SummaryConfig implements ConfigScope {
             }
         }
 
-        // maskFusionMount
-        if(config.containsKey('maskFusionMount')) {
-            if(config.maskFusionMount instanceof Boolean) {
-                maskFusionMount = config.maskFusionMount
-                log.debug("Set `maskFusionMount` to ${maskFusionMount}")
+        // mask
+        if (config.containsKey('mask')) {
+            if (config.mask in CharSequence) {
+                mask = config.mask
+                log.debug("Set `validation.summary.mask` to ${mask}")
             } else {
-                log.warn('Incorrect value detected for `validation.summary.maskFusionMount`, a boolean is expected. Defaulting to `false`')
+                mask = '[** masked **]'
+                /* groovylint-disable-next-line LineLength */
+                log.warn("Incorrect value detected for `validation.summary.mask`, a string is expected. Defaulting to `${mask}`")
             }
+        } else {
+            mask = '[** masked **]'
         }
 
-        // maskBucketNames
-        if(config.containsKey('maskBucketNames')) {
-            if(config.maskBucketNames instanceof Boolean) {
-                maskBucketNames = config.maskBucketNames
-                log.debug("Set `maskBucketNames` to ${maskBucketNames}")
+        // maskSubpaths
+        if(config.containsKey('maskSubpaths')) {
+            if(config.maskSubpaths instanceof List<CharSequence>) {
+                maskSubpaths = config.maskSubpaths
+                log.debug("Set `maskSubpaths` to ${maskSubpaths}")
             } else {
-                log.warn('Incorrect value detected for `validation.summary.maskBucketNames`, a boolean is expected. Defaulting to `false`')
-            }
-        }
-
-        // maskFromPaths
-        if(config.containsKey('maskFromPaths')) {
-            if(config.maskFromPaths instanceof List<CharSequence>) {
-                maskFromPaths = config.maskFromPaths
-                log.debug("Set `maskFromPaths` to ${maskFromPaths}")
-            } else {
-                log.warn('Incorrect value detected for `validation.summary.maskFromPaths`, a list of strings is expected. Defaulting to ``')
+                log.warn('Incorrect value detected for `validation.summary.maskSubpaths`, a list of strings is expected. Defaulting to ``')
             }
         }
     }

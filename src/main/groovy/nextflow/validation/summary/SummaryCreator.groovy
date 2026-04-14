@@ -133,36 +133,17 @@ class SummaryCreator {
     }
 
     private CharSequence maybeMask(Path value) {
-        return maybeMask(value.toString())
+        return maybeMask(value.toUriString())
     }
 
     private CharSequence maybeMask(CharSequence value) {
-        return maybeMaskFusionMount(maybeMaskBucketNames(maybeMaskFromPaths(value)))
+        return maybeMaskSubpaths(value)
     }
 
-    private CharSequence maybeMaskFusionMount(CharSequence value) {
-        if(config.summary.maskFusionMount) {
-            return value.replace('/fusion', '')
-        }
-        return value
-    }
-
-    // see https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
-    static final CharSequence S3_BUCKET_PATH_PREFIX = '\\/s3\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
-    static final CharSequence S3_BUCKET_URI_PREFIX = 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
-
-    private CharSequence maybeMaskBucketNames(CharSequence value) {
-        if(config.summary.maskBucketNames) {
-            value = value.replaceAll(S3_BUCKET_PATH_PREFIX, '/[** masked **]/')
-            value = value.replaceAll(S3_BUCKET_URI_PREFIX, '[** masked **]/')
-        }
-        return value
-    }
-
-    private CharSequence maybeMaskFromPaths(CharSequence value) {
-        if(config.summary.maskFromPaths != null && config.summary.maskFromPaths.size() > 0) {
-            for (CharSequence toReplace : config.summary.maskFromPaths) {
-                value = value.replace(toReplace, '[** masked **]')
+    private CharSequence maybeMaskSubpaths(CharSequence value) {
+        if(config.summary.maskSubpaths != null && config.summary.maskSubpaths.size() > 0) {
+            for (CharSequence toReplace : config.summary.maskSubpaths) {
+                value = value.replaceAll(toReplace, config.summary.mask)
             }
         }
         return value
