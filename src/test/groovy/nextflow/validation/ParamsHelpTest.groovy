@@ -208,7 +208,7 @@ class ParamsHelpTest extends Dsl2Spec {
             workflow {
                 def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-                def help_msg = paramsHelp("this.is", parameters_schema: '$schema', command: command)
+                def help_msg = paramsHelp("map.is", parameters_schema: '$schema', command: command)
                 log.info help_msg
             }
         """
@@ -219,10 +219,10 @@ class ParamsHelpTest extends Dsl2Spec {
                 .toString()
                 .readLines()
                 .findResults { line ->
-                    line.startsWith('--this.is') ||
+                    line.startsWith('--map.is') ||
                     line.contains('description:') ||
                     line.contains('options    :') ||
-                    line.contains('this.is.so.deep')
+                    line.contains('map.is.so.deep')
                     ? line : null
                 }
 

@@ -468,12 +468,14 @@ class ValidateParametersTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
-            params.input = 'src/testResources/correct.csv'
-            params.outdir = 'src/testResources/testDir'
-            params['test-kebab-bug'] = 'a real kebab bug'
+            params {
+                input = 'src/testResources/correct.csv'
+                outdir = 'src/testResources/testDir'
+            }
             include { validateParameters } from 'plugin/nf-schema'
 
             workflow {
+                params['test-kebab-bug'] = 'a real kebab bug'
                 validateParameters(parameters_schema: '${schema}')
             }
         """
@@ -1154,7 +1156,7 @@ class ValidateParametersTest extends Dsl2Spec {
                 'monochromeLogs': true
             ],
             'params': [
-                'this': [
+                'map': [
                     'is': [
                         'so': [
                             'deep': true
@@ -1177,7 +1179,7 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate nested params - fail'() {
         given:
         String script = '''
-            params.this.is.so.deep = "this shouldn't be a string"
+            params.map.is.so.deep = "this shouldn't be a string"
             include { validateParameters } from 'plugin/nf-schema'
 
             workflow {
@@ -1191,7 +1193,7 @@ class ValidateParametersTest extends Dsl2Spec {
                 'monochromeLogs': true
             ],
             'params': [
-                'this': [
+                'map': [
                     'is': [
                         'so': [
                             'deep': true
@@ -1210,7 +1212,7 @@ class ValidateParametersTest extends Dsl2Spec {
         SchemaValidationException error = thrown(SchemaValidationException)
         error.message == '''The following invalid input values have been detected:
 
-* --this.is.so.deep (this shouldn't be a string): Value is [string] but should be [boolean]
+* --map.is.so.deep (this shouldn't be a string): Value is [string] but should be [boolean]
 
 '''
         !stdout
@@ -1498,9 +1500,7 @@ class ValidateParametersTest extends Dsl2Spec {
                 outdir = file('src/testResources/testDir')
             }
             workflow {
-                workflow {
                 validateParameters(parameters_schema: '${schema}')
-                }
             }
         """
 

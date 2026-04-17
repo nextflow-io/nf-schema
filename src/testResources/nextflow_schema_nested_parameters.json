@@ -7,10 +7,10 @@
     "$defs": {
         "nested_parameters": {
             "title": "Nested Parameters",
-            "required": ["this"],
+            "required": ["map"],
             "properties": {
-                "this": {
-                    "description": "this is this",
+                "map": {
+                    "description": "map is map",
                     "type": "object",
                     "properties": {
                         "is":{

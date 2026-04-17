@@ -116,7 +116,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath()
         String script = """
-            params.this.is.so.deep = "changed_value"
+            params.map.is.so.deep = "changed_value"
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
                 def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
@@ -127,7 +127,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         when:
         Map config = [
             'params': [
-                'this': [
+                'map': [
                     'is': [
                         'so': [
                             'deep': true
@@ -151,14 +151,14 @@ class ParamsSummaryLogTest extends Dsl2Spec {
                     line.contains('profile') ||
                     line.contains('configFiles') ||
                     line.contains('Nested Parameters') ||
-                    line.contains('this.is.so.deep')
+                    line.contains('map.is.so.deep')
                     ? line : null
                 }
 
         then:
         noExceptionThrown()
         stdout.size() == 11
-        stdout ==~ /.*this.is.so.deep: changed_value.*/
+        stdout ==~ /.*map.is.so.deep: changed_value.*/
     }
 
     void 'should print params summary - adds before and after text'() {
@@ -260,7 +260,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath()
         String script = """
-            params.this.is.so.deep = "changed_value"
+            params.map.is.so.deep = "changed_value"
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
                 def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
@@ -271,7 +271,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         when:
         Map config = [
             'params': [
-                'this': [
+                'map': [
                     'is': [
                         'so': [
                             'deep': true
@@ -281,7 +281,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
             ],
             'validation': [
                 'summary': [
-                    'hideParams': ['params.this.is.so.deep']
+                    'hideParams': ['params.map.is.so.deep']
                 ]
             ]
         ]
@@ -300,14 +300,14 @@ class ParamsSummaryLogTest extends Dsl2Spec {
                     line.contains('profile') ||
                     line.contains('configFiles') ||
                     line.contains('Nested Parameters') ||
-                    line.contains('this.is.so.deep ')
+                    line.contains('map.is.so.deep ')
                     ? line : null
                 }
 
         then:
         noExceptionThrown()
         stdout.size() == 10
-        stdout != ~ /.*this.is.so.deep: changed_value.*/
+        stdout != ~ /.*map.is.so.deep: changed_value.*/
     }
 
     void 'should print params summary - hide params'() {
