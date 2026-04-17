@@ -13,15 +13,16 @@ This function takes all pipeline parameters and checks that they adhere to the s
 - If any parameter validation has failed, it throws a `SchemaValidationException` exception to stop the pipeline.
 - If any parameters in the schema reference a sample sheet schema with `schema`, that file is loaded and validated.
 
-The function takes two optional arguments:
+The function takes three optional arguments:
 
 - The filename of a JSON Schema file (optional, default: `nextflow_schema.json`). File paths should be relative to the root of the pipeline directory.
 - A boolean to disable coloured outputs (optional, default: `false`). The output is coloured using ANSI escape codes by default.
+- A boolean to enable or disable type casting of parameters provided via the CLI (optional, default: `true` if the syntax parser version is 2 and `false` otherwise).
 
-You can provide the parameters as follows:
+You can provide the arguments as follows:
 
 ```nextflow
-validateParameters(parameters_schema: 'custom_nextflow_parameters.json', monochrome_logs: true)
+validateParameters(parameters_schema: 'custom_nextflow_parameters.json', monochrome_logs: true, cast_cli_params: true)
 ```
 
 Monochrome logs can also be set globally providing the parameter `--monochrome_logs` or adding `params.monochrome_logs = true` to a configuration file. The form `--monochromeLogs` is also supported.

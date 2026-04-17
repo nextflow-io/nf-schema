@@ -1,5 +1,15 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.7.2
+
+## New features
+
+1. Added a new option to `validateParameters()`: `cast_cli_params`. This option takes a boolean value and determines whether or not parameters provided via the CLI should be cast to their respective types based on the JSON schema. The default value is `true` if the syntax parser version is 2 and `false` otherwise.
+
+## Changes
+
+1. Type casting of parameters is now restricted to only parameters provided via the CLI. This should mimic the behaviour of syntax parser V1 until static typing is introduced in Nextflow
+
 # Version 2.7.1
 
 ## Bug fixes
