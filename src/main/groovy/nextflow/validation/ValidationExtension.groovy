@@ -88,13 +88,12 @@ class ValidationExtension extends PluginExtensionPoint {
     */
     @Function
     void validateParameters(
-        Map options = null
+        final Map options = [:]
     ) {
         ParameterValidator validator = new ParameterValidator(config)
         validator.validateParametersMap(
             options,
-            session.params,
-            session.baseDir.toString()
+            session
         )
     }
 

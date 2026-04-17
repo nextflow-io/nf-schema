@@ -12,6 +12,7 @@ import groovy.json.JsonGenerator
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileDynamic
 import nextflow.Nextflow
+import nextflow.Session
 import nextflow.util.Duration
 import nextflow.util.MemoryUnit
 import nextflow.util.VersionNumber
@@ -120,14 +121,17 @@ class ParameterValidator {
     final private List<String> warnings = []
 
     void validateParametersMap(
-        Map options = null,
-        Map inputParams = [:],
-        String baseDir
+        final Map options = [:],
+        Session session
     ) {
-        Map<String, Object> params = initialiseExpectedParams(inputParams)
+        Map<String, Object> params = initialiseExpectedParams(session.params)
         String schemaFilename = options?.containsKey('parameters_schema') ?
             options.parameters_schema as String :
             config.parametersSchema
+        Boolean castCliParams = options?.containsKey('cast_cli_params') ?
+            options.cast_cli_params as Boolean :
+            /* groovylint-disable-next-line UnnecessaryGetter */
+            isSyntaxParserV2()
         log.debug 'Starting parameters validation'
 
         // Convert to JSONObject
@@ -138,10 +142,18 @@ class ParameterValidator {
             .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
             .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
 
-        // Explicitly cast parameters to the expected values when strict syntax is used
-        /* groovylint-disable-next-line UnnecessaryGetter */
-        if (isSyntaxParserV2()) {
-            generatorOptions.addConverter(String) { String str -> parseParamValue(str) }
+        // Cast parameters provided via the CLI to their respective types.
+        // This is a temporary workaround until static typing is introduced in Nextflow,
+        // in which case we can rely on the static type system to do the casting for us.
+        // This mimics the type casting behaviour of syntax parser V1 so shouldn't introduce any breaking changes.
+        if (castCliParams) {
+            List<String> cliParams = session.cliParams.keySet().toList()
+            generatorOptions.addConverter(Map<String, Object>) { Map<String,Object> map ->
+                map.collectEntries { k, v ->
+                    // Only cast parameters that were explicitly provided via the CLI
+                    return (cliParams.contains(k) && v in String) ? [k, parseParamValue(v)] : [k, v]
+                }
+            }
         }
 
         JSONObject paramsJSON = new JSONObject(generatorOptions.build().toJson(params))
@@ -153,6 +165,7 @@ class ParameterValidator {
         Map<String,String> colors = getLogColors(config.monochromeLogs)
 
         // Validate
+        String baseDir = session.baseDir
         ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
         List<String> paramErrors = validationResult.getErrors('parameter')
         errors.addAll(paramErrors)
