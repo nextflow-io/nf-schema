@@ -1,6 +1,8 @@
 /* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
 
+import static test.ScriptHelper.runScript
+
 import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
@@ -14,7 +16,6 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
-import test.MockScriptRunner
 
 import java.nio.file.Files
 import java.util.jar.Manifest
@@ -77,15 +78,16 @@ class ParamsHelpTest extends Dsl2Spec {
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
             include { paramsHelp } from 'plugin/nf-schema'
+            workflow {
+                def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-            def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-
-            def help_msg = paramsHelp(parameters_schema: '$schema', command: command)
-            log.info help_msg
+                def help_msg = paramsHelp(parameters_schema: '$schema', command: command)
+                log.info help_msg
+            }
         """
 
         and:
-        new MockScriptRunner([:]).setScript(script).execute()
+        runScript(script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -113,14 +115,16 @@ class ParamsHelpTest extends Dsl2Spec {
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
             include { paramsHelp } from 'plugin/nf-schema'
-            def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
+            workflow {
+                def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-            def help_msg = paramsHelp(parameters_schema: '$schema', command: command, showHidden: true)
-            log.info help_msg
+                def help_msg = paramsHelp(parameters_schema: '$schema', command: command, showHidden: true)
+                log.info help_msg
+            }
         """
 
         when:
-        new MockScriptRunner([:]).setScript(script).execute()
+        runScript(script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -140,15 +144,16 @@ class ParamsHelpTest extends Dsl2Spec {
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
             include { paramsHelp } from 'plugin/nf-schema'
+            workflow {
+                def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-            def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-
-            def help_msg = paramsHelp("publish_dir_mode", parameters_schema: '$schema', command: command)
-            log.info help_msg
+                def help_msg = paramsHelp("publish_dir_mode", parameters_schema: '$schema', command: command)
+                log.info help_msg
+            }
         """
 
         when:
-        new MockScriptRunner([validation:[monochromeLogs:true]]).setScript(script).execute()
+        runScript(script, [validation:[monochromeLogs:true]])
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -174,15 +179,16 @@ class ParamsHelpTest extends Dsl2Spec {
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
             include { paramsHelp } from 'plugin/nf-schema'
+            workflow {
+                def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-            def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-
-            def help_msg = paramsHelp("no_exist", parameters_schema: '$schema', command: command)
-            log.info help_msg
+                def help_msg = paramsHelp("no_exist", parameters_schema: '$schema', command: command)
+                log.info help_msg
+            }
         """
 
         when:
-        new MockScriptRunner([:]).setScript(script).execute()
+        runScript(script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -199,23 +205,24 @@ class ParamsHelpTest extends Dsl2Spec {
         String schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath()
         String script = """
             include { paramsHelp } from 'plugin/nf-schema'
+            workflow {
+                def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-            def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
-
-            def help_msg = paramsHelp("this.is", parameters_schema: '$schema', command: command)
-            log.info help_msg
+                def help_msg = paramsHelp("map.is", parameters_schema: '$schema', command: command)
+                log.info help_msg
+            }
         """
 
         when:
-        new MockScriptRunner([validation:[monochromeLogs:true]]).setScript(script).execute()
+        runScript(script, [validation:[monochromeLogs:true]])
         List<String> stdout = capture
                 .toString()
                 .readLines()
                 .findResults { line ->
-                    line.startsWith('--this.is') ||
+                    line.startsWith('--map.is') ||
                     line.contains('description:') ||
                     line.contains('options    :') ||
-                    line.contains('this.is.so.deep')
+                    line.contains('map.is.so.deep')
                     ? line : null
                 }
 

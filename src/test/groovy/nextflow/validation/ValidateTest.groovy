@@ -1,6 +1,8 @@
 /* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
 
+import static test.ScriptHelper.runScript
+
 import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
@@ -14,7 +16,6 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
-import test.MockScriptRunner
 
 import nextflow.validation.exceptions.SchemaValidationException
 
@@ -77,25 +78,26 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = """
             include { validate } from 'plugin/nf-schema'
-
-            def input = [
-                this: [
-                    is: [
-                        so: [
-                            deep: true
+            workflow {
+                def input = [
+                    map: [
+                        is: [
+                            so: [
+                                deep: true
+                            ]
                         ]
                     ]
                 ]
-            ]
 
-            validate(input, 'src/testResources/nextflow_schema_nested_parameters.json')
+                validate(input, 'src/testResources/nextflow_schema_nested_parameters.json')
+            }
         """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -110,25 +112,26 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = """
             include { validate } from 'plugin/nf-schema'
-
-            def input = [
-                this: [
-                    is: [
-                        so: [
-                            deep: "a wrong string"
+            workflow {
+                def input = [
+                    map: [
+                        is: [
+                            so: [
+                                deep: "a wrong string"
+                            ]
                         ]
                     ]
                 ]
-            ]
 
-            validate(input, 'src/testResources/nextflow_schema_nested_parameters.json')
+                validate(input, 'src/testResources/nextflow_schema_nested_parameters.json')
+            }
         """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -136,7 +139,7 @@ class ValidateTest extends Dsl2Spec {
 
         then:
         SchemaValidationException error = thrown(SchemaValidationException)
-        error.message == '/this/is/so/deep (a wrong string): Value is [string] but should be [boolean]\n({"this":{"is":{"so":{"deep":"a wrong string"}}}}): Value does not match against the schemas at indexes [0]\n'
+        error.message == '/map/is/so/deep (a wrong string): Value is [string] but should be [boolean]\n({"map":{"is":{"so":{"deep":"a wrong string"}}}}): Value does not match against the schemas at indexes [0]\n'
         !stdout
     }
 
@@ -144,17 +147,18 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = '''
             include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = ["value"]
 
-            def input = ["value"]
-
-            validate(input, 'src/testResources/no_header_schema.json')
+                validate(input, 'src/testResources/no_header_schema.json')
+            }
         '''
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -169,17 +173,18 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = '''
             include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = [12]
 
-            def input = [12]
-
-            validate(input, 'src/testResources/no_header_schema.json')
+                validate(input, 'src/testResources/no_header_schema.json')
+            }
         '''
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -195,17 +200,18 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = '''
             include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = "value"
 
-            def input = "value"
-
-            validate(input, 'src/testResources/string_schema.json')
+                validate(input, 'src/testResources/string_schema.json')
+            }
         '''
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -220,17 +226,18 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = '''
             include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = 12
 
-            def input = 12
-
-            validate(input, 'src/testResources/string_schema.json')
+                validate(input, 'src/testResources/string_schema.json')
+            }
         '''
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -246,17 +253,18 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = '''
             include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = 12
 
-            def input = 12
-
-            validate(input, 'src/testResources/integer_schema.json')
+                validate(input, 'src/testResources/integer_schema.json')
+            }
         '''
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -271,17 +279,18 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = '''
             include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = "value"
 
-            def input = "value"
-
-            validate(input, 'src/testResources/integer_schema.json')
+                validate(input, 'src/testResources/integer_schema.json')
+            }
         '''
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -297,17 +306,18 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = '''
             include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = true
 
-            def input = true
-
-            validate(input, 'src/testResources/boolean_schema.json')
+                validate(input, 'src/testResources/boolean_schema.json')
+            }
         '''
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -322,17 +332,18 @@ class ValidateTest extends Dsl2Spec {
         given:
         String script = '''
             include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = "value"
 
-            def input = "value"
-
-            validate(input, 'src/testResources/boolean_schema.json')
+                validate(input, 'src/testResources/boolean_schema.json')
+            }
         '''
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
