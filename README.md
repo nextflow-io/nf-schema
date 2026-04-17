@@ -25,7 +25,7 @@ Declare the plugin in your Nextflow pipeline configuration file:
 
 ```groovy title="nextflow.config"
 plugins {
-  id 'nf-schema@2.7.1'
+  id 'nf-schema@2.7.2'
 }
 ```
 
