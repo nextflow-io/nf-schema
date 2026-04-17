@@ -347,4 +347,93 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         stdout != ~ /.*outdir     : outDir.*/
     }
 
+    void 'should print params summary - mask params - default mask'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            params.outdir = "s3://bucket/outDir"
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+
+            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+            log.info summary_params
+        """
+
+        when:
+        Map config = [
+            'validation': [
+                'summary': [
+                    'hideParams': ['outdir'],
+                    'maskSubpaths': 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+                ]
+            ]
+        ]
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('outdir ')
+                    ? line : null
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 9
+        stdout != ~ /.*outdir     : [** masked **]\\/outDir.*/
+    }
+
+    void 'should print params summary - mask params - custom mask'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            params.outdir = "s3://bucket/outDir"
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+
+            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+            log.info summary_params
+        """
+
+        when:
+        Map config = [
+            'validation': [
+                'summary': [
+                    'hideParams': ['outdir'],
+                    'mask': '/mask',
+                    'maskSubpaths': 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+                ]
+            ]
+        ]
+        new MockScriptRunner(config).setScript(script).execute()
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('outdir ')
+                    ? line : null
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 9
+        stdout != ~ /.*outdir     : \\/mask\\/outDir.*/
+    }
+
 }

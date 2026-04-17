@@ -33,11 +33,11 @@ class SummaryConfig implements ConfigScope {
 
     @ConfigOption
     @Description('Mask value, when replacing bucket names or subpaths. Defaults to [** masked **].')
-    final public CharSequence mask
+    CharSequence mask = '[** masked **]'
 
     @ConfigOption
     @Description('A list of subpaths to mask from path values.')
-    final public List<CharSequence> maskSubpaths
+    final List<CharSequence> maskSubpaths
 
     SummaryConfig(Map map, Boolean monochromeLogs) {
         Map config = map ?: Collections.emptyMap()
@@ -89,12 +89,9 @@ class SummaryConfig implements ConfigScope {
                 mask = config.mask
                 log.debug("Set `validation.summary.mask` to ${mask}")
             } else {
-                mask = '[** masked **]'
                 /* groovylint-disable-next-line LineLength */
                 log.warn("Incorrect value detected for `validation.summary.mask`, a string is expected. Defaulting to `${mask}`")
             }
-        } else {
-            mask = '[** masked **]'
         }
 
         // maskSubpaths
