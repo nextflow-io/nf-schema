@@ -468,10 +468,8 @@ class ValidateParametersTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
-            params {
-                input = 'src/testResources/correct.csv'
-                outdir = 'src/testResources/testDir'
-            }
+            params.input = 'src/testResources/correct.csv'
+            params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
             workflow {
