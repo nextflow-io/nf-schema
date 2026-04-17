@@ -141,7 +141,7 @@ class SummaryCreator {
     }
 
     private CharSequence maybeMaskSubpaths(CharSequence value) {
-        if(config.summary.maskSubpaths != null && config.summary.maskSubpaths.size() > 0) {
+        if(config.summary.maskSubpaths?.size() > 0) {
             for (CharSequence toReplace : config.summary.maskSubpaths) {
                 value = value.replaceAll(toReplace, config.summary.mask)
             }
