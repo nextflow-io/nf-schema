@@ -1,6 +1,8 @@
 /* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
 
+import static test.ScriptHelper.runScript
+
 import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
@@ -14,7 +16,6 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
-import test.MockScriptRunner
 
 import nextflow.validation.exceptions.SchemaValidationException
 
@@ -95,7 +96,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -128,7 +129,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -154,7 +155,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -179,7 +180,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -205,7 +206,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -230,7 +231,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -256,7 +257,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -281,7 +282,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -307,7 +308,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -332,7 +333,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()

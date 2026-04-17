@@ -1,6 +1,8 @@
 /* groovylint-disable LineLength, MethodName, TrailingWhitespace, UnnecessaryObjectReferences */
 package nextflow.validation
 
+import static test.ScriptHelper.runScript
+
 import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
@@ -14,7 +16,6 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
-import test.MockScriptRunner
 
 import nextflow.validation.exceptions.SchemaValidationException
 
@@ -82,13 +83,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -111,13 +112,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -140,13 +141,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -169,13 +170,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -198,13 +199,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -227,13 +228,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input_with_arrays.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -255,13 +256,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input_with_arrays.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -283,13 +284,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/no_header_schema.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -309,13 +310,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/no_header_schema.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -335,13 +336,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/no_header_schema.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -361,7 +362,7 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
@@ -374,7 +375,7 @@ class SamplesheetConverterTest extends Dsl2Spec {
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -401,7 +402,7 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
@@ -415,7 +416,7 @@ class SamplesheetConverterTest extends Dsl2Spec {
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
 
         then:
         SchemaValidationException error = thrown(SchemaValidationException)
@@ -431,13 +432,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/no_meta_schema.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -457,13 +458,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/samplesheet_schema_deeply_nested.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -483,13 +484,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/samplesheet_schema_deeply_nested.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -504,12 +505,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
         given:
         String scriptText = '''
             include { samplesheetToList } from 'plugin/nf-schema'
-
-            println(samplesheetToList("src/testResources/correct.csv", "src/testResources/schema_input.json").join("\\n"))
+            workflow {
+                println(samplesheetToList("src/testResources/correct.csv", "src/testResources/schema_input.json").join("\\n"))
+            }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -527,12 +529,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
         given:
         String scriptText = '''
             include { samplesheetToList } from 'plugin/nf-schema'
-
-            println(samplesheetToList(file("src/testResources/correct.csv", checkIfExists:true), "src/testResources/schema_input.json").join("\\n"))
+            workflow {
+                println(samplesheetToList(file("src/testResources/correct.csv", checkIfExists:true), "src/testResources/schema_input.json").join("\\n"))
+            }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -550,12 +553,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
         given:
         String scriptText = '''
             include { samplesheetToList } from 'plugin/nf-schema'
-
-            println(samplesheetToList("src/testResources/correct.csv", file("src/testResources/schema_input.json", checkIfExists:true)).join("\\n"))
+            workflow {
+                println(samplesheetToList("src/testResources/correct.csv", file("src/testResources/schema_input.json", checkIfExists:true)).join("\\n"))
+            }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -573,12 +577,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
         given:
         String scriptText = '''
             include { samplesheetToList } from 'plugin/nf-schema'
-
-            println(samplesheetToList(file("src/testResources/correct.csv", checkIfExists:true), file("src/testResources/schema_input.json", checkIfExists:true)).join("\\n"))
+            workflow {
+                println(samplesheetToList(file("src/testResources/correct.csv", checkIfExists:true), file("src/testResources/schema_input.json", checkIfExists:true)).join("\\n"))
+            }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -597,23 +602,23 @@ class SamplesheetConverterTest extends Dsl2Spec {
         /* groovylint-disable-next-line GStringExpressionWithinString */
         String scriptText = '''
             include { samplesheetToList } from 'plugin/nf-schema'
+            workflow {
+                channel.of("src/testResources/correct.csv")
+                    .flatMap { it ->
+                        samplesheetToList(it, "src/testResources/schema_input.json")
+                    }
+                    .map { it -> println("first: ${it}") }
 
-            Channel.of("src/testResources/correct.csv")
-                .flatMap { it ->
-                    samplesheetToList(it, "src/testResources/schema_input.json")
-                }
-                .map { it -> println("first: ${it}") }
-
-            Channel.of("src/testResources/correct_arrays.json")
-                .flatMap { it ->
-                    samplesheetToList(it, "src/testResources/schema_input_with_arrays.json")
-                }
-                .map { it -> println("second: ${it}") }
-
+                channel.of("src/testResources/correct_arrays.json")
+                    .flatMap { it ->
+                        samplesheetToList(it, "src/testResources/schema_input_with_arrays.json")
+                    }
+                    .map { it -> println("second: ${it}") }            
+            }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -636,13 +641,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             include { samplesheetToList } from 'plugin/nf-schema'
 
             workflow {
-                Channel.fromList(samplesheetToList("src/testResources/deeply_nested.yaml", "src/testResources/samplesheet_schema_deeply_nested_anyof.json")).view()
+                channel.fromList(samplesheetToList("src/testResources/deeply_nested.yaml", "src/testResources/samplesheet_schema_deeply_nested_anyof.json")).view()
             }
 
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -659,13 +664,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             include { samplesheetToList } from 'plugin/nf-schema'
 
             workflow {
-                Channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.csv", "src/testResources/no_meta_schema.json")).view()
+                channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.csv", "src/testResources/no_meta_schema.json")).view()
             }
 
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -682,13 +687,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             include { samplesheetToList } from 'plugin/nf-schema'
 
             workflow {
-                Channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.tsv", "src/testResources/no_meta_schema.json")).view()
+                channel.fromList(samplesheetToList("src/testResources/samplesheet_empty_header_column.tsv", "src/testResources/no_meta_schema.json")).view()
             }
 
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -705,13 +710,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             include { samplesheetToList } from 'plugin/nf-schema'
 
             workflow {
-                Channel.fromList(samplesheetToList("src/testResources/samplesheet_defaults.yaml", "src/testResources/schema_input_defaults.json")).view()
+                channel.fromList(samplesheetToList("src/testResources/samplesheet_defaults.yaml", "src/testResources/schema_input_defaults.json")).view()
             }
 
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -732,13 +737,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                Channel.fromList(samplesheetToList(params.input, params.schema))
+                channel.fromList(samplesheetToList(params.input, params.schema))
                     .view()
             }
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()

@@ -1,6 +1,8 @@
 /* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
 
+import static test.ScriptHelper.runScript
+
 import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
@@ -81,7 +83,7 @@ class NfSchemaTest extends Dsl2Spec {
         '''
 
         when:
-        dsl_eval(scriptText)
+        runScript(scriptText)
         List<String> stdout = capture
                 .toString()
                 .readLines()

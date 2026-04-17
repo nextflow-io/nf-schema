@@ -147,7 +147,7 @@ class ParameterValidator {
         // in which case we can rely on the static type system to do the casting for us.
         // This mimics the type casting behaviour of syntax parser V1 so shouldn't introduce any breaking changes.
         if (castCliParams) {
-            List<String> cliParams = session.cliParams.keySet().toList()
+            List<String> cliParams = session.cliParams?.keySet()?.toList() ?: []
             generatorOptions.addConverter(Map<String, Object>) { Map<String,Object> map ->
                 map.collectEntries { k, v ->
                     // Only cast parameters that were explicitly provided via the CLI

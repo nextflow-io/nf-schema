@@ -1,6 +1,8 @@
 /* groovylint-disable LineLength, TrailingWhitespace, MethodName, UnnecessaryGString */
 package nextflow.validation
 
+import static test.ScriptHelper.runScript
+
 import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
@@ -14,7 +16,6 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
-import test.MockScriptRunner
 
 import java.nio.file.Files
 import java.util.jar.Manifest
@@ -78,14 +79,15 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         String script = """
             params.outdir = "outDir"
             include { paramsSummaryLog } from 'plugin/nf-schema'
-
-            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
-            log.info summary_params
+            workflow {
+                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                log.info summary_params
+            }
         """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -116,9 +118,10 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         String script = """
             params.this.is.so.deep = "changed_value"
             include { paramsSummaryLog } from 'plugin/nf-schema'
-
-            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
-            log.info summary_params
+            workflow {
+                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                log.info summary_params
+            }
         """
 
         when:
@@ -133,7 +136,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -164,9 +167,10 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         String script = """
             params.outdir = "outDir"
             include { paramsSummaryLog } from 'plugin/nf-schema'
-
-            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
-            log.info summary_params
+            workflow {
+                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                log.info summary_params
+            }
         """
 
         when:
@@ -178,7 +182,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -211,19 +215,20 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         String script = """
             params.outdir = 'outDir'
             include { paramsSummaryLog } from 'plugin/nf-schema'
-
-            def summary_params = paramsSummaryLog(
-                workflow,
-                parameters_schema: '${schema}',
-                beforeText: "This text is printed before \\n",
-                afterText: "\\nThis text is printed after"
-            )
-            log.info summary_params
+            workflow {
+                def summary_params = paramsSummaryLog(
+                    workflow,
+                    parameters_schema: '${schema}',
+                    beforeText: "This text is printed before \\n",
+                    afterText: "\\nThis text is printed after"
+                )
+                log.info summary_params
+            }
         """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -257,9 +262,10 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         String script = """
             params.this.is.so.deep = "changed_value"
             include { paramsSummaryLog } from 'plugin/nf-schema'
-
-            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
-            log.info summary_params
+            workflow {
+                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                log.info summary_params
+            }
         """
 
         when:
@@ -279,7 +285,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -310,9 +316,10 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         String script = """
             params.outdir = "outDir"
             include { paramsSummaryLog } from 'plugin/nf-schema'
-
-            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
-            log.info summary_params
+            workflow {
+                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                log.info summary_params
+            }
         """
 
         when:
@@ -323,7 +330,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()

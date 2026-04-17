@@ -2,6 +2,8 @@
 // TODO split this test class up
 package nextflow.validation
 
+import static test.ScriptHelper.runScript
+
 import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
@@ -15,7 +17,6 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
-import test.MockScriptRunner
 
 import nextflow.validation.exceptions.SchemaValidationException
 
@@ -78,17 +79,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate when no params'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             include { validateParameters } from 'plugin/nf-schema'
-
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -114,13 +116,14 @@ class ValidateParametersTest extends Dsl2Spec {
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-
-            validateParameters()
+            workflow {
+                validateParameters()
+            }
         '''
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -137,17 +140,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema - CSV'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -161,17 +165,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema - TSV'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.tsv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
-
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -185,17 +190,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema - YAML'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.yaml'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -209,17 +216,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema - JSON'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.json'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -233,17 +242,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema with failures - CSV'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/wrong.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -267,17 +278,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema with failures - TSV'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/wrong.tsv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -301,17 +314,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema with failures - YAML'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/wrong.yaml'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -335,17 +350,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema with failures - JSON'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/wrong.json'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -369,17 +386,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should find unexpected params'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -394,18 +413,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should not find unexpected params patternProperties'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.pattern_xyz = 'abc'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -419,18 +440,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should ignore unexpected param kebab-case like camelCase'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.testCamelCase = 'aCamelBug'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -444,18 +467,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should find unexpected param kebab-case not like camelCase'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params['test-kebab-bug'] = 'a real kebab bug'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -470,20 +495,22 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should ignore unexpected param'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'ignoreParams': ['xyz']
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -497,20 +524,22 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should ignore default unexpected param'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'defaultIgnoreParams': ['xyz']
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -524,18 +553,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should ignore nf_test_output param'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.nf_test_output = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -549,22 +580,24 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should ignore default unexpected params'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             params.abc = '/some/other/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'ignoreParams': ['abc'],
             'defaultIgnoreParams': ['xyz']
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -578,20 +611,22 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should ignore wrong expected params'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 1
             params.outdir = 2
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'ignoreParams': ['input'],
             'defaultIgnoreParams': ['outdir']
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -605,14 +640,16 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should fail for unexpected param'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.xyz = '/some/path'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
@@ -621,7 +658,7 @@ class ValidateParametersTest extends Dsl2Spec {
                 'unrecognisedParams': 'error'
             ]
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -636,19 +673,21 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should find validation errors'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 10
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -667,19 +706,21 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should correctly validate duration and memory objects'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.max_memory = '10.GB'
             params.max_time = '10.day'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -693,18 +734,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'correct validation of integers'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.max_cpus = 12
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -718,21 +761,23 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'correct validation of numerics - 0'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_required_numerics.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.integer = 0
             params.number = 0
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -746,19 +791,21 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'fail validation of numerics - null'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_required_numerics.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -777,16 +824,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'correct validation of file-path-pattern - glob'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_file_path_pattern.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.glob = 'src/testResources/*.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -800,16 +849,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'correct validation of file-path-pattern - single file'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_file_path_pattern.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.glob = 'src/testResources/correct.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -823,19 +874,21 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'correct validation of numbers with lenient mode'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 1
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'lenientMode': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -849,20 +902,22 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should fail because of incorrect integer'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/correct.csv'
             params.outdir = 'src/testResources/testDir'
             params.max_cpus = 1.2
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -877,15 +932,17 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a schema from an input file'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/samplesheet.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -899,18 +956,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should fail because of wrong file pattern'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/samplesheet_wrong_pattern.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -929,18 +988,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should fail because of missing required value'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/samplesheet_no_required.csv'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -962,17 +1023,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should fail because of wrong draft'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_draft7.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -986,18 +1049,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should fail because of existing file'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_exists_false.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.outdir = "src/testResources/"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1016,18 +1081,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should fail because of non-unique entries'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet_uniqueEntries.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = "src/testResources/samplesheet_non_unique.csv"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1047,18 +1114,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should not fail because of non-unique empty entries'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet_uniqueEntries.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = "src/testResources/samplesheet_non_unique_empty.csv"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1074,7 +1143,9 @@ class ValidateParametersTest extends Dsl2Spec {
         String script = '''
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+            workflow {
+                validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+            }
         '''
 
         when:
@@ -1092,7 +1163,7 @@ class ValidateParametersTest extends Dsl2Spec {
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1109,7 +1180,9 @@ class ValidateParametersTest extends Dsl2Spec {
             params.this.is.so.deep = "this shouldn't be a string"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+            workflow {
+                validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+            }
         '''
 
         when:
@@ -1127,7 +1200,7 @@ class ValidateParametersTest extends Dsl2Spec {
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1146,18 +1219,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate an email'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/samplesheet.csv'
             params.outdir = 'src/testResources/testDir'
             params.email = "test@domain.com"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1171,18 +1246,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate an email - failure'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/samplesheet.csv'
             params.outdir = 'src/testResources/testDir'
             params.email = "thisisnotanemail"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1197,17 +1274,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should give an error when a file-path-pattern is used with a file-path format'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/*.csv'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1222,17 +1301,19 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should give an error when a file-path-pattern is used with a directory-path format'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/samplesheet.csv'
             params.outdir = 'src/testResources/testDi*'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1247,16 +1328,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a map file - yaml'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.map_file = 'src/testResources/map_file.yaml'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1270,16 +1353,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate a map file - json'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.map_file = 'src/testResources/map_file.json'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1293,16 +1378,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should give an error when a map file is wrong - yaml'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.map_file = 'src/testResources/map_file_wrong.yaml'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1318,16 +1405,18 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should give an error when a map file is wrong - json'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_map_file.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.map_file = 'src/testResources/map_file_wrong.json'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = [:]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1343,18 +1432,20 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should truncate long values in errors'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.input = 'src/testResources/wrong_samplesheet_with_a_super_long_name.and_a_weird_extension'
             params.outdir = 'src/testResources/testDir'
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
         when:
         Map config = ['validation': [
             'maxErrValSize': 20
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1369,7 +1460,7 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should correctly detect invalid parameters'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_no_type.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             params.genome = [
                 "test": "test"
             ]
@@ -1377,14 +1468,16 @@ class ValidateParametersTest extends Dsl2Spec {
             params.testing = "test"
             include { validateParameters } from 'plugin/nf-schema'
 
-            validateParameters(parameters_schema: '%s')
-        ''', schema)
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
 
         when:
         Map config = ['validation': [
             'defaultIgnoreParams': [ 'genome' ]
         ]]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(script, config)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1398,19 +1491,21 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should correctly validate static types paths'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_no_type.json').toAbsolutePath()
-        String script = String.format('''
+        String script = """
             include { validateParameters } from 'plugin/nf-schema'
             params {
                 input = file('src/testResources/correct.csv')
                 outdir = file('src/testResources/testDir')
             }
             workflow {
-                validateParameters(parameters_schema: '%s')
+                workflow {
+                validateParameters(parameters_schema: '${schema}')
+                }
             }
-        ''', schema)
+        """
 
         when:
-        new MockScriptRunner([:]).setScript(script).execute()
+        runScript(script)
 
         then:
         noExceptionThrown()
