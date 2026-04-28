@@ -95,13 +95,15 @@ class SummaryConfig implements ConfigScope {
         }
 
         // maskSubpaths
-        if(config.containsKey('maskSubpaths')) {
-            if(config.maskSubpaths instanceof List<CharSequence>) {
+        if (config.containsKey('maskSubpaths')) {
+            if (config.maskSubpaths in List<CharSequence>) {
                 maskSubpaths = config.maskSubpaths
                 log.debug("Set `maskSubpaths` to ${maskSubpaths}")
             } else {
-                log.warn('Incorrect value detected for `validation.summary.maskSubpaths`, a list of strings is expected. Defaulting to ``')
+                log.warn('Incorrect value detected for `validation.summary.maskSubpaths`, a list of strings'
+                         + ' is expected. Defaulting to ``')
             }
         }
     }
+
 }
