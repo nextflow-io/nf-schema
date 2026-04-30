@@ -100,8 +100,8 @@ class SummaryConfig implements ConfigScope {
                 maskSubpaths = config.maskSubpaths
                 log.debug("Set `maskSubpaths` to ${maskSubpaths}")
             } else {
-                log.warn('Incorrect value detected for `validation.summary.maskSubpaths`, a list of strings'
-                         + ' is expected. Defaulting to ``')
+                /* groovylint-disable-next-line LineLength */
+                log.warn('Incorrect value detected for `validation.summary.maskSubpaths`, a list of strings is expected. Defaulting to ``')
             }
         }
     }
