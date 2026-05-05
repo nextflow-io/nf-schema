@@ -5,8 +5,8 @@
 ## New features
 
 1. Added new configuration options to mask paths when generating the summary message:
-  - `mask`: Mask value, when replacing bucket names or subpaths (optional, default: `[** masked **]`).
-  - `maskSubpaths`: A list of subpaths to mask from path values (optional, default: `[]`).
+   - `mask`: Mask value, when replacing bucket names or subpaths (optional, default: `[** masked **]`).
+   - `maskSubpaths`: A list of subpaths to mask from path values (optional, default: `[]`).
 
 # Version 2.7.2
 
