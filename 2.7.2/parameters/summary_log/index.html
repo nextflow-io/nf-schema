@@ -1343,12 +1343,14 @@ without wading through an array of default settings.</p>
 <ul>
 <li>The <code>WorkflowMetadata</code> object, <code>workflow</code> (required)</li>
 </ul>
-<p>And four optional arguments:</p>
+<p>And optional arguments:</p>
 <ul>
 <li><code>parameters_schema</code>: File name of a schema file (optional, default: <code>nextflow_schema.json</code>).</li>
 <li><code>monochrome_logs</code>: Boolean to disable coloured logs (optional, default: <code>false</code>).</li>
 <li><code>beforeText</code>: String to add before the summary log (optional, default: <code>''</code>).</li>
 <li><code>afterText</code>: String to add after the summary log (optional, default: <code>''</code>).</li>
+<li><code>mask</code>: Mask value, when replacing bucket names or subpaths (optional, default: <code>[** masked **]</code>).</li>
+<li><code>maskSubpaths</code>: A list of subpaths to mask from path values (optional, default: <code>[]</code>).</li>
 </ul>
 <p>Typical usage:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">main.nf</label><label for="__tabbed_1_2">nextflow.config</label><label for="__tabbed_1_3">nextflow_schema.json</label></div>
