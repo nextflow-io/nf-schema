@@ -97,7 +97,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -131,7 +131,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -158,7 +158,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -184,7 +184,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -211,7 +211,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -237,7 +237,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -264,7 +264,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -290,7 +290,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -317,7 +317,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -343,7 +343,7 @@ class ValidateTest extends Dsl2Spec {
         Map config = ['validation': [
             'monochromeLogs': true
         ]]
-        runScript(script, config)
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()

@@ -368,14 +368,14 @@ class SamplesheetConverterTest extends Dsl2Spec {
         '''
 
         when:
-        Map config = [
+        Map opts = ['config': [
             'validation': [
                 'logging': [
                     'unrecognisedHeaders': 'warn'
                 ]
             ]
-        ]
-        runScript(script, config)
+        ]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -408,15 +408,15 @@ class SamplesheetConverterTest extends Dsl2Spec {
         '''
 
         when:
-        Map config = [
+        Map opts = ['config': [
             'validation': [
                 'monochromeLogs': true,
                 'logging': [
                     'unrecognisedHeaders': 'error'
                 ]
             ]
-        ]
-        runScript(script, config)
+        ]]
+        runScript(opts, script)
 
         then:
         SchemaValidationException error = thrown(SchemaValidationException)

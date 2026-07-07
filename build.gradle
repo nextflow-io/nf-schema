@@ -14,7 +14,7 @@ dependencies {
 version = '2.7.3'
 
 nextflowPlugin {
-    nextflowVersion = '26.03.2-edge'
+    nextflowVersion = '26.04.0'
 
     provider = 'nextflow-io'
     className = 'nextflow.validation.ValidationPlugin'

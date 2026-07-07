@@ -87,10 +87,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -122,8 +122,8 @@ class ValidateParametersTest extends Dsl2Spec {
         '''
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -150,8 +150,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -175,8 +175,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -201,8 +201,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -227,8 +227,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -253,8 +253,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -289,8 +289,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -325,8 +325,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -361,8 +361,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -397,8 +397,8 @@ class ValidateParametersTest extends Dsl2Spec {
             }
         """
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -425,8 +425,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -452,8 +452,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -479,8 +479,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -507,10 +507,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'ignoreParams': ['xyz']
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -536,10 +536,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'defaultIgnoreParams': ['xyz']
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -565,8 +565,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -593,11 +593,11 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'ignoreParams': ['abc'],
             'defaultIgnoreParams': ['xyz']
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -622,11 +622,11 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'ignoreParams': ['input'],
             'defaultIgnoreParams': ['outdir']
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -652,13 +652,13 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true,
             'logging': [
                 'unrecognisedParams': 'error'
             ]
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -684,10 +684,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -719,8 +719,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -746,8 +746,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -774,10 +774,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -802,10 +802,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -834,8 +834,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -859,8 +859,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -885,10 +885,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'lenientMode': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -914,10 +914,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -941,8 +941,8 @@ class ValidateParametersTest extends Dsl2Spec {
             }
         """
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -966,10 +966,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -998,10 +998,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1032,10 +1032,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1059,10 +1059,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1091,10 +1091,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1124,10 +1124,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'monochromeLogs': true
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1149,21 +1149,23 @@ class ValidateParametersTest extends Dsl2Spec {
         '''
 
         when:
-        Map config = [
-            'validation': [
-                'monochromeLogs': true
-            ],
-            'params': [
-                'map': [
-                    'is': [
-                        'so': [
-                            'deep': true
+        Map opts = [
+            'config': [
+                'validation': [
+                    'monochromeLogs': true
+                ],
+                'params': [
+                    'map': [
+                        'is': [
+                            'so': [
+                                'deep': true
+                            ]
                         ]
                     ]
                 ]
             ]
         ]
-        runScript(script, config)
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1177,7 +1179,7 @@ class ValidateParametersTest extends Dsl2Spec {
     void 'should validate nested params - fail'() {
         given:
         String script = '''
-            params.map.is.so.deep = "this shouldn't be a string"
+            params.map = [is: [so: [deep: "this shouldn't be a string"]]]
             include { validateParameters } from 'plugin/nf-schema'
 
             workflow {
@@ -1186,9 +1188,11 @@ class ValidateParametersTest extends Dsl2Spec {
         '''
 
         when:
-        Map config = [
-            'validation': [
-                'monochromeLogs': true
+        Map opts = [
+            'config': [
+                'validation': [
+                    'monochromeLogs': true
+                ]
             ],
             'params': [
                 'map': [
@@ -1200,7 +1204,7 @@ class ValidateParametersTest extends Dsl2Spec {
                 ]
             ]
         ]
-        runScript(script, config)
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1231,8 +1235,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1258,8 +1262,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1285,8 +1289,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1312,8 +1316,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1338,8 +1342,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1363,8 +1367,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1388,8 +1392,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1415,8 +1419,8 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1442,10 +1446,10 @@ class ValidateParametersTest extends Dsl2Spec {
             }
         """
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'maxErrValSize': 20
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -1474,10 +1478,10 @@ class ValidateParametersTest extends Dsl2Spec {
         """
 
         when:
-        Map config = ['validation': [
+        Map opts = ['config': ['validation': [
             'defaultIgnoreParams': [ 'genome' ]
-        ]]
-        runScript(script, config)
+        ]]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()

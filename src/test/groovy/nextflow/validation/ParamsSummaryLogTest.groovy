@@ -86,8 +86,8 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -116,7 +116,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath()
         String script = """
-            params.map.is.so.deep = "changed_value"
+            params.map = [is: [so: [deep: "changed_value"]]]
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
                 def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
@@ -125,7 +125,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [
+        Map opts = [
             'params': [
                 'map': [
                     'is': [
@@ -136,7 +136,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
                 ]
             ]
         ]
-        runScript(script, config)
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -174,15 +174,15 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [
+        Map opts = ['config': [
             'validation': [
                 'summary': [
                     'beforeText': "This text is printed before \n",
                     'afterText': "\nThis text is printed after",
                 ]
             ]
-        ]
-        runScript(script, config)
+        ] ]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -227,8 +227,8 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [:]
-        runScript(script, config)
+        Map opts = [:]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -260,7 +260,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath()
         String script = """
-            params.map.is.so.deep = "changed_value"
+            params.map = [is: [so: [deep: "changed_value"]]]
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
                 def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
@@ -269,7 +269,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [
+        Map opts = [
             'params': [
                 'map': [
                     'is': [
@@ -279,13 +279,13 @@ class ParamsSummaryLogTest extends Dsl2Spec {
                     ]
                 ]
             ],
-            'validation': [
+            'config': ['validation': [
                 'summary': [
                     'hideParams': ['params.map.is.so.deep']
                 ]
-            ]
+            ]]
         ]
-        runScript(script, config)
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -314,8 +314,8 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
-            params.outdir = "outDir"
             include { paramsSummaryLog } from 'plugin/nf-schema'
+            params.outdir = "outDir"
             workflow {
                 def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
                 log.info summary_params
@@ -323,14 +323,14 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         """
 
         when:
-        Map config = [
+        Map opts = ['config': [
             'validation': [
                 'summary': [
                     'hideParams': ['outdir']
                 ]
             ]
-        ]
-        runScript(script, config)
+        ]]
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -358,23 +358,26 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
-            params.outdir = "s3://bucket/outDir"
-            include { paramsSummaryLog } from 'plugin/nf-schema'
-
+        include { paramsSummaryLog } from 'plugin/nf-schema'
+        params.outdir = "s3://bucket/outDir"
+        workflow {
             def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
             log.info summary_params
+        }
         """
 
         when:
-        Map config = [
-            'validation': [
-                'summary': [
-                    'hideParams': ['outdir'],
-                    'maskSubpaths': 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+        Map opts = [
+            'config': [
+                'validation': [
+                    'summary': [
+                        'hideParams': ['outdir'],
+                        'maskSubpaths': 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+                    ]
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -402,24 +405,27 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
-            params.outdir = "s3://bucket/outDir"
-            include { paramsSummaryLog } from 'plugin/nf-schema'
-
+        include { paramsSummaryLog } from 'plugin/nf-schema'
+        params.outdir = "s3://bucket/outDir"
+        workflow {
             def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
             log.info summary_params
+        }
         """
 
         when:
-        Map config = [
-            'validation': [
-                'summary': [
-                    'hideParams': ['outdir'],
-                    'mask': '/mask',
-                    'maskSubpaths': 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+        Map opts = [
+            'config': [
+                'validation': [
+                    'summary': [
+                        'hideParams': ['outdir'],
+                        'mask': '/mask',
+                        'maskSubpaths': 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+                    ]
                 ]
             ]
         ]
-        new MockScriptRunner(config).setScript(script).execute()
+        runScript(opts, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()

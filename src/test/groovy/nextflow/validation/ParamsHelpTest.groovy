@@ -153,7 +153,8 @@ class ParamsHelpTest extends Dsl2Spec {
         """
 
         when:
-        runScript(script, [validation:[monochromeLogs:true]])
+        Map config = [config:[validation:[monochromeLogs:true]]]
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
@@ -214,7 +215,8 @@ class ParamsHelpTest extends Dsl2Spec {
         """
 
         when:
-        runScript(script, [validation:[monochromeLogs:true]])
+        Map config = [config:[validation:[monochromeLogs:true]]]
+        runScript(config, script)
         List<String> stdout = capture
                 .toString()
                 .readLines()
