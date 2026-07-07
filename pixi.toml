@@ -1,0 +1,14 @@
+[workspace]
+authors = ["Nicolas Vannieuwkerke <nicolas.vannieuwkerke@ugent.be>"]
+channels = ["conda-forge", "bioconda"]
+name = "nf-cmgg"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+nextflow = ">=26.4.0,<27"
+openjdk = "21.*"
+gradle = ">=9.3.1,<10"
+prek = ">=0.4.1,<0.5"
