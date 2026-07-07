@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.8.0
+
+## Changes
+
+1. Bumped the minimal Nextflow version to 26.04.0
+
 # Version 2.7.3
 
 ## New features

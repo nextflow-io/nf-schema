@@ -18,6 +18,7 @@ import nextflow.plugin.extension.Function
 import nextflow.plugin.extension.PluginExtensionPoint
 import nextflow.script.WorkflowMetadata
 import nextflow.Session
+import nextflow.util.RecordMap
 
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
@@ -80,6 +81,51 @@ class ValidationExtension extends PluginExtensionPoint {
         SamplesheetConverter converter = new SamplesheetConverter(config)
         List output = converter.validateAndConvertToList(samplesheet, schema)
         return output
+    }
+
+    /*
+    * Function to convert a samplesheet to a list of records
+    */
+    @Function
+    List<RecordMap> samplesheetToRecords(
+        final CharSequence samplesheet,
+        final CharSequence schema,
+        final Class<RecordMap> recordClass = RecordMap
+    ) {
+        Path samplesheetFile = Nextflow.file(samplesheet) as Path
+        return samplesheetToRecords(samplesheetFile, schema, recordClass)
+    }
+
+    @Function
+    List<RecordMap> samplesheetToRecords(
+        final Path samplesheet,
+        final CharSequence schema,
+        final Class<RecordMap> recordClass = RecordMap
+    ) {
+        Path samplesheetFile = Nextflow.file(samplesheet) as Path
+        return samplesheetToRecords(samplesheetFile, schema, recordClass)
+    }
+
+    @Function
+    List<RecordMap> samplesheetToRecords(
+        final CharSequence samplesheet,
+        final Path schema,
+        final Class<RecordMap> recordClass = RecordMap
+    ) {
+        Path samplesheetFile = Nextflow.file(samplesheet) as Path
+        return samplesheetToRecords(samplesheetFile, schema, recordClass)
+    }
+
+    @Function
+    List<RecordMap> samplesheetToRecords(
+        final Path samplesheet,
+        final Path schema,
+        final Class<RecordMap> recordClass = RecordMap
+    ) {
+        return [id:'test', name:'file', value:'test'].asType(recordClass)
+        // SamplesheetConverter converter = new SamplesheetConverter(config)
+        // List<RecordMap> output = converter.validateAndConvertToRecords(samplesheet, schema)
+        // return output
     }
 
     /*
