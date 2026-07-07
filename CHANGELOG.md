@@ -8,6 +8,16 @@
    - `mask`: Mask value, when replacing bucket names or subpaths (optional, default: `[** masked **]`).
    - `maskSubpaths`: A list of subpaths to mask from path values (optional, default: `[]`).
 
+## Changes
+
+1. Bumped nf-schema dependencies:
+
+| dependency                 | old version | new version |
+| -------------------------- | ----------- | ----------- |
+| org.json:json              | 20240303    | 20260522    |
+| dev.harrel:json-schema     | 1.5.0       | 1.9.1       |
+| com.sanctionco.jmail:jmail | 1.6.3       | 6.1.1       |
+
 # Version 2.7.2
 
 ## New features
