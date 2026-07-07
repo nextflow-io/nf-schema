@@ -238,14 +238,14 @@ copyNoFollow, move) [default: copy]
 
         then:
         noExceptionThrown()
-        String expectedHelp = '''--help              [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+        String expectedHelp = '''--help             [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
 help message of that parameter will be printed. 
---helpFull          [boolean]         Show the help message for all non-hidden parameters. 
---showHidden        [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
+--helpFull         [boolean]         Show the help message for all non-hidden parameters. 
+--showHidden       [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
 or `--helpFull`. 
 
 Nested Parameters
-  --this.is.so.deep [boolean] so deep [default: true] 
+  --map.is.so.deep [boolean] so deep [default: true] 
 
 '''
         List<String> resultHelp = help.readLines()
@@ -269,14 +269,14 @@ Nested Parameters
         HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
 
         when:
-        String help = helpCreator.getShortMessage('this')
+        String help = helpCreator.getShortMessage('map')
 
         then:
         noExceptionThrown()
-        String expectedHelp = '''--this
-    description: this is this
+        String expectedHelp = '''--map
+    description: map is map
     options    : 
-      --this.is.so.deep [boolean] so deep [default: true] 
+      --map.is.so.deep [boolean] so deep [default: true] 
 
 '''
         List<String> resultHelp = help.readLines()
