@@ -50,7 +50,6 @@ class SummaryCreator {
             workflowSummary['container'] = workflow.container
         }
 
-        println("Workflow type: ${workflow.getClass()}")
         workflowSummary['launchDir']    = maybeMask(workflow.launchDir ?: '')
         workflowSummary['workDir']      = maybeMask(workflow.workDir ?: '')
         workflowSummary['projectDir']   = maybeMask(workflow.projectDir ?: '')
