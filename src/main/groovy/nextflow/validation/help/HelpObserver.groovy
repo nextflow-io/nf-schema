@@ -38,7 +38,7 @@ class HelpObserver implements TraceObserverV2 {
                 log.debug('Printing out the short help message')
                 Object paramValue = params.get(config.help.shortParameter)
                 help += helpCreator.getShortMessage(
-                    paramValue == true || paramValue == 'true' ? '' : paramValue as String
+                    paramValue in [true, 'true'] ? '' : paramValue as String
                 )
             }
             help += helpCreator.afterText
