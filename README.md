@@ -84,3 +84,7 @@ We would like to thank the key contributors who include (but are not limited to)
 - Phil Ewels ([@ewels](https://github.com/ewels))
 - Arthur ([@awgymer](https://github.com/awgymer))
 - Maxime U Garcia ([@maxulysse](https://github.com/maxulysse))
+
+## License
+
+Apache License 2.0. See the [`LICENSE`](LICENSE) file for details.
