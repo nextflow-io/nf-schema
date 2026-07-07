@@ -18,7 +18,6 @@ jobs:
       fail-fast: false
       matrix:
         java_version: [17, 21, 25]
-        syntax_parser_version: [1, 2]
 
     steps:
       - name: Environment
@@ -42,7 +41,7 @@ jobs:
         run: ./gradlew assemble
 
       - name: Tests
-        run: NXF_SYNTAX_PARSER=v${{ matrix.syntax_parser_version }} ./gradlew check
+        run: ./gradlew check
         env:
           GRADLE_OPTS: '-Dorg.gradle.daemon=false'
 

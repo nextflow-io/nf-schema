@@ -95,7 +95,7 @@ public class ValidationResult {
             // Change some error messages to make them more clear
             String keyword = error.keyword
             if (keyword == 'required') {
-                Matcher matcher = errorString =~ ~/\[\[([^\[\]]*)\]\]$/
+                Matcher matcher = errorString =~ ~/\[([^\[\]]*)\]$/
                 String missingKeywords = matcher.findAll().flatten().last()
                 errorString = "Missing required ${validationType}(s): ${missingKeywords}"
             }

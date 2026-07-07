@@ -1,17 +1,17 @@
 plugins {
-    id 'io.nextflow.nextflow-plugin' version '1.0.0-beta.12'
+    id 'io.nextflow.nextflow-plugin' version '1.0.0-beta.15'
 }
 
 dependencies {
-    implementation 'org.json:json:20240303'
-    implementation 'dev.harrel:json-schema:1.5.0'
-    implementation 'com.sanctionco.jmail:jmail:1.6.3' // Needed for e-mail format validation
+    implementation 'org.json:json:20260522'
+    implementation 'dev.harrel:json-schema:1.9.1'
+    implementation 'com.sanctionco.jmail:jmail:2.1.0' // Needed for e-mail format validation
 
     // Ensure the platform launcher is available at test runtime
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.1'
 }
 
-version = '2.7.2'
+version = '2.7.3'
 
 nextflowPlugin {
     nextflowVersion = '26.03.2-edge'

@@ -31,6 +31,14 @@ class SummaryConfig implements ConfigScope {
     @Description('A list of parameters to hide in the summary message.')
     final Set<CharSequence> hideParams = []
 
+    @ConfigOption
+    @Description('Mask value, when replacing bucket names or subpaths. Defaults to [** masked **].')
+    CharSequence mask = '[** masked **]'
+
+    @ConfigOption
+    @Description('A list of subpaths to mask from path values.')
+    final List<CharSequence> maskSubpaths
+
     SummaryConfig(Map map, Boolean monochromeLogs) {
         Map config = map ?: Collections.emptyMap()
 
@@ -72,6 +80,28 @@ class SummaryConfig implements ConfigScope {
             } else {
                 /* groovylint-disable-next-line LineLength */
                 log.warn("Incorrect value detected for `validation.summary.hideParams`, a list of strings is expected. Defaulting to `${hideParams}`")
+            }
+        }
+
+        // mask
+        if (config.containsKey('mask')) {
+            if (config.mask in CharSequence) {
+                mask = config.mask
+                log.debug("Set `validation.summary.mask` to ${mask}")
+            } else {
+                /* groovylint-disable-next-line LineLength */
+                log.warn("Incorrect value detected for `validation.summary.mask`, a string is expected. Defaulting to `${mask}`")
+            }
+        }
+
+        // maskSubpaths
+        if (config.containsKey('maskSubpaths')) {
+            if (config.maskSubpaths in List<CharSequence>) {
+                maskSubpaths = config.maskSubpaths
+                log.debug("Set `maskSubpaths` to ${maskSubpaths}")
+            } else {
+                /* groovylint-disable-next-line LineLength */
+                log.warn('Incorrect value detected for `validation.summary.maskSubpaths`, a list of strings is expected. Defaulting to ``')
             }
         }
     }

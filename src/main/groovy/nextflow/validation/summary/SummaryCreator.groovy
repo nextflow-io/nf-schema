@@ -50,12 +50,12 @@ class SummaryCreator {
             workflowSummary['container'] = workflow.container
         }
 
-        workflowSummary['launchDir']    = workflow.launchDir
-        workflowSummary['workDir']      = workflow.workDir
-        workflowSummary['projectDir']   = workflow.projectDir
+        workflowSummary['launchDir']    = maybeMask(workflow.launchDir)
+        workflowSummary['workDir']      = maybeMask(workflow.workDir)
+        workflowSummary['projectDir']   = maybeMask(workflow.projectDir)
         workflowSummary['userName']     = workflow.userName
         workflowSummary['profile']      = workflow.profile
-        workflowSummary['configFiles']  = workflow.configFiles ? workflow.configFiles.join(', ') : ''
+        workflowSummary['configFiles']  = maybeMask(workflow.configFiles ? workflow.configFiles.join(', ') : '')
 
         // Get pipeline parameters defined in JSON Schema
         Map paramsSummary = [:]
@@ -121,15 +121,33 @@ class SummaryCreator {
 
                 // We have a default in the schema, and this isn't it
                 if (defaultValue != null && value != defaultValue) {
-                    summary.put(param, value)
+                    summary.put(param, maybeMask(value))
                 }
                 // No default in the schema, and this isn't empty or false
                 else if (defaultValue == null && value != '' && value != null && value != false && value != 'false') {
-                    summary.put(param, value)
+                    summary.put(param, maybeMask(value))
                 }
             }
         }
         return summary
+    }
+
+    private CharSequence maybeMask(Path value) {
+        return maybeMask(value.toUriString())
+    }
+
+    private CharSequence maybeMask(CharSequence value) {
+        return maybeMaskSubpaths(value)
+    }
+
+    private CharSequence maybeMaskSubpaths(CharSequence value) {
+        CharSequence v = value
+        if (config.summary.maskSubpaths?.size() > 0) {
+            config.summary.maskSubpaths.each { CharSequence toReplace ->
+                v = v.replaceAll(toReplace, config.summary.mask)
+            }
+        }
+        return v
     }
 
 }

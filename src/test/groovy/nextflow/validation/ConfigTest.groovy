@@ -44,6 +44,7 @@ class ConfigTest extends Dsl2Spec {
                 beforeText: 'before',
                 afterText: 'after',
                 hideParams: ['some_random_param'],
+                mask: 'mask'
             ],
             logging: [
                 unrecognisedParams: 'error',
@@ -87,6 +88,7 @@ class ConfigTest extends Dsl2Spec {
                 beforeText: "${randomString}",
                 afterText: "${randomString}",
                 hideParams: ["${randomString}"],
+                mask: "${randomString}"
             ],
             logging: [
                 unrecognisedParams: "${errorLevel}",
