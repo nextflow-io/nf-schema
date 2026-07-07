@@ -18,6 +18,8 @@
 | dev.harrel:json-schema     | 1.5.0       | 1.9.1       |
 | com.sanctionco.jmail:jmail | 1.6.3       | 6.1.1       |
 
+2. Added a pixi environment for ease of development
+
 # Version 2.7.2
 
 ## New features
