@@ -120,10 +120,10 @@ class ValidationExtension extends PluginExtensionPoint {
         final Path samplesheet,
         final Path schema
     ) {
-        return [Nextflow.record(id:'test', name:'file', value:'test')]
-        // SamplesheetConverter converter = new SamplesheetConverter(config)
-        // List<RecordMap> output = converter.validateAndConvertToRecords(samplesheet, schema)
-        // return output
+        SamplesheetConverter converter = new SamplesheetConverter(config)
+        converter.validate(samplesheet, schema)
+        List<RecordMap> output = converter.toRecords(samplesheet, schema)
+        return output
     }
 
     /*

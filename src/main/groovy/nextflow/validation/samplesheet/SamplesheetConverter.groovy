@@ -14,6 +14,7 @@ import java.nio.file.Path
 import org.json.JSONArray
 
 import nextflow.Nextflow
+import nextflow.util.RecordMap
 
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
@@ -94,7 +95,7 @@ class SamplesheetConverter {
 
         Map schemaMap = new JsonSlurper().parseText(schemaFile.text) as Map
 
-        List channelFormat = samplesheetList.collect { entry ->
+        List formattedList = samplesheetList.collect { entry ->
             resetMeta()
             Object result = formatEntry(entry, schemaMap['items'] as Map)
             if (isMeta()) {
@@ -109,7 +110,18 @@ class SamplesheetConverter {
 
         logUnrecognisedHeaders(samplesheetFile.toString())
 
-        return channelFormat
+        return formattedList
+    }
+
+    /*
+     * Convert the samplesheet to a list of RecordMap entries
+     */
+    List<RecordMap> toRecords(
+        Path samplesheetFile,
+        Path schemaFile
+    ) {
+        List<Map> samplesheetList = fileToObject(samplesheetFile, schemaFile) as List<Map>
+        return samplesheetList.collect { entry -> Nextflow.record(entry) }
     }
 
     private void resetMeta() {
