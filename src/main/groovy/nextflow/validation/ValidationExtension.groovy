@@ -79,7 +79,8 @@ class ValidationExtension extends PluginExtensionPoint {
         final Path schema
     ) {
         SamplesheetConverter converter = new SamplesheetConverter(config)
-        List output = converter.validateAndConvertToList(samplesheet, schema)
+        converter.validate(samplesheet, schema)
+        List output = converter.toList(samplesheet, schema)
         return output
     }
 
@@ -89,40 +90,37 @@ class ValidationExtension extends PluginExtensionPoint {
     @Function
     List<RecordMap> samplesheetToRecords(
         final CharSequence samplesheet,
-        final CharSequence schema,
-        final Class<RecordMap> recordClass = RecordMap
+        final CharSequence schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
-        return samplesheetToRecords(samplesheetFile, schema, recordClass)
+        return samplesheetToRecords(samplesheetFile, schema)
     }
 
     @Function
     List<RecordMap> samplesheetToRecords(
         final Path samplesheet,
-        final CharSequence schema,
-        final Class<RecordMap> recordClass = RecordMap
+        final CharSequence schema
     ) {
-        Path samplesheetFile = Nextflow.file(samplesheet) as Path
-        return samplesheetToRecords(samplesheetFile, schema, recordClass)
+        String fullPathSchema = getBasePath(session.baseDir.toString(), schema as String)
+        Path schemaFile = Nextflow.file(fullPathSchema) as Path
+        return samplesheetToRecords(samplesheet, schemaFile)
     }
 
     @Function
     List<RecordMap> samplesheetToRecords(
         final CharSequence samplesheet,
-        final Path schema,
-        final Class<RecordMap> recordClass = RecordMap
+        final Path schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
-        return samplesheetToRecords(samplesheetFile, schema, recordClass)
+        return samplesheetToRecords(samplesheetFile, schema)
     }
 
     @Function
     List<RecordMap> samplesheetToRecords(
         final Path samplesheet,
-        final Path schema,
-        final Class<RecordMap> recordClass = RecordMap
+        final Path schema
     ) {
-        return [id:'test', name:'file', value:'test'].asType(recordClass)
+        return [Nextflow.record(id:'test', name:'file', value:'test')]
         // SamplesheetConverter converter = new SamplesheetConverter(config)
         // List<RecordMap> output = converter.validateAndConvertToRecords(samplesheet, schema)
         // return output

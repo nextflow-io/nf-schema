@@ -41,13 +41,12 @@ class SamplesheetConverter {
     private Map meta = [:]
 
     /*
-    Convert the samplesheet to a list of entries based on a schema
-    */
-    List validateAndConvertToList(
+     * Validate the samplesheet against a schema
+     */
+    void validate(
         Path samplesheetFile,
         Path schemaFile
     ) {
-
         Map colors = getLogColors(config.monochromeLogs)
 
         // Some checks before validating
@@ -80,10 +79,20 @@ class SamplesheetConverter {
             log.error('Validation of samplesheet failed!')
             throw new SchemaValidationException(msg, validationErrors)
         }
+    }
 
-        // Convert
+    /*
+     * Convert the samplesheet to a list of entries based on a schema
+     */
+    List toList(
+        Path samplesheetFile,
+        Path schemaFile
+    ) {
+
         List samplesheetList = fileToObject(samplesheetFile, schemaFile) as List
         rows = []
+
+        Map schemaMap = new JsonSlurper().parseText(schemaFile.text) as Map
 
         List channelFormat = samplesheetList.collect { entry ->
             resetMeta()
