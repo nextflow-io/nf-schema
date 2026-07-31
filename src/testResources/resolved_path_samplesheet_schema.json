@@ -1,0 +1,26 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/test/test/master/assets/schema_input.json",
+    "title": "Test schema for samplesheets",
+    "description": "Schema for the file provided with params.input",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "description": "Sample name to use in the analysis",
+                "errorMessage": "Sample name must be provided and cannot contain spaces"
+            },
+            "data": {
+                "type": "string",
+                "format": "file-path",
+                "pattern": "^\\S+\\.csv$",
+                "description": "Data file for the sample",
+                "errorMessage": "Data file must end in '.csv'"
+            }
+        },
+        "required": ["sample", "data"]
+    }
+}
