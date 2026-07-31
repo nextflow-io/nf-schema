@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 2.7.4
+
+## Bug fixes
+
+1. `pattern` validation of values with a `file-path`, `directory-path` or `path` format is now retried against the resolved real path when the value itself does not match and points to a non-local filesystem. This fixes validation of proxy filesystem URIs (e.g. `lamin://`) that resolve to a matching storage path ([#217](https://github.com/nextflow-io/nf-schema/issues/217)).
+
 # Version 2.7.3
 
 ## New features
