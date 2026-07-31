@@ -1,3 +1,4 @@
+/* groovylint-disable CloseWithoutCloseable */
 package nextflow.validation
 
 import groovy.transform.AutoImplement
@@ -41,10 +42,7 @@ class FakeProxyFileSystemProvider extends FileSystemProvider {
         return TARGETS[uri.toString()]
     }
 
-    @Override
-    String getScheme() {
-        return 'fakeproxy'
-    }
+    final String scheme = 'fakeproxy'
 
     @Override
     FileSystem getFileSystem(URI uri) {
@@ -70,7 +68,7 @@ class FakeProxyFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
+    public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) {
         Path target = targetFor(path.toUri())
         if (target == null) {
             throw new NoSuchFileException(path.toString())
@@ -95,10 +93,7 @@ class FakeProxyFileSystem extends FileSystem {
         return fsProvider
     }
 
-    @Override
-    String getSeparator() {
-        return '/'
-    }
+    final String separator = '/'
 
     @Override
     boolean isOpen() {

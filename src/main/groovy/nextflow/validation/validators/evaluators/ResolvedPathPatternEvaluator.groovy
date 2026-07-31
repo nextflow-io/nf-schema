@@ -44,9 +44,9 @@ class ResolvedPathPatternEvaluator implements Evaluator {
 
         // Retry the pattern against the resolved real path for non-local paths
         try {
-            def file = Nextflow.file(value)
-            if (!(file in List) && (file as Path).fileSystem != FileSystems.default) {
-                String resolved = (file as Path).toRealPath().toUriString()
+            Path file = Nextflow.file(value) as Path
+            if (!(file in List) && file.fileSystem != FileSystems.default) {
+                String resolved = file.toRealPath().toUriString()
                 if (pattern.matcher(resolved).find()) {
                     return Evaluator.Result.success()
                 }
