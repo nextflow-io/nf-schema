@@ -51,6 +51,11 @@ class CustomEvaluatorFactory implements EvaluatorFactory {
             return Optional.of(new LenientTypeEvaluator(schemaNode))
         } else if (fieldName == 'deprecated' && schemaNode.boolean) {
             return Optional.of(new DeprecatedEvaluator(schemaNode.asBoolean()))
+        } else if (fieldName == 'pattern' && schemaNode.string) {
+            JsonNode format = ctx.currentSchemaObject.get('format')
+            if (format?.string && format.asString() in ['file-path', 'directory-path', 'path']) {
+                return Optional.of(new ResolvedPathPatternEvaluator(schemaNode.asString()))
+            }
         }
         return Optional.empty()
     }
