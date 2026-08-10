@@ -135,7 +135,7 @@ class HelpMessageCreator {
                     }
                     .join('\n')
                 helpMessage += '    ' + colors.dim + 'options'.padRight(optionMaxChars) + ': ' +
-                    colors.reset + '\n' + subParamsHelpString + '\n'
+                    colors.reset + '\n' + subParamsHelpString + '\n\n'
                 continue
             }
             String value = option.value
