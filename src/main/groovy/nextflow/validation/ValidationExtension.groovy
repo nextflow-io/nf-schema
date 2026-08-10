@@ -143,14 +143,6 @@ class ValidationExtension extends PluginExtensionPoint {
     String paramsHelp(
         final Map options = [:]
     ) {
-        return paramsHelp(options, '')
-    }
-
-    @Function
-    String paramsHelp(
-        final Map options = [:],
-        final String parameter
-    ) {
         log.debug "Generating help message with options: ${options}"
         Map config = session.config.navigate('validation') ?: [:]
 
@@ -165,6 +157,9 @@ class ValidationExtension extends PluginExtensionPoint {
         config.help.afterText = options.get('afterText', config.help.get('afterText', '')) as String
         config.help.command = options.get('command', config.help.get('command', '')) as String
         config.help.showHidden = options.get('showHidden', false) as Boolean
+
+        // Set the parameter if given
+        String parameter = options.get('parameter', null) as String
 
         // Get function logic options
         Boolean fullHelp = options.get('fullHelp') as Boolean ?: false
