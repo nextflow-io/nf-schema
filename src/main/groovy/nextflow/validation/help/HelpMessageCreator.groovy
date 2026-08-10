@@ -90,7 +90,7 @@ class HelpMessageCreator {
     }
 
     String getBeforeText() {
-        String beforeText = config.help.beforeText
+        String beforeText = config.help.beforeText + '\n'
         if (config.help.command) {
             beforeText += 'Typical pipeline command:\n\n'
             beforeText += "  ${colors.cyan}${config.help.command}${colors.reset}\n\n"
@@ -105,7 +105,7 @@ class HelpMessageCreator {
             afterText += "\n ${colors.dim}!! Hiding ${hiddenParametersCount} param(s), use the `--${config.help.showHiddenParameter}` parameter to show them !!${colors.reset}"
         }
         afterText += "\n-${colors.dim}----------------------------------------------------${colors.reset}-\n"
-        afterText += config.help.afterText
+        afterText += config.help.afterText + '\n'
         return afterText
     }
 
