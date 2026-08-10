@@ -147,7 +147,7 @@ class ParamsHelpTest extends Dsl2Spec {
             workflow {
                 def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-                def help_msg = paramsHelp("publish_dir_mode", parameters_schema: '$schema', command: command)
+                def help_msg = paramsHelp(parameter: "publish_dir_mode", parameters_schema: '$schema', command: command)
                 log.info help_msg
             }
         """
@@ -183,7 +183,7 @@ class ParamsHelpTest extends Dsl2Spec {
             workflow {
                 def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-                def help_msg = paramsHelp("no_exist", parameters_schema: '$schema', command: command)
+                def help_msg = paramsHelp(parameter: "no_exist", parameters_schema: '$schema', command: command)
                 log.info help_msg
             }
         """
@@ -209,7 +209,7 @@ class ParamsHelpTest extends Dsl2Spec {
             workflow {
                 def command = "nextflow run <pipeline> --input samplesheet.csv --outdir <OUTDIR> -profile docker"
 
-                def help_msg = paramsHelp("map.is", parameters_schema: '$schema', command: command)
+                def help_msg = paramsHelp(parameter: "map.is", parameters_schema: '$schema', command: command)
                 log.info help_msg
             }
         """
