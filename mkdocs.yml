@@ -14,6 +14,7 @@ nav:
   - Tutorials:
       - nextflow_schema/create_schema.md
       - Nf-validation migration guide: migration_guide.md
+      - 3.0.0 migration guide: 3_0_0_migration_guide.md
   - Reference:
       - nextflow_schema/nextflow_schema_specification.md
       - nextflow_schema/sample_sheet_schema_specification.md
