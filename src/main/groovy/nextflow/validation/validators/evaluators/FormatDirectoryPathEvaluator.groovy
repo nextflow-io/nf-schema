@@ -26,14 +26,15 @@ class FormatDirectoryPathEvaluator implements Evaluator {
             return Evaluator.Result.success()
         }
 
-        def String value = node.asString()
-        
-        def Path file
+        String value = node.asString()
+
+        Path file
         try {
             file = Nextflow.file(value) as Path
             if (!(file in List)) {
                 file.exists() // Do an exists check to see if the file can be correctly accessed
             }
+        /* groovylint-disable-next-line CatchException */
         } catch (Exception e) {
             return Evaluator.Result.failure("could not validate directory format of '${value}': ${e.message}" as String)
         }

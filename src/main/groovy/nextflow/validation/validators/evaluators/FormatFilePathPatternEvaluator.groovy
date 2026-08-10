@@ -26,9 +26,9 @@ class FormatFilePathPatternEvaluator implements Evaluator {
             return Evaluator.Result.success()
         }
 
-        def String value = node.asString()
+        String value = node.asString()
 
-        def List<Path> files
+        List<Path> files
         try {
             files = Nextflow.files(value)
             files.each { file ->
