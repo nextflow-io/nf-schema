@@ -1,10 +1,6 @@
 name: build docs
 on:
-  push:
-    branches:
-      - master
-      - main
-      - dev
+  release:
 permissions:
   contents: write
 jobs:
