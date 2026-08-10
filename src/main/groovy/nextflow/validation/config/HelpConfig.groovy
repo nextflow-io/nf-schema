@@ -20,10 +20,6 @@ import groovy.transform.CompileDynamic
 class HelpConfig implements ConfigScope {
 
     @ConfigOption
-    @Description('Enable the help message.')
-    final Boolean enabled = false
-
-    @ConfigOption
     @Description('Show hidden parameters in the help message.')
     final Boolean showHidden = false
 
@@ -64,17 +60,6 @@ class HelpConfig implements ConfigScope {
     /* groovylint-disable-next-line MethodSize */
     HelpConfig(Map map, Map params, Boolean monochromeLogs) {
         Map config = map ?: Collections.emptyMap()
-
-        // enabled
-        if (config.containsKey('enabled')) {
-            if (config.enabled in Boolean) {
-                enabled = config.enabled
-                log.debug("Set `validation.help.enabled` to ${enabled}")
-            } else {
-                /* groovylint-disable-next-line LineLength */
-                log.warn("Incorrect value detected for `validation.help.enabled`, a boolean is expected. Defaulting to `${enabled}`")
-            }
-        }
 
         // showHiddenParameter
         if (config.containsKey('showHiddenParameter')) {
