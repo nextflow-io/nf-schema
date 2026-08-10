@@ -102,9 +102,9 @@ class HelpMessageCreator {
         String afterText = ''
         if (hiddenParametersCount > 0) {
             /* groovylint-disable-next-line LineLength */
-            afterText += " ${colors.dim}!! Hiding ${hiddenParametersCount} param(s), use the `--${config.help.showHiddenParameter}` parameter to show them !!${colors.reset}\n"
+            afterText += "\n ${colors.dim}!! Hiding ${hiddenParametersCount} param(s), use the `--${config.help.showHiddenParameter}` parameter to show them !!${colors.reset}"
         }
-        afterText += "-${colors.dim}----------------------------------------------------${colors.reset}-\n"
+        afterText += "\n-${colors.dim}----------------------------------------------------${colors.reset}-\n"
         afterText += config.help.afterText
         return afterText
     }
