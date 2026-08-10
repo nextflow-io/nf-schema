@@ -176,7 +176,7 @@ class ValidationExtension extends PluginExtensionPoint {
             !line.startsWith("--${functionConfig.help.shortParameter}") &&
             !line.startsWith("--${functionConfig.help.fullParameter}") &&
             !line.startsWith("--${functionConfig.help.showHiddenParameter}")
-        }.join('\n')
+        }.join('\n') + '\n'
         help += helpCreator.afterText
         log.debug 'Done generating help message'
         return help
