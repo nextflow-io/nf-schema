@@ -16,3 +16,6 @@ work
 out
 site
 bin
+# pixi environments
+.pixi/*
+!.pixi/config.toml

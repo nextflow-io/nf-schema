@@ -1,19 +1,26 @@
 package nextflow.validation.parameters
 
-import groovy.json.JsonBuilder
-import groovy.json.JsonSlurper
+import static nextflow.NF.isSyntaxParserV2
+
+import static nextflow.validation.utils.Colors.getLogColors
+import static nextflow.validation.utils.Common.getBasePath
+import static nextflow.validation.utils.Common.getValueFromJsonPointer
+import static nextflow.validation.utils.Types.parseParamValue
+
+import java.nio.file.Path
+import groovy.json.JsonGenerator
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 import nextflow.Nextflow
+import nextflow.Session
 import nextflow.util.Duration
 import nextflow.util.MemoryUnit
+import nextflow.util.VersionNumber
 import org.json.JSONObject
 
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
-import static nextflow.validation.utils.Colors.getLogColors
-import static nextflow.validation.utils.Common.getBasePath
-import static nextflow.validation.utils.Common.getValueFromJsonPointer
 import nextflow.validation.validators.ValidationResult
 
 /**
@@ -23,15 +30,24 @@ import nextflow.validation.validators.ValidationResult
  */
 
 @Slf4j
+@CompileDynamic
 class ParameterValidator {
 
-    private ValidationConfig config
+    final private ValidationConfig config
+
+    // A map of expected parameters with their default values
+    final private Map<String, Object> expectedParamsDefaults
 
     ParameterValidator(ValidationConfig config) {
         this.config = config
+        this.expectedParamsDefaults = [
+            (config.help.shortParameter): false,
+            (config.help.fullParameter): false,
+            (config.help.showHiddenParameter): false
+        ]
     }
 
-    final List<String> NF_OPTIONS = [
+    final List<String> nextflowOptions = [
             // Options for base `nextflow` command
             'bg',
             'c',
@@ -101,151 +117,113 @@ class ParameterValidator {
             'work-dir'
     ]
 
-    private List<String> errors = []
-    private List<String> warnings = []
+    final private List<String> errors = []
+    final private List<String> warnings = []
 
-    // The amount of parameters hidden (for help messages)
-    private Integer hiddenParametersCount = 0
-
-    // The length of the terminal
-    private Integer terminalLength = System.getenv("COLUMNS")?.toInteger() ?: 100
-
-
-    private boolean hasErrors() { errors.size()>0 }
-    private List<String> getErrors() { errors }
-
-    private boolean hasWarnings() { warnings.size()>0 }
-    private List<String> getWarnings() { warnings }
-
-    public validateParametersMap(
-        Map options = null,
-        Map inputParams = [:],
-        String baseDir
+    void validateParametersMap(
+        final Map options = [:],
+        Session session
     ) {
-        def Map params = initialiseExpectedParams(inputParams)
-        def String schemaFilename = options?.containsKey('parameters_schema') ? options.parameters_schema as String : config.parametersSchema
-        log.debug "Starting parameters validation"
+        Map<String, Object> params = initialiseExpectedParams(session.params)
+        String schemaFilename = options?.containsKey('parameters_schema') ?
+            options.parameters_schema as String :
+            config.parametersSchema
+        Boolean castCliParams = options?.containsKey('cast_cli_params') ?
+            options.cast_cli_params as Boolean :
+            /* groovylint-disable-next-line UnnecessaryGetter */
+            isSyntaxParserV2()
+        log.debug 'Starting parameters validation'
 
-        // Clean the parameters
-        def cleanedParams = cleanParameters(params)
         // Convert to JSONObject
-        def paramsJSON = new JSONObject(new JsonBuilder(cleanedParams).toString())
+        JsonGenerator.Options generatorOptions = new JsonGenerator.Options()
+            .excludeNulls()
+            .addConverter(Path) { Path path -> path.toUriString() }
+            .addConverter(Duration) { Duration duration -> duration.toMillis() }
+            .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
+            .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
 
-        //=====================================================================//
+        // Cast parameters provided via the CLI to their respective types.
+        // This is a temporary workaround until static typing is introduced in Nextflow,
+        // in which case we can rely on the static type system to do the casting for us.
+        // This mimics the type casting behaviour of syntax parser V1 so shouldn't introduce any breaking changes.
+        if (castCliParams) {
+            List<String> cliParams = session.cliParams?.keySet()?.toList() ?: []
+            generatorOptions.addConverter(Map<String, Object>) { Map<String,Object> map ->
+                map.collectEntries { k, v ->
+                    // Only cast parameters that were explicitly provided via the CLI
+                    return (cliParams.contains(k) && v in String) ? [k, parseParamValue(v)] : [k, v]
+                }
+            }
+        }
+
+        JSONObject paramsJSON = new JSONObject(generatorOptions.build().toJson(params))
+
         // Validate parameters against the schema
-        def validator = new JsonSchemaValidator(config)
+        JsonSchemaValidator validator = new JsonSchemaValidator(config)
 
         // Colors
-        def colors = getLogColors(config.monochromeLogs)
+        Map<String,String> colors = getLogColors(config.monochromeLogs)
 
         // Validate
-        def ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
-        def List<String> paramErrors = validationResult.getErrors('parameter')
-        this.errors.addAll(paramErrors)
+        String baseDir = session.baseDir
+        ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
+        List<String> paramErrors = validationResult.getErrors('parameter')
+        errors.addAll(paramErrors)
 
-        //=====================================================================//
         // Check for nextflow core params and unexpected params
-        //=====================================================================//
-        def List<String> unexpectedParams = []
-        if(paramErrors.size() == 0) {
-            validationResult.getUnevaluated().each{ param ->
-                def String dotParam = param.replaceAll("/", ".")
-                if (NF_OPTIONS.contains(param)) {
+        List<String> unexpectedParams = []
+        if (paramErrors.size() == 0) {
+            validationResult.unevaluated.each { param ->
+                String dotParam = param.replaceAll('/', '.')
+                if (nextflowOptions.contains(param)) {
+                    /* groovylint-disable-next-line LineLength */
                     errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
                 }
-                else if (!config.ignoreParams.any { dotParam == it || dotParam.startsWith(it + ".") } ) { // Check if an ignore param is present
-                    unexpectedParams << "* --${param.replaceAll("/", ".")}: ${getValueFromJsonPointer("/"+param, paramsJSON)}".toString()
+                else if (!config.ignoreParams.any { ignoreParam ->
+                    dotParam == ignoreParam || dotParam.startsWith(ignoreParam + '.')
+                }) {
+                    // Check if an ignore param is present
+                    /* groovylint-disable-next-line LineLength */
+                    unexpectedParams << "* --${dotParam}: ${getValueFromJsonPointer('/' + param, paramsJSON)}".toString()
                 }
             }
         }
 
         if (unexpectedParams.size() > 0) {
-            config.logging.unrecognisedParams.log("The following invalid input values have been detected:\n\n" + unexpectedParams.join("\n").trim() + "\n\n")
+            config.logging.unrecognisedParams.log(
+                'The following invalid input values have been detected:\n\n' +
+                unexpectedParams.join('\n').trim() + '\n\n'
+            )
         }
 
-        def List<String> modifiedIgnoreParams = config.ignoreParams.collect { param -> "* --${param}" as String }
-        def List<String> filteredErrors = errors.findAll { error -> 
+        List<String> modifiedIgnoreParams = config.ignoreParams.collect { param -> "* --${param}" as String }
+        List<String> filteredErrors = errors.findAll { error ->
             return modifiedIgnoreParams.find { param -> error.startsWith(param) } == null
         }
         if (filteredErrors.size() > 0) {
-            def msg = "${colors.red}The following invalid input values have been detected:\n\n" + filteredErrors.join('\n').trim() + "\n${colors.reset}\n"
-            log.error("Validation of pipeline parameters failed!")
-            throw new SchemaValidationException(msg, this.getErrors())
+            /* groovylint-disable-next-line LineLength */
+            String msg = "${colors.red}The following invalid input values have been detected:\n\n" + filteredErrors.join('\n').trim() + "\n${colors.reset}\n"
+            log.error('Validation of pipeline parameters failed!')
+            throw new SchemaValidationException(msg, errors)
         }
 
-        log.debug "Finishing parameters validation"
+        log.debug 'Finishing parameters validation'
     }
 
-    //
-    // Function to collect enums (options) of a parameter and expected parameters (present in the schema)
-    //
-    private Tuple collectEnums(Map schemaParams) {
-        def expectedParams = []
-        def enums = [:]
-        for (group in schemaParams) {
-            def Map properties = (Map) group.value['properties']
-            for (p in properties) {
-                def String key = (String) p.key
-                expectedParams.push(key)
-                def Map property = properties[key] as Map
-                if (property.containsKey('enum')) {
-                    enums[key] = property['enum']
-                }
-            }
-        }
-        return new Tuple (expectedParams, enums)
-    }
+    private List<String> getErrors() { return errors }
 
-    //
-    // Clean and check parameters relative to Nextflow native classes
-    //
-    private Map cleanParameters(Map params) {
-        def Map new_params = (Map) params.getClass().newInstance(params)
-        for (p in params) {
-            // remove anything evaluating to false
-            if (!p['value'] && p['value'] != 0) {
-                new_params.remove(p.key)
-            }
-            // Cast MemoryUnit to String
-            if (p['value'] instanceof MemoryUnit) {
-                new_params.replace(p.key, p['value'].toString())
-            }
-            // Cast Duration to String
-            if (p['value'] instanceof Duration) {
-                new_params.replace(p.key, p['value'].toString())
-            }
-            // Cast LinkedHashMap to String
-            if (p['value'] instanceof LinkedHashMap) {
-                new_params.replace(p.key, p['value'].toString())
-            }
-            // Parsed nested parameters
-            if (p['value'] instanceof Map) {
-                new_params.replace(p.key, cleanParameters(p['value'] as Map))
-            }
-        }
-        return new_params
-    }
+    private List<String> getWarnings() { return warnings }
 
     //
     // Initialise expected params if not present
     //
     private Map initialiseExpectedParams(Map params) {
-        getExpectedParams().each { param ->
-            params[param] = false
+        expectedParamsDefaults.each { param, defaultValue ->
+            if (!params.containsKey(param)) {
+                params[param] = defaultValue
+            }
         }
         return params
     }
 
-    //
-    // Add expected params
-    //
-    private List getExpectedParams() {
-        def List expectedParams = [
-            config.help.shortParameter,
-            config.help.fullParameter,
-            config.help.showHiddenParameter
-        ]
-
-        return expectedParams
-    }
 }

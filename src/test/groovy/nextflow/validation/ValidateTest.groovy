@@ -1,4 +1,9 @@
+/* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
+
+import static test.ScriptHelper.runScript
+
+import groovy.transform.CompileDynamic
 
 import java.nio.file.Path
 
@@ -11,331 +16,343 @@ import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
 import test.Dsl2Spec
 import test.OutputCapture
-import test.MockScriptRunner
 
 import nextflow.validation.exceptions.SchemaValidationException
 
 import java.nio.file.Files
-import java.nio.file.Path
 import java.util.jar.Manifest
 
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  * @author : jorgeaguileraseqera
  */
-class ValidateTest extends Dsl2Spec{
+
+@CompileDynamic
+class ValidateTest extends Dsl2Spec {
 
     @Rule
-    OutputCapture capture = new OutputCapture()
+    final private OutputCapture capture = new OutputCapture()
 
+    @Shared 
+    private String pluginsMode
 
-    @Shared String pluginsMode
+    final private Path root = Path.of('.').toAbsolutePath().normalize()
 
-    Path root = Path.of('.').toAbsolutePath().normalize()
-    Path getRoot() { this.root }
-    String getRootString() { this.root.toString() }
-
-    def setup() {
+    void setup() {
         // reset previous instances
         PluginExtensionProvider.reset()
         // this need to be set *before* the plugin manager class is created
         pluginsMode = System.getProperty('pf4j.mode')
         System.setProperty('pf4j.mode', 'dev')
         // the plugin root should
-        def root = this.getRoot()
-        def manager = new TestPluginManager(root){
+        TestPluginManager manager = new TestPluginManager(root){
+
             @Override
             protected PluginDescriptorFinder createPluginDescriptorFinder() {
                 return new TestPluginDescriptorFinder(){
+
                     @Override
                     protected Manifest readManifestFromDirectory(Path pluginPath) {
-                        def manifestPath = getManifestPath(pluginPath)
-                        final input = Files.newInputStream(manifestPath)
+                        Path manifestPath = getManifestPath(pluginPath)
+                        InputStream input = Files.newInputStream(manifestPath)
                         return new Manifest(input)
                     }
                     protected Path getManifestPath(Path pluginPath) {
                         return pluginPath.resolve('build/tmp/jar/MANIFEST.MF')
                     }
+
                 }
             }
+
         }
         Plugins.init(root, 'dev', manager)
     }
 
-    def cleanup() {
+    void cleanup() {
         Plugins.stop()
         PluginExtensionProvider.reset()
-        pluginsMode ? System.setProperty('pf4j.mode',pluginsMode) : System.clearProperty('pf4j.mode')
+        pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
-    def 'should validate a map - success' () {
+    void 'should validate a map - success'() {
         given:
-        def SCRIPT = """
+        String script = """
             include { validate } from 'plugin/nf-schema'
-            
-            def input = [
-                this: [
-                    is: [
-                        so: [
-                            deep: true
+            workflow {
+                def input = [
+                    map: [
+                        is: [
+                            so: [
+                                deep: true
+                            ]
                         ]
                     ]
                 ]
-            ]
 
-            validate(input, 'src/testResources/nextflow_schema_nested_parameters.json')
+                validate(input, 'src/testResources/nextflow_schema_nested_parameters.json')
+            }
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        Map config = ['validation': [
+            'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        runScript(config, script)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a map - failure' () {
+    void 'should validate a map - failure'() {
         given:
-        def SCRIPT = """
+        String script = """
             include { validate } from 'plugin/nf-schema'
-            
-            def input = [
-                this: [
-                    is: [
-                        so: [
-                            deep: "a wrong string"
+            workflow {
+                def input = [
+                    map: [
+                        is: [
+                            so: [
+                                deep: "a wrong string"
+                            ]
                         ]
                     ]
                 ]
-            ]
 
-            validate(input, 'src/testResources/nextflow_schema_nested_parameters.json')
+                validate(input, 'src/testResources/nextflow_schema_nested_parameters.json')
+            }
         """
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        Map config = ['validation': [
+            'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        runScript(config, script)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "/this/is/so/deep (a wrong string): Value is [string] but should be [boolean]\n({\"this\":{\"is\":{\"so\":{\"deep\":\"a wrong string\"}}}}): Value does not match against the schemas at indexes [0]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '/map/is/so/deep (a wrong string): Value is [string] but should be [boolean]\n({"map":{"is":{"so":{"deep":"a wrong string"}}}}): Value does not match against the schemas at indexes [0]\n'
         !stdout
     }
 
-    def 'should validate a list - success' () {
+    void 'should validate a list - success'() {
         given:
-        def SCRIPT = """
+        String script = '''
             include { validate } from 'plugin/nf-schema'
-            
-            def input = ["value"]
+            workflow {
+                def input = ["value"]
 
-            validate(input, 'src/testResources/no_header_schema.json')
-        """
+                validate(input, 'src/testResources/no_header_schema.json')
+            }
+        '''
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        Map config = ['validation': [
+            'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        runScript(config, script)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a list - failure' () {
+    void 'should validate a list - failure'() {
         given:
-        def SCRIPT = """
+        String script = '''
             include { validate } from 'plugin/nf-schema'
-            
-            def input = [12]
+            workflow {
+                def input = [12]
 
-            validate(input, 'src/testResources/no_header_schema.json')
-        """
+                validate(input, 'src/testResources/no_header_schema.json')
+            }
+        '''
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        Map config = ['validation': [
+            'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        runScript(config, script)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "/0 (12): Value is [integer] but should be [string]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '/0 (12): Value is [integer] but should be [string]\n'
         !stdout
     }
 
-    def 'should validate a string - success' () {
+    void 'should validate a string - success'() {
         given:
-        def SCRIPT = """
+        String script = '''
             include { validate } from 'plugin/nf-schema'
-            
-            def input = "value"
+            workflow {
+                def input = "value"
 
-            validate(input, 'src/testResources/string_schema.json')
-        """
+                validate(input, 'src/testResources/string_schema.json')
+            }
+        '''
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        Map config = ['validation': [
+            'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        runScript(config, script)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
-
-        then:
-        noExceptionThrown()
-        !stdout
-    }
-
-    def 'should validate a string - failure' () {
-        given:
-        def SCRIPT = """
-            include { validate } from 'plugin/nf-schema'
-            
-            def input = 12
-
-            validate(input, 'src/testResources/string_schema.json')
-        """
-
-        when:
-        def config = ["validation": [
-            "monochromeLogs": true
-        ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
-                .toString()
-                .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
-
-        then:
-        def error = thrown(SchemaValidationException)
-        error.message == "(12): Value is [integer] but should be [string]\n"
-        !stdout
-    }
-
-    def 'should validate a integer - success' () {
-        given:
-        def SCRIPT = """
-            include { validate } from 'plugin/nf-schema'
-            
-            def input = 12
-
-            validate(input, 'src/testResources/integer_schema.json')
-        """
-
-        when:
-        def config = ["validation": [
-            "monochromeLogs": true
-        ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
-                .toString()
-                .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a integer - failure' () {
+    void 'should validate a string - failure'() {
         given:
-        def SCRIPT = """
+        String script = '''
             include { validate } from 'plugin/nf-schema'
-            
-            def input = "value"
+            workflow {
+                def input = 12
 
-            validate(input, 'src/testResources/integer_schema.json')
-        """
+                validate(input, 'src/testResources/string_schema.json')
+            }
+        '''
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        Map config = ['validation': [
+            'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        runScript(config, script)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "(value): Value is [string] but should be [integer]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '(12): Value is [integer] but should be [string]\n'
         !stdout
     }
 
-    def 'should validate a boolean - success' () {
+    void 'should validate a integer - success'() {
         given:
-        def SCRIPT = """
+        String script = '''
             include { validate } from 'plugin/nf-schema'
-            
-            def input = true
+            workflow {
+                def input = 12
 
-            validate(input, 'src/testResources/boolean_schema.json')
-        """
+                validate(input, 'src/testResources/integer_schema.json')
+            }
+        '''
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        Map config = ['validation': [
+            'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        runScript(config, script)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'should validate a boolean - failure' () {
+    void 'should validate a integer - failure'() {
         given:
-        def SCRIPT = """
+        String script = '''
             include { validate } from 'plugin/nf-schema'
-            
-            def input = "value"
+            workflow {
+                def input = "value"
 
-            validate(input, 'src/testResources/boolean_schema.json')
-        """
+                validate(input, 'src/testResources/integer_schema.json')
+            }
+        '''
 
         when:
-        def config = ["validation": [
-            "monochromeLogs": true
+        Map config = ['validation': [
+            'monochromeLogs': true
         ]]
-        def result = new MockScriptRunner(config).setScript(SCRIPT).execute()
-        def stdout = capture
+        runScript(config, script)
+        List<String> stdout = capture
                 .toString()
                 .readLines()
-                .findResults {it.contains('WARN nextflow.validation.SchemaValidator') || it.startsWith('\\') ? it : null }
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
 
         then:
-        def error = thrown(SchemaValidationException)
-        error.message == "(value): Value is [string] but should be [boolean]\n"
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '(value): Value is [string] but should be [integer]\n'
         !stdout
     }
+
+    void 'should validate a boolean - success'() {
+        given:
+        String script = '''
+            include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = true
+
+                validate(input, 'src/testResources/boolean_schema.json')
+            }
+        '''
+
+        when:
+        Map config = ['validation': [
+            'monochromeLogs': true
+        ]]
+        runScript(config, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
+
+        then:
+        noExceptionThrown()
+        !stdout
+    }
+
+    void 'should validate a boolean - failure'() {
+        given:
+        String script = '''
+            include { validate } from 'plugin/nf-schema'
+            workflow {
+                def input = "value"
+
+                validate(input, 'src/testResources/boolean_schema.json')
+            }
+        '''
+
+        when:
+        Map config = ['validation': [
+            'monochromeLogs': true
+        ]]
+        runScript(config, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> line.contains('WARN nextflow.validation.SchemaValidator') || line.startsWith('\\') ? line : null }
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '(value): Value is [string] but should be [boolean]\n'
+        !stdout
+    }
+
 }

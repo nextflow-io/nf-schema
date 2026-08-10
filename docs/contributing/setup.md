@@ -7,6 +7,12 @@ description: How to contribute to nf-schema
 
 ## Tests
 
+Optionally activate the [pixi](https://pixi.prefix.dev/latest/) environment to ensure all needed tools are available:
+
+```bash
+pixi shell
+```
+
 To run the tests use the following command:
 
 ```bash
@@ -37,6 +43,14 @@ make install
 plugins {
     id 'nf-schema@x.y.z'
 }
+```
+
+## Lint the groovy code
+
+To lint the groovy code use the following command:
+
+```bash
+prek run
 ```
 
 ## Change and preview the docs

@@ -1,16 +1,9 @@
+/* groovylint-disable LineLength, MethodName, TrailingWhitespace */
 package nextflow.validation
 
-import java.nio.file.Path
+import groovy.transform.CompileDynamic
 
-import nextflow.plugin.Plugins
-import nextflow.plugin.TestPluginDescriptorFinder
-import nextflow.plugin.TestPluginManager
-import nextflow.plugin.extension.PluginExtensionProvider
-import org.pf4j.PluginDescriptorFinder
 import nextflow.Session
-import spock.lang.Specification
-import spock.lang.Shared
-import org.slf4j.Logger
 import org.junit.Rule
 import test.Dsl2Spec
 import test.OutputCapture
@@ -20,27 +13,18 @@ import nextflow.validation.config.ValidationConfig
 /**
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
-class ConfigTest extends Dsl2Spec{
+
+@CompileDynamic
+class ConfigTest extends Dsl2Spec {
 
     @Rule
-    OutputCapture capture = new OutputCapture()
+    final private OutputCapture capture = new OutputCapture()
 
-    @Shared String pluginsMode
+    final private Session session = Mock(Session)
 
-    Path root = Path.of('.').toAbsolutePath().normalize()
-    Path getRoot() { this.root }
-    String getRootString() { this.root.toString() }
-
-    private Session session
-
-    def setup() {
-        session = Mock(Session)
-        session.getBaseDir() >> getRoot()
-    }
-
-    def 'test valid config' () {
+    void 'test valid config'() {
         given:
-        def config = [
+        Map config = [
             lenientMode: true,
             monochromeLogs: true,
             maxErrValSize: 20,
@@ -60,31 +44,31 @@ class ConfigTest extends Dsl2Spec{
                 beforeText: 'before',
                 afterText: 'after',
                 hideParams: ['some_random_param'],
+                mask: 'mask'
             ],
             logging: [
                 unrecognisedParams: 'error',
                 unrecognisedHeaders: 'error'
             ]
         ]
-        def params = [:]
 
         when:
         new ValidationConfig(config, session)
-        def stdout = capture
+        List<String> stdout = capture
             .toString()
             .readLines()
-            .findResults { it.contains('WARN') ? it : null }
+            .findResults { line -> line.contains('WARN') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'test valid config - GStrings' () {
+    void 'test valid config - GStrings'() {
         given:
-        def randomString = 'randomString'
-        def errorLevel = 'error'
-        def config = [
+        String randomString = 'randomString'
+        String errorLevel = 'error'
+        Map config = [
             lenientMode: true,
             monochromeLogs: true,
             maxErrValSize: 20,
@@ -104,33 +88,33 @@ class ConfigTest extends Dsl2Spec{
                 beforeText: "${randomString}",
                 afterText: "${randomString}",
                 hideParams: ["${randomString}"],
+                mask: "${randomString}"
             ],
             logging: [
                 unrecognisedParams: "${errorLevel}",
                 unrecognisedHeaders: "${errorLevel}"
             ]
         ]
-        def params = [:]
 
         when:
         new ValidationConfig(config, session)
-        def stdout = capture
+        List<String> stdout = capture
             .toString()
             .readLines()
-            .findResults { it.contains('WARN') ? it : null }
+            .findResults { line -> line.contains('WARN') ? line : null }
 
         then:
         noExceptionThrown()
         !stdout
     }
 
-    def 'test invalid config' () {
+    void 'test invalid config'() {
         given:
-        def config = [
+        Map config = [
             lenientMode: 'notABoolean',
             monochromeLogs: 12,
             showHiddenParams: 'notABoolean',
-            maxErrValSize: ["notAnInteger"],
+            maxErrValSize: ['notAnInteger'],
             parametersSchema: 42,
             ignoreParams: true,
             help: [
@@ -140,7 +124,7 @@ class ConfigTest extends Dsl2Spec{
                 shortParameter: false,
                 fullParameter: [im:'a_map'],
                 beforeText: true,
-                afterText: ['im','a','list'],
+                afterText: ['im', 'a', 'list'],
                 command: 0
             ],
             summary: [
@@ -153,17 +137,17 @@ class ConfigTest extends Dsl2Spec{
                 unrecognisedHeaders: 589654
             ]
         ]
-        def params = [:]
 
         when:
         new ValidationConfig(config, session)
-        def stdout = capture
+        List<String> stdout = capture
             .toString()
             .readLines()
-            .findResults { it.contains('WARN') ? it : null }
+            .findResults { line -> line.contains('WARN') ? line : null }
 
         then:
         noExceptionThrown()
         stdout
     }
+
 }

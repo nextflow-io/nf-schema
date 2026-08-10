@@ -25,7 +25,7 @@ Declare the plugin in your Nextflow pipeline configuration file:
 
 ```groovy title="nextflow.config"
 plugins {
-  id 'nf-schema@2.5.1'
+  id 'nf-schema@2.7.2'
 }
 ```
 
@@ -63,9 +63,9 @@ validation {
 
 ## Dependencies
 
-- Java 11 or later
+- Java 17 or later
 - <https://github.com/harrel56/json-schema>
-- Nextflow 24.10.0 or later
+- Nextflow 25.10.0 or later
 
 ## Slack channel
 
@@ -83,3 +83,8 @@ We would like to thank the key contributors who include (but are not limited to)
 - Kevin Menden ([@KevinMenden](https://github.com/KevinMenden))
 - Phil Ewels ([@ewels](https://github.com/ewels))
 - Arthur ([@awgymer](https://github.com/awgymer))
+- Maxime U Garcia ([@maxulysse](https://github.com/maxulysse))
+
+## License
+
+Apache License 2.0. See the [`LICENSE`](LICENSE) file for details.

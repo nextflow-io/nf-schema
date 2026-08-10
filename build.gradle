@@ -1,19 +1,22 @@
 plugins {
-    id 'io.nextflow.nextflow-plugin' version '0.0.1-alpha3'
+    id 'io.nextflow.nextflow-plugin' version '1.0.0-beta.15'
 }
 
 dependencies {
-    implementation 'org.json:json:20240303'
-    implementation 'dev.harrel:json-schema:1.5.0'
-    implementation 'com.sanctionco.jmail:jmail:1.6.3' // Needed for e-mail format validation
+    implementation 'org.json:json:20260522'
+    implementation 'dev.harrel:json-schema:1.9.1'
+    implementation 'com.sanctionco.jmail:jmail:2.1.0' // Needed for e-mail format validation
+
+    // Ensure the platform launcher is available at test runtime
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.1'
 }
 
-version = '2.5.1'
+version = '2.8.0'
 
 nextflowPlugin {
-    nextflowVersion = '25.04.0'
+    nextflowVersion = '26.04.0'
 
-    provider = 'nextflow'
+    provider = 'nextflow-io'
     className = 'nextflow.validation.ValidationPlugin'
     extensionPoints = [
         'nextflow.validation.config.ValidationConfig',
@@ -21,18 +24,8 @@ nextflowPlugin {
         'nextflow.validation.ValidationObserverFactory'
     ]
 
-    publishing {
-        github {
-            repository = 'nextflow-io/nf-schema'
-            userName = project.findProperty('github_username')
-            authToken = project.findProperty('github_access_token')
-            email = project.findProperty('github_commit_email')
-
-            indexUrl = 'https://github.com/nextflow-io/plugins/blob/main/plugins.json'
-        }
-    }
-
     test {
+        useJUnitPlatform()
         jvmArgs += [
             '--add-opens', 'java.base/sun.net.www.protocol.ftp=ALL-UNNAMED'
         ]

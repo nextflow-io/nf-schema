@@ -4,21 +4,22 @@ import nextflow.Session
 import nextflow.trace.TraceObserverV2
 
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileDynamic
 
 /**
- * An observer for initial checks that always need to be run at the start of the pipeline 
+ * An observer for initial checks that always need to be run at the start of the pipeline
  *
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
 
-
 @Slf4j
+@CompileDynamic
 class ValidationObserver implements TraceObserverV2 {
-    
+
     @Override
     void onFlowCreate(Session session) {
-        def plugins = session?.config?.navigate("plugins") as ArrayList
-        if(plugins?.contains("nf-schema")) {
+        List<String> plugins = session?.config?.navigate('plugins') as List<String>
+        if (plugins?.contains('nf-schema')) {
             log.warn("""
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                                 !
@@ -37,4 +38,5 @@ class ValidationObserver implements TraceObserverV2 {
             """)
         }
     }
+
 }

@@ -326,6 +326,10 @@ For example, this pattern only validates if the supplied string ends in `.fastq`
 }
 ```
 
+!!! note
+
+    For values with a `file-path`, `directory-path` or `path` format, a value that does not match the pattern is retried against its resolved real path (e.g. the storage location a proxy filesystem resolves to) if the value points to a non-local filesystem. Local paths and symbolic links are never resolved.
+
 ### `minLength`, `maxLength`
 
 Specify a minimum / maximum string length with `minLength` and `maxLength`.
