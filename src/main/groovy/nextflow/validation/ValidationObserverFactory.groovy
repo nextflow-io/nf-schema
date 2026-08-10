@@ -4,8 +4,6 @@ import nextflow.Session
 import nextflow.trace.TraceObserverV2
 import nextflow.trace.TraceObserverFactoryV2
 
-import nextflow.validation.help.HelpObserver
-
 import groovy.transform.CompileDynamic
 
 /**

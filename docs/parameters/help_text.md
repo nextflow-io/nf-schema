@@ -205,4 +205,3 @@ If you prefer, you can disable these by setting the `validation.monochromeLogs` 
 === "Monochrome logs"
 
     ![Default help output](../images/help_monochrome_logs.png)
-
