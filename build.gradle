@@ -11,7 +11,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.1'
 }
 
-version = '2.8.0'
+version = '3.0.0'
 
 nextflowPlugin {
     nextflowVersion = '26.04.0'

@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 3.0.0
+
+## Removed
+
+1. Removed support for help message creation via configuration. Use the `paramsHelp()` function instead. All configuration options (except for `validation.help.enabled`) are still available and will still change the output of the `paramsHelp()` function
+
 # Version 2.8.0
 
 ## Changes
