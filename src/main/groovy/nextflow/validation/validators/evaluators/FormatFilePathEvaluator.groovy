@@ -28,7 +28,6 @@ class FormatFilePathEvaluator implements Evaluator {
 
         String value = node.asString()
         Path file
-
         try {
             file = Nextflow.file(value) as Path
             if (!(file in List)) {
@@ -44,6 +43,10 @@ class FormatFilePathEvaluator implements Evaluator {
         }
         /* groovylint-disable-next-line UnnecessaryGetter */
         if (file.exists() && file.isDirectory()) {
+            // If it's an Azure storage path, skip directoryvalidation
+            if (value.startsWith('az://')) {
+                return Evaluator.Result.success()
+            }
             return Evaluator.Result.failure("'${value}' is not a file, but a directory" as String)
         }
         return Evaluator.Result.success()

@@ -47,10 +47,17 @@ class SchemaEvaluator implements Evaluator {
 
         // Actual validation logic
         Path file = Nextflow.file(value)
-        // Don't validate if the file does not exist or is a directory
+
+        // Don't validate if the file does not exist
+        if (!file.exists()) {
+            log.debug("Could not validate the file ${file} - file does not exist")
+            return Evaluator.Result.success()
+        }
+
+        // Skip validation if it's a directory
         /* groovylint-disable-next-line UnnecessaryGetter */
-        if (!file.exists() || file.isDirectory()) {
-            log.debug("Could not validate the file ${file}")
+        if (file.isDirectory() || value.startsWith('az://')) {
+            log.debug("Could not validate the file ${file} - path is a directory")
             return Evaluator.Result.success()
         }
 

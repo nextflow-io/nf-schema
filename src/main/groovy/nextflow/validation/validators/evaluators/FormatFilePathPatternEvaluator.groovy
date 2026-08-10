@@ -27,8 +27,8 @@ class FormatFilePathPatternEvaluator implements Evaluator {
         }
 
         String value = node.asString()
-        List<Path> files
 
+        List<Path> files
         try {
             files = Nextflow.files(value)
             files.each { file ->
@@ -45,7 +45,7 @@ class FormatFilePathPatternEvaluator implements Evaluator {
         }
         files.each { file ->
             /* groovylint-disable-next-line UnnecessaryGetter */
-            if (file.isDirectory()) {
+            if (file.isDirectory() && !file.toString().startsWith('az://')) {
                 errors.add("'${file.string}' is not a file, but a directory" as String)
             }
         }
