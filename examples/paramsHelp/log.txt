@@ -1,9 +1,10 @@
 
- N E X T F L O W   ~  version 25.04.6
+ N E X T F L O W   ~  version 26.04.4
 
-Launching `examples/paramsHelp/pipeline/main.nf` [kickass_miescher] DSL2 - revision: 5c681b32ca
+Launching `examples/paramsHelp/pipeline/main.nf` [condescending_faggin] revision: df33e40799
 
-This is a help message for the pipeline.Typical pipeline command:
+This is a help message for the pipeline.
+Typical pipeline command:
 
   nextflow run main.nf
 
@@ -14,3 +15,4 @@ Input/output options
   --help       [boolean] Show the help message for the pipeline. [default: false] 
 ------------------------------------------------------
 Done with the help message.
+

@@ -1,16 +1,59 @@
 ## Configure help message
 
-Add the following configuration to your configuration files to enable the creation of help messages:
+The `paramsHelp()` function returns a help message with the command to run a pipeline and the available parameters.
+Pass it to `log.info` to print in the terminal.
 
-```groovy title="nextflow.config"
-validation {
-    help {
-        enabled = true
-    }
-}
+The function takes the following options to customize the help message:
+
+- `parameter`: A specific parameter to print the help message of. Will print the full message if this option is empty.
+- `parametersSchema`: Path to the JSON schema to get the help message from. Defaults to the schema defined in the `validation.parametersSchema` configuration option (which is `nextflow_schema.json` by default).
+- `beforeText`: Text to print before the help message. Defaults to the `validation.help.beforeText` configuration option.
+- `afterText`: Text to print after the help message. Defaults to the `validation.help.afterText` configuration option.
+- `command`: Command to print before the help message. Defaults to the `validation.help.command` configuration option.
+- `showHidden`: Whether to show hidden parameters in the help message. Defaults to `false`.
+- `fullHelp`: Whether to show the full help message (including all parameters, even those that are not top-level). Defaults to `false`.
+
+!!! Note
+
+    `paramsHelp()` doesn't stop pipeline execution after running.
+    You must add this into your pipeline code if it's the desired functionality.
+
+Typical usage:
+
+=== "main.nf"
+
+    ```groovy
+    --8<-- "examples/paramsHelp/pipeline/main.nf"
+    ```
+
+=== "nextflow.config"
+
+    ```groovy
+    --8<-- "examples/paramsHelp/pipeline/nextflow.config"
+    ```
+
+=== "nextflow_schema.json"
+
+    ```json
+    --8<-- "examples/paramsHelp/pipeline/nextflow_schema.json"
+    ```
+
+Output with `--help`:
+
+```
+--8<-- "examples/paramsHelp/log.txt"
 ```
 
-That's it! Every time the pipeline user passes the `--help` and `--helpFull` parameters to the pipeline, the help message will be created!
+Output with `--help outdir`:
+
+```
+--8<-- "examples/paramsHelp/log_outdir.txt"
+```
+
+!!! warning
+
+    We shouldn't be using `exit` as it kills the Nextflow head job in a way that is difficult to handle by systems that may be running it externally, but at the time of writing there is no good alternative.
+    See [`nextflow-io/nextflow#3984`](https://github.com/nextflow-io/nextflow/issues/3984).
 
 The help message can be customized with a series of different options. See [help configuration](../configuration/configuration.md#help) docs for a list of all options.
 
@@ -162,59 +205,3 @@ If you prefer, you can disable these by setting the `validation.monochromeLogs` 
 === "Monochrome logs"
 
     ![Default help output](../images/help_monochrome_logs.png)
-
-## `paramsHelp()`
-
-This function returns a help message with the command to run a pipeline and the available parameters.
-Pass it to `log.info` to print in the terminal.
-
-The function takes one optional positional argument, which can be a parameter name to get the help message for. Additionally, it accepts the following options to customize the help message:
-
-- `parametersSchema`: Path to the JSON schema to get the help message from. Defaults to the schema defined in the `validation.parametersSchema` configuration option (which is `nextflow_schema.json` by default).
-- `beforeText`: Text to print before the help message. Defaults to the `validation.help.beforeText` configuration option.
-- `afterText`: Text to print after the help message. Defaults to the `validation.help.afterText` configuration option.
-- `command`: Command to print before the help message. Defaults to the `validation.help.command` configuration option.
-- `showHidden`: Whether to show hidden parameters in the help message. Defaults to `false`.
-- `fullHelp`: Whether to show the full help message (including all parameters, even those that are not top-level). Defaults to `false`.
-
-!!! Note
-
-    `paramsHelp()` doesn't stop pipeline execution after running.
-    You must add this into your pipeline code if it's the desired functionality.
-
-Typical usage:
-
-=== "main.nf"
-
-    ```groovy
-    --8<-- "examples/paramsHelp/pipeline/main.nf"
-    ```
-
-=== "nextflow.config"
-
-    ```groovy
-    --8<-- "examples/paramsHelp/pipeline/nextflow.config"
-    ```
-
-=== "nextflow_schema.json"
-
-    ```json
-    --8<-- "examples/paramsHelp/pipeline/nextflow_schema.json"
-    ```
-
-Output with `--help`:
-
-```
---8<-- "examples/paramsHelp/log.txt"
-```
-
-Output with `--help outdir`:
-
-```
---8<-- "examples/paramsHelp/log_outdir.txt"
-```
-
-!!! warning
-
-    We shouldn't be using `exit` as it kills the Nextflow head job in a way that is difficult to handle by systems that may be running it externally, but at the time of writing there is no good alternative.
-    See [`nextflow-io/nextflow#3984`](https://github.com/nextflow-io/nextflow/issues/3984).

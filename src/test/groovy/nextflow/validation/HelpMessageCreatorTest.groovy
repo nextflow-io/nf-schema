@@ -24,10 +24,7 @@ class HelpMessageCreatorTest extends Specification {
         given:
         Map validationConfig = [
             monochromeLogs: true,
-            parametersSchema: 'src/testResources/nextflow_schema.json',
-            help: [
-                enabled: true
-            ]
+            parametersSchema: 'src/testResources/nextflow_schema.json'
         ]
         ValidationConfig config = new ValidationConfig(validationConfig, session)
         HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
@@ -69,7 +66,6 @@ Reference genome options
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
-                enabled: true,
                 showHidden: true
             ]
         ]
@@ -145,7 +141,6 @@ copyNoFollow, move) [default: copy]
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
-                enabled: true,
                 showHiddenParameter: 'showMeThoseHiddenParams'
             ]
         ]
@@ -225,10 +220,7 @@ copyNoFollow, move) [default: copy]
         given:
         Map validationConfig = [
             monochromeLogs: true,
-            parametersSchema: 'src/testResources/nextflow_schema_nested_parameters.json',
-            help: [
-                enabled: true
-            ]
+            parametersSchema: 'src/testResources/nextflow_schema_nested_parameters.json'
         ]
         ValidationConfig config = new ValidationConfig(validationConfig, session)
         HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
@@ -260,10 +252,7 @@ Nested Parameters
         given:
         Map validationConfig = [
             monochromeLogs: true,
-            parametersSchema: 'src/testResources/nextflow_schema_nested_parameters.json',
-            help: [
-                enabled: true
-            ]
+            parametersSchema: 'src/testResources/nextflow_schema_nested_parameters.json'
         ]
         ValidationConfig config = new ValidationConfig(validationConfig, session)
         HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
@@ -291,10 +280,7 @@ Nested Parameters
         given:
         Map validationConfig = [
             monochromeLogs: true,
-            parametersSchema: 'src/testResources/nextflow_schema.json',
-            help: [
-                enabled: true
-            ]
+            parametersSchema: 'src/testResources/nextflow_schema.json'
         ]
         ValidationConfig config = new ValidationConfig(validationConfig, session)
         HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
@@ -330,11 +316,9 @@ docs](https://nf-co.re/testpipeline/usage#samplesheet-input).
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
-                enabled: true,
                 command: 'nextflow run test/test --profile test,docker --outdir results',
                 beforeText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
-Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
-'''
+Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.'''
             ]
         ]
         ValidationConfig config = new ValidationConfig(validationConfig, session)
@@ -366,7 +350,6 @@ Typical pipeline command:
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
-                enabled: true,
                 beforeText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
 '''
@@ -398,7 +381,6 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
-                enabled: true,
                 afterText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
 Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
 '''
@@ -429,10 +411,7 @@ Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec cons
         given:
         Map validationConfig = [
             monochromeLogs: true,
-            parametersSchema: 'src/testResources/nextflow_schema.json',
-            help: [
-                enabled: true
-            ]
+            parametersSchema: 'src/testResources/nextflow_schema.json'
         ]
         ValidationConfig config = new ValidationConfig(validationConfig, session)
         HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
@@ -475,10 +454,7 @@ Reference genome options
         given:
         Map validationConfig = [
             monochromeLogs: true,
-            parametersSchema: 'src/testResources/nextflow_schema_no_type.json',
-            help: [
-                enabled: true
-            ]
+            parametersSchema: 'src/testResources/nextflow_schema_no_type.json'
         ]
         ValidationConfig config = new ValidationConfig(validationConfig, session)
         HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
@@ -510,10 +486,7 @@ or `--helpFull`.
         given:
         Map validationConfig = [
             monochromeLogs: true,
-            parametersSchema: 'src/testResources/nextflow_schema_with_samplesheet.json',
-            help: [
-                enabled: true
-            ]
+            parametersSchema: 'src/testResources/nextflow_schema_with_samplesheet.json'
         ]
         ValidationConfig config = new ValidationConfig(validationConfig, session)
         HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
@@ -564,7 +537,6 @@ Fields:
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
-                enabled: true,
                 enumLength: 10,
                 showHidden: true
             ]
@@ -587,7 +559,6 @@ Fields:
             monochromeLogs: true,
             parametersSchema: 'src/testResources/nextflow_schema.json',
             help: [
-                enabled: true,
                 enumLength: -1,
                 showHidden: true
             ]
