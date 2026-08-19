@@ -8,6 +8,7 @@ This version contains some breaking changes to the nf-schema API. See the [migra
 
 1. Removed support for help message creation via configuration. Use the `paramsHelp()` function instead. All configuration options (except for `validation.help.enabled`) are still available and will still change the output of the `paramsHelp()` function
 2. Removed the positional argument from `paramsHelp()` and moved to the a named option called `parameter`
+3. Removed the positional argument from `paramsSummaryLog()` and `paramsSummaryMap()` functions. This data is now fetched from the pipeline session itself.
 
 ## Bug fixes
 
