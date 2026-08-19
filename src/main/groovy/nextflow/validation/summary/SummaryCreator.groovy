@@ -95,7 +95,8 @@ class SummaryCreator {
                     )
                     continue
                 }
-                String value = params.get(param)
+                Object rawValue = params.get(param)
+                String value = rawValue in Path ? rawValue.toUriString() : rawValue?.toString()
                 String defaultValue = schema.get('default')
                 String type = schema.type
                 if (defaultValue != null && type == 'string') {
@@ -120,7 +121,7 @@ class SummaryCreator {
                 }
 
                 // We have a default in the schema, and this isn't it
-                if (defaultValue != null && value != defaultValue) {
+                if (defaultValue != null && value != defaultValue && value != null) {
                     summary.put(param, maybeMask(value))
                 }
                 // No default in the schema, and this isn't empty or false

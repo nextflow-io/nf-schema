@@ -16,11 +16,7 @@ This function returns a string that can be logged to the terminal, summarizing t
     This feature is essential for users to verify their configurations, like checking for typos or confirming proper resolution,
     without wading through an array of default settings.
 
-The function takes one required argument:
-
-- The `WorkflowMetadata` object, `workflow` (required)
-
-And optional arguments:
+This function takes following optional arguments:
 
 - `parameters_schema`: File name of a schema file (optional, default: `nextflow_schema.json`).
 - `monochrome_logs`: Boolean to disable coloured logs (optional, default: `false`).
@@ -74,7 +70,7 @@ If you prefer, you can disable these by using the argument monochrome_logs, e.g.
 This function returns a Groovy Map summarizing parameters/workflow options used by the pipeline.
 As above, it **only** returns the provided parameters that are **different** to the default values.
 
-This function takes the same arguments as `paramsSummaryLog()`: the `workflow` object and an optional schema file path.
+This function takes the same arguments as [`paramsSummaryLog()`](#paramssummarylog).
 
 !!! note
 

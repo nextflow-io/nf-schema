@@ -80,7 +80,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
             params.outdir = "outDir"
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
-                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
                 log.info summary_params
             }
         """
@@ -119,7 +119,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
             params.map = [is: [so: [deep: "changed_value"]]]
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
-                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
                 log.info summary_params
             }
         """
@@ -168,7 +168,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
             params.outdir = "outDir"
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
-                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
                 log.info summary_params
             }
         """
@@ -217,7 +217,6 @@ class ParamsSummaryLogTest extends Dsl2Spec {
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
                 def summary_params = paramsSummaryLog(
-                    workflow,
                     parameters_schema: '${schema}',
                     beforeText: "This text is printed before \\n",
                     afterText: "\\nThis text is printed after"
@@ -263,7 +262,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
             params.map = [is: [so: [deep: "changed_value"]]]
             include { paramsSummaryLog } from 'plugin/nf-schema'
             workflow {
-                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
                 log.info summary_params
             }
         """
@@ -317,7 +316,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
             include { paramsSummaryLog } from 'plugin/nf-schema'
             params.outdir = "outDir"
             workflow {
-                def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
                 log.info summary_params
             }
         """
@@ -361,7 +360,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         include { paramsSummaryLog } from 'plugin/nf-schema'
         params.outdir = "s3://bucket/outDir"
         workflow {
-            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+            def summary_params = paramsSummaryLog(parameters_schema: '$schema')
             log.info summary_params
         }
         """
@@ -408,7 +407,7 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         include { paramsSummaryLog } from 'plugin/nf-schema'
         params.outdir = "s3://bucket/outDir"
         workflow {
-            def summary_params = paramsSummaryLog(workflow, parameters_schema: '$schema')
+            def summary_params = paramsSummaryLog(parameters_schema: '$schema')
             log.info summary_params
         }
         """

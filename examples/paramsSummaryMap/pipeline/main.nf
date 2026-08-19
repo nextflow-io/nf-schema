@@ -1,7 +1,7 @@
 include { paramsSummaryMap } from 'plugin/nf-schema'
 
 workflow {
-    paramsMap = paramsSummaryMap(workflow)
+    paramsMap = paramsSummaryMap()
     prettyPrint(paramsMap)
 }
 

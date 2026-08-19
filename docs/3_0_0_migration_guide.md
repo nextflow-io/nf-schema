@@ -30,3 +30,21 @@ The `paramsHelp()` function no longer takes an optional positional argument. Ple
     ```groovy
     log.info paramsHelp(parameter: 'input')
     ```
+
+## Changes to `paramsSummaryMap` and `paramsSummaryLog`
+
+The `paramsSummaryMap` and `paramsSummaryLog` function no longer take the workflow object as their input. This object is now automatically fetched from the running session.
+
+=== "2.x"
+
+    ```groovy
+    paramsSummaryMap(workflow)
+    paramsSummaryLog(workflow)
+    ```
+
+=== "3.x"
+
+    ```groovy
+    paramsSummaryMap()
+    paramsSummaryLog()
+    ```

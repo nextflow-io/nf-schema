@@ -16,7 +16,6 @@ import java.nio.file.Path
 import nextflow.Nextflow
 import nextflow.plugin.extension.Function
 import nextflow.plugin.extension.PluginExtensionPoint
-import nextflow.script.WorkflowMetadata
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
@@ -190,25 +189,23 @@ class ValidationExtension extends PluginExtensionPoint {
     //
     @Function
     Map paramsSummaryMap(
-        Map options = null,
-        WorkflowMetadata workflow
-        ) {
+        Map options = [:]
+    ) {
         SummaryCreator creator = new SummaryCreator(config)
         return creator.getSummaryMap(
             options,
-            workflow,
-            session.baseDir.toString(),
+            session.workflowMetadata,
+            session.baseDir?.toUriString(),
             session.params
         )
-        }
+    }
 
     //
     // Beautify parameters for summary and return as string
     //
     @Function
     String paramsSummaryLog(
-        Map options = [:],
-        WorkflowMetadata workflow
+        Map options = [:]
     ) {
         String schemaFilename = options.get('parameters_schema') ?: config.parametersSchema
         String beforeText = options?.get('beforeText') as String ?: config.summary.beforeText ?: ''
@@ -217,7 +214,7 @@ class ValidationExtension extends PluginExtensionPoint {
         Map<String, String> colors = getLogColors(config.monochromeLogs)
         String output  = ''
         output += beforeText
-        Map paramsMap = paramsSummaryMap(workflow, parameters_schema: schemaFilename)
+        Map paramsMap = paramsSummaryMap(parameters_schema: schemaFilename)
         Map containers = paramsMap.get('Core Nextflow options')?.get('container')
         if (containers) {
             log.debug "Containers specified in config:\n${containers.collect { entry ->
