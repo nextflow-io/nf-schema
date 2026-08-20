@@ -29,7 +29,7 @@ class UniqueEntriesEvaluator implements Evaluator {
             return Evaluator.Result.success()
         }
 
-        Set<Tuple> uniques = []
+        Set<List<String>> uniques = []
         Integer count = 0
         Evaluator.Result result = Evaluator.Result.success()
         node.asArray().any { nodeEntry ->
@@ -37,11 +37,8 @@ class UniqueEntriesEvaluator implements Evaluator {
             if (!nodeEntry.object) {
                 return true
             }
-            Map filteredNodes = nodeEntry.asObject().subMap(uniqueEntries)
-            List<String> uniqueValues = filteredNodes.collect { k, v -> "${k}:${v.asString()}" as String }
-            Tuple nodeTup = filteredNodes ?
-                Tuple.tuple(uniqueValues.toArray()) :
-                Tuple.tuple()
+            Map<String,JsonNode> filteredNodes = nodeEntry.asObject().subMap(uniqueEntries)
+            List<String> nodeTup = filteredNodes.collect { k, v -> "${k}:${v.asString()}" as String }
             if (nodeTup && nodeTup in uniques) {
                 result = Evaluator.Result.failure("Entry ${count}: Detected duplicate entries: ${nodeTup}" as String)
                 return true

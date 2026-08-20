@@ -80,7 +80,7 @@ class HelpMessageCreator {
                 }
             }
         } else {
-            helpMessage = groupHelpString
+            helpMessage = getGroupHelpString(false)
         }
         return helpMessage
     }
@@ -198,15 +198,11 @@ class HelpMessageCreator {
     private List<String> getHelpListParams(Map<String,Map> params, Integer maxChars, String parentParameter = '') {
         List<String> helpMessage = []
         Integer typeMaxChars = longestStringLength(params.collect { key, value ->
-            Object type = value.get('type', '')
-            return (type in String && ((String) type).length() > 0 ? "[${type}]" : type) as String
-        } as List<String>)
+            formatType(value['type'])
+        })
         for (String paramName in params.keySet()) {
             Map paramOptions = params.get(paramName) as Map
-            Object paramType = paramOptions.get('type', '')
-            String type = paramType in String && paramType.length() > 0 ?
-                '[' + paramType + ']' :
-                paramType as String
+            String type = formatType(paramOptions['type'])
             String enumsString = ''
             if (paramOptions.enum != null) {
                 List enums = (List) paramOptions.enum
@@ -240,6 +236,21 @@ class HelpMessageCreator {
             )
         }
         return helpMessage
+    }
+
+    //
+    // Format the type of a parameter for the help message.
+    // Single types are wrapped in brackets, lists of types already render their own brackets.
+    //
+    private static String formatType(Object type) {
+        if (type == null) {
+            return ''
+        }
+        if (type in String) {
+            String typeString = (String) type
+            return typeString.length() > 0 ? '[' + typeString + ']' : typeString
+        }
+        return type.toString()
     }
 
     //

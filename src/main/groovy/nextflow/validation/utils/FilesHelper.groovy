@@ -137,6 +137,9 @@ public class FilesHelper {
 
         // Obtain the type of each variable in the schema
         Map properties = (Map) (schema['items'] ? schema['items']['properties'] : schema['properties'])
+        if (properties == null) {
+            return types
+        }
         properties.each { p ->
             String key = (String) p.key
             Map property = properties[key] as Map
