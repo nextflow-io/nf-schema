@@ -29,6 +29,7 @@ class AssetsHelper {
             JSONObject schemaJson = new JSONObject(schemaPath.text)
             schemaMap = schemaJson.toMap()
         } else {
+            schemaMap = [:]
             log.warn("nextflow_schema.json not found at: ${schemaPath.toUriString()}")
         }
         this.colors = getLogColors(monochromeLogs)

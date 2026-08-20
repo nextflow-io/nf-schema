@@ -51,22 +51,26 @@ class SamplesheetConverter {
 
         Map colors = getLogColors(config.monochromeLogs)
 
+        String schemaName = schemaFile.toUriString()
+        String samplesheetName = samplesheetFile.toUriString()
+
         // Some checks before validating
         if (!schemaFile.exists()) {
-            String msg = "${colors.red}JSON schema file ${schemaFile} does not exist\n${colors.reset}\n"
+            String msg = "${colors.red}JSON schema file ${schemaName} does not exist\n${colors.reset}\n"
             throw new SchemaValidationException(msg)
         }
 
+        // JsonSlurper retains the order specified in the JSON schema. This is important for the samplesheet conversion.
         Map schemaMap = new JsonSlurper().parseText(schemaFile.text) as Map
         List<String> schemaKeys = schemaMap.keySet() as List<String>
         if (schemaKeys.contains('properties') || !schemaKeys.contains('items')) {
             /* groovylint-disable-next-line LineLength */
-            String msg = "${colors.red}The schema for '${samplesheetFile}' (${schemaFile}) is not valid. Please make sure that 'items' is the top level keyword and not 'properties'\n${colors.reset}\n"
+            String msg = "${colors.red}The schema for '${samplesheetName}' (${schemaName}) is not valid. Please make sure that 'items' is the top level keyword and not 'properties'\n${colors.reset}\n"
             throw new SchemaValidationException(msg)
         }
 
         if (!samplesheetFile.exists()) {
-            String msg = "${colors.red}Samplesheet file ${samplesheetFile} does not exist\n${colors.reset}\n"
+            String msg = "${colors.red}Samplesheet file ${samplesheetName} does not exist\n${colors.reset}\n"
             throw new SchemaValidationException(msg)
         }
 
@@ -79,7 +83,7 @@ class SamplesheetConverter {
         List<String> validationErrors = validationResult.getErrors('field')
         if (validationErrors) {
             /* groovylint-disable-next-line LineLength */
-            String msg = "${colors.red}The following errors have been detected in ${samplesheetFile}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
+            String msg = "${colors.red}The following errors have been detected in ${samplesheetName}:\n\n" + validationErrors.join('\n').trim() + "\n${colors.reset}\n"
             log.error('Validation of samplesheet failed!')
             throw new SchemaValidationException(msg, validationErrors)
         }
@@ -99,7 +103,7 @@ class SamplesheetConverter {
             return result
         }
 
-        logUnrecognisedHeaders(samplesheetFile.toString())
+        logUnrecognisedHeaders(samplesheetName)
 
         return channelFormat
     }

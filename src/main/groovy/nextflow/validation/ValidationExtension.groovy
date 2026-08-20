@@ -195,7 +195,7 @@ class ValidationExtension extends PluginExtensionPoint {
         return creator.getSummaryMap(
             options,
             session.workflowMetadata,
-            session.baseDir?.toUriString(),
+            session.baseDir,
             session.params
         )
     }

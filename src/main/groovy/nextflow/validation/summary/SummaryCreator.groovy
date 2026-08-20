@@ -30,7 +30,7 @@ class SummaryCreator {
     Map getSummaryMap(
         Map options,
         WorkflowMetadata workflow,
-        String baseDir,
+        Path baseDir,
         Map params
     ) {
         String schemaFilename = options?.containsKey('parameters_schema') ?
