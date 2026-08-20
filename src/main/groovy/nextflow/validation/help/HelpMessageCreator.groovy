@@ -9,8 +9,6 @@ import static nextflow.validation.utils.Common.getLongestKeyLength
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 
-import java.nio.file.Path
-
 import nextflow.Session
 
 import nextflow.validation.config.ValidationConfig
@@ -107,6 +105,21 @@ class HelpMessageCreator {
         afterText += "-${colors.dim}----------------------------------------------------${colors.reset}-\n"
         afterText += config.help.afterText + '\n'
         return afterText
+    }
+
+    //
+    // Format the type of a parameter for the help message.
+    // Single types are wrapped in brackets, lists of types already render their own brackets.
+    //
+    private static String formatType(Object type) {
+        if (type == null) {
+            return ''
+        }
+        if (type in String) {
+            String typeString = (String) type
+            return typeString.length() > 0 ? '[' + typeString + ']' : typeString
+        }
+        return type.toString()
     }
 
     //
@@ -236,21 +249,6 @@ class HelpMessageCreator {
             )
         }
         return helpMessage
-    }
-
-    //
-    // Format the type of a parameter for the help message.
-    // Single types are wrapped in brackets, lists of types already render their own brackets.
-    //
-    private static String formatType(Object type) {
-        if (type == null) {
-            return ''
-        }
-        if (type in String) {
-            String typeString = (String) type
-            return typeString.length() > 0 ? '[' + typeString + ']' : typeString
-        }
-        return type.toString()
     }
 
     //
