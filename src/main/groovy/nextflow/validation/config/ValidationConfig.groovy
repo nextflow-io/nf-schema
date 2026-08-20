@@ -1,7 +1,7 @@
 package nextflow.validation.config
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import nextflow.Session
 import nextflow.config.spec.ConfigOption
@@ -16,7 +16,7 @@ import nextflow.script.dsl.Description
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 @ScopeName('validation')
 @Description('''
     The `validation` scope allows you to configure the `nf-schema` plugin.
@@ -84,7 +84,7 @@ A list of default parameters to ignore during validation. This option should onl
         // lenientMode
         if (config.containsKey('lenientMode')) {
             if (config.lenientMode in Boolean) {
-                lenientMode = config.lenientMode
+                lenientMode = config.lenientMode as Boolean
                 log.debug("Set `validation.lenientMode` to ${lenientMode}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -99,33 +99,11 @@ A list of default parameters to ignore during validation. This option should onl
                 monochromeLogs = !ansiLog
                 log.debug("Set `validation.monochromeLogs` to ${monochromeLogs} due to the ANSI log settings.")
             } else if (config.monochromeLogs in Boolean) {
-                monochromeLogs = config.monochromeLogs
+                monochromeLogs = config.monochromeLogs as Boolean
                 log.debug("Set `validation.monochromeLogs` to ${monochromeLogs}")
             } else {
                 /* groovylint-disable-next-line LineLength */
                 log.warn("Incorrect value detected for `validation.monochromeLogs`, a boolean is expected. Defaulting to `${monochromeLogs}`")
-            }
-        }
-
-        // failUnrecognisedParams
-        if (config.containsKey('failUnrecognisedParams')) {
-            if (config.failUnrecognisedParams in Boolean) {
-                failUnrecognisedParams = config.failUnrecognisedParams
-                log.debug("Set `validation.failUnrecognisedParams` to ${failUnrecognisedParams}")
-            } else {
-                /* groovylint-disable-next-line LineLength */
-                log.warn("Incorrect value detected for `validation.failUnrecognisedParams`, a boolean is expected. Defaulting to `${failUnrecognisedParams}`")
-            }
-        }
-
-        // failUnrecognisedHeaders
-        if (config.containsKey('failUnrecognisedHeaders')) {
-            if (config.failUnrecognisedHeaders in Boolean) {
-                failUnrecognisedHeaders = config.failUnrecognisedHeaders
-                log.debug("Set `validation.failUnrecognisedHeaders` to ${failUnrecognisedHeaders}")
-            } else {
-                /* groovylint-disable-next-line LineLength */
-                log.warn("Incorrect value detected for `validation.failUnrecognisedHeaders`, a boolean is expected. Defaulting to `${failUnrecognisedHeaders}`")
             }
         }
 
@@ -134,7 +112,7 @@ A list of default parameters to ignore during validation. This option should onl
             /* groovylint-disable-next-line LineLength */
             log.warn('configuration option `validation.showHiddenParams` is deprecated, please use `validation.help.showHidden` or the `--showHidden` parameter instead')
             if (config.showHiddenParams in Boolean) {
-                showHiddenParams = config.showHiddenParams
+                showHiddenParams = config.showHiddenParams as Boolean
                 log.debug("Set `validation.showHiddenParams` to ${showHiddenParams}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -144,9 +122,15 @@ A list of default parameters to ignore during validation. This option should onl
 
         // maxErrValSize
         if (config.containsKey('maxErrValSize')) {
-            if (config.maxErrValSize in Integer && (config.maxErrValSize >= 1 || config.maxErrValSize == -1)) {
-                maxErrValSize = config.maxErrValSize
-                log.debug("Set `validation.maxErrValSize` to ${maxErrValSize}")
+            if (config.maxErrValSize in Integer) {
+                Integer maxSize = config.maxErrValSize as Integer
+                if (maxSize >= 1 || maxSize == -1) {
+                    maxErrValSize = maxSize
+                    log.debug("Set `validation.maxErrValSize` to ${maxErrValSize}")
+                } else {
+                    /* groovylint-disable-next-line LineLength */
+                    log.warn("`validation.maxErrValSize` needs to be a value above 0 or equal to -1. Defaulting to ${maxErrValSize}")
+                }
             } else {
                 /* groovylint-disable-next-line LineLength */
                 log.warn("`validation.maxErrValSize` needs to be a value above 0 or equal to -1. Defaulting to ${maxErrValSize}")
@@ -156,7 +140,7 @@ A list of default parameters to ignore during validation. This option should onl
         // parameterSchema
         if (config.containsKey('parametersSchema')) {
             if (config.parametersSchema in CharSequence) {
-                parametersSchema = config.parametersSchema
+                parametersSchema = config.parametersSchema as CharSequence
                 log.debug("Set `validation.parametersSchema` to ${parametersSchema}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -167,7 +151,7 @@ A list of default parameters to ignore during validation. This option should onl
         // ignoreParams
         if (config.containsKey('ignoreParams')) {
             if (config.ignoreParams in List<CharSequence>) {
-                ignoreParams += config.ignoreParams
+                ignoreParams += config.ignoreParams as List<CharSequence>
                 log.debug("Added the following parameters to the ignored parameters: ${config.ignoreParams}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -178,7 +162,7 @@ A list of default parameters to ignore during validation. This option should onl
         // defaultIgnoreParams
         if (config.containsKey('defaultIgnoreParams')) {
             if (config.defaultIgnoreParams in List<CharSequence>) {
-                ignoreParams += config.defaultIgnoreParams
+                ignoreParams += config.defaultIgnoreParams as List<CharSequence>
                 log.debug("Added the following parameters to the ignored parameters: ${config.defaultIgnoreParams}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -190,7 +174,7 @@ A list of default parameters to ignore during validation. This option should onl
         Map helpConfig = [:]
         if (config.containsKey('help')) {
             if (config.help in Map) {
-                helpConfig = config.help
+                helpConfig = config.help as Map
             } else {
                 /* groovylint-disable-next-line LineLength */
                 log.warn('Incorrect value detected for `validation.help`, a map with key-value pairs is expected. Setting the defaults for all help options.')
@@ -205,7 +189,7 @@ A list of default parameters to ignore during validation. This option should onl
         Map summaryConfig = [:]
         if (config.containsKey('summary')) {
             if (config.summary in Map) {
-                summaryConfig = config.summary
+                summaryConfig = config.summary as Map
             } else {
                 /* groovylint-disable-next-line LineLength */
                 log.warn('Incorrect value detected for `validation.summary`, a map with key-value pairs is expected. Setting the defaults for all summary options.')
@@ -217,7 +201,7 @@ A list of default parameters to ignore during validation. This option should onl
         Map loggingConfig = [:]
         if (config.containsKey('logging')) {
             if (config.logging in Map) {
-                loggingConfig = config.logging
+                loggingConfig = config.logging as Map
             } else {
                 /* groovylint-disable-next-line LineLength */
                 log.warn('Incorrect value detected for `validation.logging`, a map with key-value pairs is expected. Setting the defaults for all logging options.')

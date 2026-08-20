@@ -4,7 +4,7 @@ import nextflow.Session
 import nextflow.trace.TraceObserverV2
 import nextflow.trace.TraceObserverFactoryV2
 
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 /**
  * An observer factory to create validation observers
@@ -12,7 +12,7 @@ import groovy.transform.CompileDynamic
  * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
  */
 
-@CompileDynamic
+@CompileStatic
 class ValidationObserverFactory implements TraceObserverFactoryV2 {
 
     @Override

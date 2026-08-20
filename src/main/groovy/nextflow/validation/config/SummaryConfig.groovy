@@ -3,7 +3,7 @@ package nextflow.validation.config
 import static nextflow.validation.utils.Colors.removeColors
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import nextflow.config.spec.ConfigOption
 import nextflow.config.spec.ConfigScope
@@ -16,7 +16,7 @@ import nextflow.script.dsl.Description
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class SummaryConfig implements ConfigScope {
 
     @ConfigOption
@@ -46,9 +46,9 @@ class SummaryConfig implements ConfigScope {
         if (config.containsKey('beforeText')) {
             if (config.beforeText in CharSequence) {
                 if (monochromeLogs) {
-                    beforeText = config.beforeText
+                    beforeText = config.beforeText as String
                 } else {
-                    beforeText = removeColors(config.beforeText)
+                    beforeText = removeColors(config.beforeText as String)
                 }
                 log.debug("Set `validation.summary.beforeText` to ${beforeText}")
             } else {
@@ -61,9 +61,9 @@ class SummaryConfig implements ConfigScope {
         if (config.containsKey('afterText')) {
             if (config.afterText in CharSequence) {
                 if (monochromeLogs) {
-                    afterText = config.afterText
+                    afterText = config.afterText as String
                 } else {
-                    afterText = removeColors(config.afterText)
+                    afterText = removeColors(config.afterText as String)
                 }
                 log.debug("Set `validation.summary.afterText` to ${afterText}")
             } else {
@@ -75,7 +75,7 @@ class SummaryConfig implements ConfigScope {
         // hideParams
         if (config.containsKey('hideParams')) {
             if (config.hideParams in List<CharSequence>) {
-                hideParams = config.hideParams
+                hideParams = config.hideParams as Set<CharSequence>
                 log.debug("Set `validation.summary.hideParams` to ${hideParams}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -86,7 +86,7 @@ class SummaryConfig implements ConfigScope {
         // mask
         if (config.containsKey('mask')) {
             if (config.mask in CharSequence) {
-                mask = config.mask
+                mask = config.mask as CharSequence
                 log.debug("Set `validation.summary.mask` to ${mask}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -97,7 +97,7 @@ class SummaryConfig implements ConfigScope {
         // maskSubpaths
         if (config.containsKey('maskSubpaths')) {
             if (config.maskSubpaths in List<CharSequence>) {
-                maskSubpaths = config.maskSubpaths
+                maskSubpaths = config.maskSubpaths as List<CharSequence>
                 log.debug("Set `maskSubpaths` to ${maskSubpaths}")
             } else {
                 /* groovylint-disable-next-line LineLength */
