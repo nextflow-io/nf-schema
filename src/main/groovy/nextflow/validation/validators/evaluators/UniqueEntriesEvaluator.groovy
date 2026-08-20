@@ -5,7 +5,7 @@ import dev.harrel.jsonschema.EvaluationContext
 import dev.harrel.jsonschema.JsonNode
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 /**
  * The evaluator to validate that entries in an array are unique based on specified fields
@@ -13,7 +13,7 @@ import groovy.transform.CompileDynamic
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class UniqueEntriesEvaluator implements Evaluator {
 
     final private List<String> uniqueEntries
@@ -38,8 +38,9 @@ class UniqueEntriesEvaluator implements Evaluator {
                 return true
             }
             Map filteredNodes = nodeEntry.asObject().subMap(uniqueEntries)
+            List<String> uniqueValues = filteredNodes.collect { k, v -> "${k}:${v.asString()}" as String }
             Tuple nodeTup = filteredNodes ?
-                Tuple.tuple(*filteredNodes.collect { k, v -> "${k}:${v.asString()}" }) :
+                Tuple.tuple(uniqueValues.toArray()) :
                 Tuple.tuple()
             if (nodeTup && nodeTup in uniques) {
                 result = Evaluator.Result.failure("Entry ${count}: Detected duplicate entries: ${nodeTup}" as String)

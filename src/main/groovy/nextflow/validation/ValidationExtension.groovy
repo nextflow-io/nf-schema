@@ -6,7 +6,7 @@ import static nextflow.validation.utils.Common.getLongestKeyLength
 
 import groovy.json.JsonBuilder
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import org.json.JSONObject
 import org.json.JSONArray
@@ -34,7 +34,7 @@ import nextflow.validation.validators.ValidationResult
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class ValidationExtension extends PluginExtensionPoint {
 
     // The configuration class
@@ -104,15 +104,6 @@ class ValidationExtension extends PluginExtensionPoint {
         final Object input,
         final Path schema
     ) {
-        return validate(input, schema.toUri(), options)
-    }
-
-    @Function
-    List<String> validate(
-        final Map options = [:],
-        final Object input,
-        final String schema
-    ) {
         Boolean exitOnError = options?.containsKey('exitOnError') ? options.exitOnError : true
 
         JsonSchemaValidator validator = new JsonSchemaValidator(config)
@@ -124,7 +115,7 @@ class ValidationExtension extends PluginExtensionPoint {
         } else {
             jsonObj = input
         }
-        JSONObject schemaJson = new JSONObject(getBasePath(session.baseDir, schema).text)
+        JSONObject schemaJson = new JSONObject(schema.text)
         ValidationResult result = validator.validate(jsonObj, schemaJson)
         List<String> errors = result.getErrors('object')
         if (exitOnError && errors != []) {
@@ -135,6 +126,15 @@ class ValidationExtension extends PluginExtensionPoint {
         return errors
     }
 
+    @Function
+    List<String> validate(
+        final Map options = [:],
+        final Object input,
+        final String schema
+    ) {
+        return validate(options, input, getBasePath(session.baseDir, schema))
+    }
+
     //
     // Beautify parameters for --help
     //
@@ -143,19 +143,20 @@ class ValidationExtension extends PluginExtensionPoint {
         final Map options = [:]
     ) {
         log.debug "Generating help message with options: ${options}"
-        Map config = session.config.navigate('validation') ?: [:]
+        Map config = (session.config.navigate('validation') ?: [:]) as Map
 
         // Adapt config options with function options
         config.parametersSchema = options.get(
             'parameters_schema',
             config.get('parametersSchema', 'nextflow_schema.json')
         ) as String
-        config.help = config.help ?: [:]
-        config.help.enabled = true
-        config.help.beforeText = options.get('beforeText', config.help.get('beforeText', '')) as String
-        config.help.afterText = options.get('afterText', config.help.get('afterText', '')) as String
-        config.help.command = options.get('command', config.help.get('command', '')) as String
-        config.help.showHidden = options.get('showHidden', false) as Boolean
+        Map helpConfig = (config.help ?: [:]) as Map
+        helpConfig.enabled = true
+        helpConfig.beforeText = options.get('beforeText', helpConfig.get('beforeText', '')) as String
+        helpConfig.afterText = options.get('afterText', helpConfig.get('afterText', '')) as String
+        helpConfig.command = options.get('command', helpConfig.get('command', '')) as String
+        helpConfig.showHidden = options.get('showHidden', false) as Boolean
+        config.help = helpConfig
 
         // Set the parameter if given
         String parameter = options.get('parameter', null) as String
@@ -215,12 +216,14 @@ class ValidationExtension extends PluginExtensionPoint {
         String output  = ''
         output += beforeText
         Map paramsMap = paramsSummaryMap(parameters_schema: schemaFilename)
-        Map containers = paramsMap.get('Core Nextflow options')?.get('container')
-        if (containers) {
-            log.debug "Containers specified in config:\n${containers.collect { entry ->
-                "    ${entry.key}: ${entry.value}" }.join('\n')}"
-            paramsMap['Core Nextflow options'] = paramsMap['Core Nextflow options']
-                .findAll { entry -> entry.key != 'container' }
+        Map coreOptions = paramsMap.get('Core Nextflow options') as Map
+        Object containers = coreOptions?.get('container')
+        if (containers in Map) {
+            Map containerMap = (Map) containers
+            log.debug "Containers specified in config:\n${containerMap.collect { key, value ->
+                "    ${key}: ${value}" }.join('\n')}"
+            paramsMap['Core Nextflow options'] = coreOptions
+                .findAll { key, value -> key != 'container' }
         }
 
         paramsMap.each { key, value ->
@@ -232,9 +235,10 @@ class ValidationExtension extends PluginExtensionPoint {
             if (groupParams) {
                 output += "$colors.bold$group$colors.reset\n"
                 groupParams.keySet().each { param ->
+                    String paramName = param as String
                     output += '  ' +
                         colors.blue +
-                        param.padRight(maxChars) +
+                        paramName.padRight(maxChars) +
                         ': ' +
                         colors.green +
                         groupParams.get(param) +

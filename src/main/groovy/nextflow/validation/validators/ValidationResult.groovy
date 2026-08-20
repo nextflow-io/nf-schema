@@ -6,7 +6,7 @@ import static nextflow.validation.utils.Common.kebabToCamel
 import static nextflow.validation.utils.Types.isInteger
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import java.util.regex.Matcher
 
@@ -23,7 +23,7 @@ import nextflow.validation.config.ValidationConfig
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 public class ValidationResult {
 
     final private Validator.Result result
@@ -54,7 +54,7 @@ public class ValidationResult {
         Set<String> unevaluatedUnformatted = allKeys - evaluated
         List<String> unevaluated = unevaluatedUnformatted
             .collect { key -> evaluated.contains(kebabToCamel(key)) ? null : key }
-        return unevaluated - null
+        return unevaluated.findAll { u -> u != null }
     }
 
     List<String> getErrors(String validationType) {

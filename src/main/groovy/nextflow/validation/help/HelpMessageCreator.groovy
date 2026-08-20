@@ -7,7 +7,7 @@ import static nextflow.validation.utils.Common.longestStringLength
 import static nextflow.validation.utils.Common.getLongestKeyLength
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import java.nio.file.Path
 
@@ -24,7 +24,7 @@ import nextflow.validation.exceptions.SchemaValidationException
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class HelpMessageCreator {
 
     private final ValidationConfig config
@@ -42,7 +42,7 @@ class HelpMessageCreator {
         this.assetsHelper = new AssetsHelper(session.baseDir, config.parametersSchema, config.monochromeLogs)
         enumLength = config.help.enumLength
         colors = getLogColors(config.monochromeLogs)
-        paramsMap = paramsLoad(getBasePath(session.baseDir, config.parametersSchema))
+        paramsMap = paramsLoad(getBasePath(session.baseDir, config.parametersSchema)) as Map<String,Map>
         addHelpParameters()
     }
 
@@ -67,7 +67,7 @@ class HelpMessageCreator {
                 throw new SchemaValidationException("Unable to create help message: Specified param '${param}' does not exist in JSON schema.")
             }
             if (paramOptions.containsKey('properties')) {
-                paramOptions.properties = removeHidden(paramOptions.properties)
+                paramOptions.properties = removeHidden(paramOptions.properties as Map)
             }
             helpMessage = getDetailedHelpString(param, paramOptions)
 
@@ -129,8 +129,8 @@ class HelpMessageCreator {
                     subParamsOptions.put("${paramName}.${subParam}" as String, value)
                 }
                 Integer maxChars = longestStringLength(subParamsOptions.keySet() as List<String>) + 1
-                String subParamsHelpString = getHelpListParams(subParamsOptions, maxChars, paramName)
-                    .collect { helpString ->
+                String subParamsHelpString = getHelpListParams(subParamsOptions as Map<String,Map>, maxChars, paramName)
+                    .collect { String helpString ->
                         '      --' + helpString[4..helpString.length() - 1]
                     }
                     .join('\n')
@@ -183,7 +183,7 @@ class HelpMessageCreator {
             if (!value.hidden) {
                 returnMap[key] = value
             } else if (value.containsKey('properties')) {
-                value.properties = removeHidden(value.properties)
+                value.properties = removeHidden(value.properties as Map)
                 returnMap[key] = value
             } else {
                 hiddenParametersCount++
@@ -196,11 +196,11 @@ class HelpMessageCreator {
     // Get help for params in list format
     //
     private List<String> getHelpListParams(Map<String,Map> params, Integer maxChars, String parentParameter = '') {
-        List helpMessage = []
+        List<String> helpMessage = []
         Integer typeMaxChars = longestStringLength(params.collect { key, value ->
             Object type = value.get('type', '')
-            return type in String && type.length() > 0 ? "[${type}]" : type as String
-        })
+            return (type in String && ((String) type).length() > 0 ? "[${type}]" : type) as String
+        } as List<String>)
         for (String paramName in params.keySet()) {
             Map paramOptions = params.get(paramName) as Map
             Object paramType = paramOptions.get('type', '')
@@ -246,15 +246,17 @@ class HelpMessageCreator {
     // Flattens the schema params map so all nested parameters are shown as their full name
     //
     private Map<String,Map> flattenNestedSchemaMap(Map params) {
-        Map returnMap = [:]
-        params.each { String key, Map value ->
-            if (value.containsKey('properties')) {
-                Map flattenedMap = flattenNestedSchemaMap(value.properties)
-                flattenedMap.each { String k, Map v ->
-                    returnMap.put(key + '.' + k, v)
+        Map<String,Map> returnMap = [:]
+        params.each { key, value ->
+            String paramKey = key as String
+            Map paramValue = value as Map
+            if (paramValue.containsKey('properties')) {
+                Map flattenedMap = flattenNestedSchemaMap(paramValue.properties as Map)
+                flattenedMap.each { k, v ->
+                    returnMap.put(paramKey + '.' + k, v as Map)
                 }
             } else {
-                returnMap.put(key, value)
+                returnMap.put(paramKey, paramValue)
             }
         }
         return returnMap

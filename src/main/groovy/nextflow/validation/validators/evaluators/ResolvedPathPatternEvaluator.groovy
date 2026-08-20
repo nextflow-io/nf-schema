@@ -6,7 +6,7 @@ import dev.harrel.jsonschema.JsonNode
 import nextflow.Nextflow
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.util.regex.Pattern
@@ -21,7 +21,7 @@ import java.util.regex.Pattern
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class ResolvedPathPatternEvaluator implements Evaluator {
 
     private final Pattern pattern

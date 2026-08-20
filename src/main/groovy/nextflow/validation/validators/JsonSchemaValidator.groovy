@@ -4,7 +4,7 @@ package nextflow.validation.validators
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.json.JSONObject
 import dev.harrel.jsonschema.ValidatorFactory
 import dev.harrel.jsonschema.Validator
@@ -24,7 +24,7 @@ import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 public class JsonSchemaValidator {
 
     final private ValidatorFactory validator

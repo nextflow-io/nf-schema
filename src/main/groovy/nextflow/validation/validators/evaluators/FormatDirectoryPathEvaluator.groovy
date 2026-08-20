@@ -6,7 +6,7 @@ import dev.harrel.jsonschema.JsonNode
 import nextflow.Nextflow
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
 
 /**
@@ -16,7 +16,7 @@ import java.nio.file.Path
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class FormatDirectoryPathEvaluator implements Evaluator {
 
     @Override

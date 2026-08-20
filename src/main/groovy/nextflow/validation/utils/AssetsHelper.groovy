@@ -4,7 +4,7 @@ import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
 import org.json.JSONObject
 
@@ -15,7 +15,7 @@ import org.json.JSONObject
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class AssetsHelper {
 
     private final Path baseDir
@@ -23,7 +23,8 @@ class AssetsHelper {
     private final Path schemaPath
     private final Map schemaMap
 
-    AssetsHelper(Path baseDir, String schemaFileName, Boolean monochromeLogs = false) {
+    AssetsHelper(Path baseDir, CharSequence schemaFileName, Boolean monochromeLogs = false) {
+        this.baseDir = baseDir
         this.schemaPath = getBasePath(baseDir, schemaFileName)
         if (schemaPath.exists()) {
             JSONObject schemaJson = new JSONObject(schemaPath.text)
@@ -169,39 +170,41 @@ class AssetsHelper {
         help.append("${colors.bold}Fields:${colors.reset}\n")
 
         // Calculate max width for alignment
-        Integer maxWidth = properties.keySet()*.length().max() ?: 0
+        Integer maxWidth = properties.keySet().collect { w -> (w as String).length() }.max() ?: 0
         maxWidth = Math.max(maxWidth, 10)
 
-        properties.each { String key, Map property ->
-            String type = property.type ?: 'string'
+        properties.each { key, property ->
+            String keyStr = key as String
+            Map propertyMap = property as Map
+            String type = propertyMap.type ?: 'string'
             String typeStr = "[${type}]"
-            String requiredStr = required?.contains(key) ? '[required]' : ''
+            String requiredStr = required?.contains(keyStr) ? '[required]' : ''
 
             /* groovylint-disable-next-line LineLength */
-            help.append("    ${colors.cyan}${key.padRight(maxWidth)}${colors.reset} ${colors.dim}${typeStr.padRight(10)}${colors.reset}")
+            help.append("    ${colors.cyan}${keyStr.padRight(maxWidth)}${colors.reset} ${colors.dim}${typeStr.padRight(10)}${colors.reset}")
 
             if (requiredStr) {
                 help.append(" ${colors.dim}${requiredStr}${colors.reset}")
             }
 
-            if (property.description) {
-                help.append(" ${property.description}")
+            if (propertyMap.description) {
+                help.append(" ${propertyMap.description}")
             }
 
             // Add pattern information
-            if (property.pattern) {
-                help.append(" ${colors.dim}(pattern: ${property.pattern})${colors.reset}")
+            if (propertyMap.pattern) {
+                help.append(" ${colors.dim}(pattern: ${propertyMap.pattern})${colors.reset}")
             }
 
             // Add enum values
-            if (property.enum) {
-                String enumStr = (property.enum as List).join(', ')
+            if (propertyMap.enum) {
+                String enumStr = (propertyMap.enum as List).join(', ')
                 help.append(" ${colors.dim}(allowed: ${enumStr})${colors.reset}")
             }
 
             // Add error message if available
-            if (property.errorMessage) {
-                help.append("\n      ${colors.yellow}Note: ${property.errorMessage}${colors.reset}")
+            if (propertyMap.errorMessage) {
+                help.append("\n      ${colors.yellow}Note: ${propertyMap.errorMessage}${colors.reset}")
             }
 
             help.append('\n')

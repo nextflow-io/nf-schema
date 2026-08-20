@@ -11,7 +11,7 @@ import dev.harrel.jsonschema.JsonNode
 import nextflow.Nextflow
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
 
 import nextflow.validation.config.ValidationConfig
@@ -24,7 +24,7 @@ import nextflow.validation.validators.ValidationResult
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class SchemaEvaluator implements Evaluator {
 
     private final String schema
@@ -47,7 +47,7 @@ class SchemaEvaluator implements Evaluator {
         String value = node.asString()
 
         // Actual validation logic
-        Path file = Nextflow.file(value)
+        Path file = Nextflow.file(value) as Path
 
         // Don't validate if the file does not exist
         if (!file.exists()) {

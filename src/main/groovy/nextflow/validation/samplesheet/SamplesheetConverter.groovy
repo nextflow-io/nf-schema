@@ -8,7 +8,7 @@ import static nextflow.validation.utils.Common.hasDeepKey
 
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
 
 import org.json.JSONArray
@@ -28,7 +28,7 @@ import nextflow.validation.validators.ValidationResult
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class SamplesheetConverter {
 
     final private ValidationConfig config
@@ -95,7 +95,7 @@ class SamplesheetConverter {
             Object result = formatEntry(entry, schemaMap['items'] as Map)
             if (isMeta()) {
                 if (result in List) {
-                    result.add(0, meta)
+                    ((List) result).add(0, meta)
                 } else {
                     result = [meta, result]
                 }
@@ -141,39 +141,41 @@ class SamplesheetConverter {
                 []
 
         if (input in Map) {
+            Map inputMap = (Map) input
             List result = []
             Map properties = findDeep(schema, 'properties') as Map
-            Set unusedKeys = input.keySet() - properties.keySet()
+            Set unusedKeys = inputMap.keySet() - properties.keySet()
 
             // Check for properties in the samplesheet that have not been defined in the schema
             unusedKeys.each { key -> addUnrecognisedHeader("${headerPrefix}${key}" as String) }
 
             // Loop over every property to maintain the correct order
             properties.each { property, schemaValues ->
-                Object value = input[property]
-                List metaIds = schemaValues['meta'] in List ?
-                    schemaValues['meta'] as List :
-                    schemaValues['meta'] in String ?
-                        [schemaValues['meta']] :
+                Object value = inputMap[property]
+                Map schemaValuesMap = schemaValues as Map
+                List metaIds = schemaValuesMap['meta'] in List ?
+                    schemaValuesMap['meta'] as List :
+                    schemaValuesMap['meta'] in String ?
+                        [schemaValuesMap['meta']] :
                         []
                 String prefix = headerPrefix ? "${headerPrefix}${property}." : "${property}."
 
                 // Add the value to the meta map if needed
                 if (metaIds) {
                     metaIds.each { id ->
-                        meta["${id}"] = processMeta(value, schemaValues as Map, prefix)
+                        meta["${id}"] = processMeta(value, schemaValuesMap, prefix)
                     }
                 }
                 // return the correctly casted value
                 else {
-                    result.add(formatEntry(value, schemaValues as Map, prefix))
+                    result.add(formatEntry(value, schemaValuesMap, prefix))
                 }
             }
             return result
         } else if (input in List) {
             List result = []
             Integer count = 0
-            input.each { entry ->
+            ((List) input).each { entry ->
                 // return the correctly casted value
                 String prefix = headerPrefix ? "${headerPrefix}${count}." : "${count}."
                 result.add(formatEntry(entry, findDeep(schema, 'items') as Map, prefix))
@@ -197,6 +199,7 @@ class SamplesheetConverter {
         if (!(value in String) || schemaEntry == null) {
             return value
         }
+        String stringValue = (String) value
 
         String defaultFormat = schemaEntry.format ?: ''
 
@@ -227,17 +230,17 @@ class SamplesheetConverter {
         }
 
         if (foundStringFileFormat && !foundStringNoFileFormat) {
-            return Nextflow.file(value)
+            return Nextflow.file(stringValue)
         } else if (foundStringFileFormat && foundStringNoFileFormat) {
             // Do a simple check if the object could be a path
             // This check looks for / in the filename or if a dot is
             // present in the last 7 characters (possibly indicating an extension)
             if (
-                value.contains('/') ||
-                (value.size() >= 7 && value[-7..-1].contains('.')) ||
-                (value.size() < 7 && value.contains('.'))
+                stringValue.contains('/') ||
+                (stringValue.size() >= 7 && stringValue[-7..-1].contains('.')) ||
+                (stringValue.size() < 7 && stringValue.contains('.'))
             ) {
-                return Nextflow.file(value)
+                return Nextflow.file(stringValue)
             }
         }
         return value
@@ -256,15 +259,16 @@ class SamplesheetConverter {
                 []
 
         if (input in Map) {
+            Map inputMap = (Map) input
             Map result = [:]
             Map properties = findDeep(schema, 'properties') as Map
-            Set unusedKeys = input.keySet() - properties.keySet()
+            Set unusedKeys = inputMap.keySet() - properties.keySet()
             // Check for properties in the samplesheet that have not been defined in the schema
             unusedKeys.each { key -> addUnrecognisedHeader("${headerPrefix}${key}" as String) }
 
             // Loop over every property to maintain the correct order
             properties.each { property, schemaValues ->
-                Object value = input[property]
+                Object value = inputMap[property]
                 String prefix = headerPrefix ? "${headerPrefix}${property}." : "${property}."
                 result[property] = processMeta(value, schemaValues as Map, prefix)
             }
@@ -272,7 +276,7 @@ class SamplesheetConverter {
         } else if (input in List) {
             List result = []
             Integer count = 0
-            input.each { entry ->
+            ((List) input).each { entry ->
                 // return the correctly casted value
                 String prefix = headerPrefix ? "${headerPrefix}${count}." : "${count}."
                 result.add(processMeta(entry, findDeep(schema, 'items') as Map, prefix))

@@ -11,7 +11,7 @@ import org.json.JSONObject
 import groovy.json.JsonGenerator
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
 import java.nio.file.Files
 
@@ -26,7 +26,7 @@ import nextflow.validation.exceptions.SchemaValidationException
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 public class FilesHelper {
 
     //
@@ -97,7 +97,15 @@ public class FilesHelper {
         List fileContent = cleanFile.splitCsv(header:header, strip:true, sep:delimiter, quote:'\"')
         if (!header) {
             // Flatten no header inputs if they contain one value
-            fileContent = fileContent.collect { cont -> cont in List && cont.size() == 1 ? cont[0] : cont }
+            fileContent = fileContent.collect { cont ->
+                if (cont in List) {
+                    List listCont = (List) cont
+                    if (listCont.size() == 1) {
+                        return listCont[0]
+                    }
+                }
+                return cont
+            }
         }
 
         return inferType(fileContent)
@@ -128,7 +136,7 @@ public class FilesHelper {
         String type = ''
 
         // Obtain the type of each variable in the schema
-        Map properties = (Map) schema['items'] ? schema['items']['properties'] : schema['properties']
+        Map properties = (Map) (schema['items'] ? schema['items']['properties'] : schema['properties'])
         properties.each { p ->
             String key = (String) p.key
             Map property = properties[key] as Map
@@ -235,9 +243,10 @@ public class FilesHelper {
         Map paramsMap = [:]
         // Grouped params
         if (schemaDefs) {
-            schemaDefs.each { String name, Map group ->
-                Map groupProperty = (Map) group.get('properties') // Gets the property object of the group
-                String title = (String) group.get('title') ?: name
+            schemaDefs.each { name, group ->
+                Map groupMap = group as Map
+                Map groupProperty = (Map) groupMap.get('properties') // Gets the property object of the group
+                String title = (String) (groupMap.get('title') ?: name)
                 Map subParams = [:]
                 groupProperty.each { innerkey, value ->
                     subParams.put(innerkey, value)

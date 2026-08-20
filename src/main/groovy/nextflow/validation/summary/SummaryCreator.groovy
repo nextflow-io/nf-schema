@@ -4,7 +4,7 @@ import static nextflow.validation.utils.FilesHelper.paramsLoad
 import static nextflow.validation.utils.Common.getBasePath
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
 import nextflow.Nextflow
 import nextflow.script.WorkflowMetadata
@@ -18,7 +18,7 @@ import nextflow.validation.config.ValidationConfig
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class SummaryCreator {
 
     final private ValidationConfig config
@@ -35,7 +35,7 @@ class SummaryCreator {
     ) {
         String schemaFilename = options?.containsKey('parameters_schema') ?
             options.parameters_schema as String :
-            config.parametersSchema
+            config.parametersSchema as String
 
         // Get a selection of core Nextflow workflow options
         Map workflowSummary = [:]
@@ -50,9 +50,11 @@ class SummaryCreator {
             workflowSummary['container'] = workflow.container
         }
 
-        workflowSummary['launchDir']    = maybeMask(workflow.launchDir ?: '')
-        workflowSummary['workDir']      = maybeMask(workflow.workDir ?: '')
-        workflowSummary['projectDir']   = maybeMask(workflow.projectDir ?: '')
+        workflowSummary['launchDir']    = maybeMask(workflow.launchDir != null ? workflow.launchDir.toUriString() : '')
+        workflowSummary['workDir']      = maybeMask(workflow.workDir != null ? workflow.workDir.toUriString() : '')
+        workflowSummary['projectDir']   = maybeMask(
+                                            workflow.projectDir != null ? workflow.projectDir.toUriString() : ''
+                                          )
         workflowSummary['userName']     = workflow.userName
         workflowSummary['profile']      = workflow.profile
         workflowSummary['configFiles']  = maybeMask(workflow.configFiles ? workflow.configFiles.join(', ') : '')
@@ -67,7 +69,7 @@ class SummaryCreator {
                 Map nestedSummary = groupSummary
                 if (hideParamList.size() >= 2) {
                     hideParamList[0..-2].each { param ->
-                        nestedSummary = nestedSummary?.get(param, null)
+                        nestedSummary = nestedSummary?.get(param, null) as Map
                     }
                 }
                 if (nestedSummary != null) {
@@ -96,9 +98,9 @@ class SummaryCreator {
                     continue
                 }
                 Object rawValue = params.get(param)
-                String value = rawValue in Path ? rawValue.toUriString() : rawValue?.toString()
-                String defaultValue = schema.get('default')
-                String type = schema.type
+                String value = rawValue in Path ? ((Path) rawValue).toUriString() : rawValue?.toString()
+                String defaultValue = schema.get('default') as String
+                String type = schema.type as String
                 if (defaultValue != null && type == 'string') {
                     // TODO rework this in a more flexible way
                     /* groovylint-disable-next-line GStringExpressionWithinString */

@@ -6,7 +6,7 @@ import dev.harrel.jsonschema.JsonNode
 import nextflow.Nextflow
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
 
 /**
@@ -16,7 +16,7 @@ import java.nio.file.Path
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class FormatFilePathPatternEvaluator implements Evaluator {
 
     @Override
@@ -30,7 +30,7 @@ class FormatFilePathPatternEvaluator implements Evaluator {
 
         List<Path> files
         try {
-            files = Nextflow.files(value)
+            files = Nextflow.files(value) as List<Path>
             files.each { file ->
                 file.exists() // Do an exists check to see if the file can be correctly accessed
             }
@@ -46,7 +46,7 @@ class FormatFilePathPatternEvaluator implements Evaluator {
         files.each { file ->
             /* groovylint-disable-next-line UnnecessaryGetter */
             if (file.isDirectory() && !file.toString().startsWith('az://')) {
-                errors.add("'${file.string}' is not a file, but a directory" as String)
+                errors.add("'${file.toUriString()}' is not a file, but a directory" as String)
             }
         }
         if (errors.size() > 0) {

@@ -5,7 +5,7 @@ import org.json.JSONArray
 import org.json.JSONPointer
 import org.json.JSONPointerException
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
 import java.util.stream.IntStream
 import nextflow.Nextflow
@@ -19,18 +19,18 @@ import nextflow.Nextflow
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 public class Common {
 
     //
     // Get full path based on the base directory of the pipeline run
     //
-    static Path getBasePath(Path baseDir, String schemaFilename) {
-        Path schemaPath = Nextflow.file(schemaFilename)
+    static Path getBasePath(Path baseDir, CharSequence schemaFilename) {
+        Path schemaPath = Nextflow.file(schemaFilename.toString()) as Path
         if (schemaPath.exists()) {
             return schemaPath
         }
-        return baseDir.resolve(schemaFilename)
+        return baseDir.resolve(schemaFilename.toString())
     }
 
     //
@@ -67,13 +67,15 @@ public class Common {
     //
     static Object findDeep(Object m, String key) {
         if (m in Map) {
-            if (m.containsKey(key)) {
-                return m[key]
+            Map map = (Map) m
+            if (map.containsKey(key)) {
+                return map[key]
             }
-            return m.findResult { k, v -> findDeep(v, key) }
+            return map.findResult { k, v -> findDeep(v, key) }
         }
         else if (m in List) {
-            return m.findResult { element -> findDeep(element, key) }
+            List list = (List) m
+            return list.findResult { element -> findDeep(element, key) }
         }
         return null
     }
@@ -83,13 +85,15 @@ public class Common {
     //
     static boolean hasDeepKey(Object m, String key) {
         if (m in Map) {
-            if (m.containsKey(key)) {
+            Map map = (Map) m
+            if (map.containsKey(key)) {
                 return true
             }
-            return m.any { k, v -> hasDeepKey(v, key) }
+            return map.any { k, v -> hasDeepKey(v, key) }
         }
         else if (m in List) {
-            return m.any { element -> hasDeepKey(element, key) }
+            List list = (List) m
+            return list.any { element -> hasDeepKey(element, key) }
         }
         return false
     }
@@ -115,8 +119,9 @@ public class Common {
     }
 
     static String kebabToCamel(String s) {
-        Closure<Object[]> toUpper = { Object[] strs -> strs[2].toUpperCase() }
-        return s.replaceAll('(-)([A-Za-z0-9])', toUpper)
+        return s.replaceAll('(-)([A-Za-z0-9])') { String full, String dash, String letter ->
+            letter.toUpperCase()
+        }
     }
 
 }
