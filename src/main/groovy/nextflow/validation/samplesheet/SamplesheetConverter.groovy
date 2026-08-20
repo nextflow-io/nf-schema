@@ -12,6 +12,7 @@ import groovy.transform.CompileDynamic
 import java.nio.file.Path
 
 import org.json.JSONArray
+import org.json.JSONObject
 
 import nextflow.Nextflow
 
@@ -71,8 +72,10 @@ class SamplesheetConverter {
 
         // Validate
         JsonSchemaValidator validator = new JsonSchemaValidator(config)
-        JSONArray samplesheet = fileToJson(samplesheetFile, schemaFile) as JSONArray
-        ValidationResult validationResult = validator.validate(samplesheet, schemaFile.toString())
+        JSONObject schemaJson = new JSONObject(schemaFile.text)
+        List samplesheetList = fileToObject(samplesheetFile, schemaJson) as List
+        JSONArray samplesheet = fileToJson(samplesheetList) as JSONArray
+        ValidationResult validationResult = validator.validate(samplesheet, schemaJson)
         List<String> validationErrors = validationResult.getErrors('field')
         if (validationErrors) {
             /* groovylint-disable-next-line LineLength */
@@ -81,8 +84,6 @@ class SamplesheetConverter {
             throw new SchemaValidationException(msg, validationErrors)
         }
 
-        // Convert
-        List samplesheetList = fileToObject(samplesheetFile, schemaFile) as List
         rows = []
 
         List channelFormat = samplesheetList.collect { entry ->

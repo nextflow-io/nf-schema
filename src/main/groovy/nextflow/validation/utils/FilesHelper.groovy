@@ -62,11 +62,11 @@ public class FilesHelper {
     //
     // Converts a given file to an Groovy object (either a List or a Map)
     //
-    static Object fileToObject(Path file, Path schema) {
+    static Object fileToObject(Path file, JSONObject schema) {
         String fileType = getFileType(file)
         String delimiter = fileType == 'csv' ? ',' : fileType == 'tsv' ? '\t' : null
-        Map schemaMap = (Map) new JsonSlurper().parse(schema)
-        Map types = getSchemaTypes(schema)
+        Map schemaMap = schema.toMap()
+        Map types = getSchemaTypes(schemaMap)
         List<String> separatedFileTypes = ['csv', 'tsv']
         if (schemaMap.type == 'object' && fileType in separatedFileTypes) {
             /* groovylint-disable-next-line LineLength */
@@ -92,7 +92,7 @@ public class FilesHelper {
         else if (fileType == 'json') {
             return new JsonSlurper().parseText(file.text)
         }
-        Boolean header = getValueFromJsonPointer('#/items/properties', new JSONObject(schema.text)) ? true : false
+        Boolean header = getValueFromJsonPointer('#/items/properties', schema) ? true : false
         Path cleanFile = header ? sanitize(file) : file
         List fileContent = cleanFile.splitCsv(header:header, strip:true, sep:delimiter, quote:'\"')
         if (!header) {
@@ -106,16 +106,15 @@ public class FilesHelper {
     //
     // Converts a given file to a JSON type (either JSONArray or JSONObject)
     //
-    static Object fileToJson(Path file, Path schema) {
+    static Object fileToJson(Object groovyObject) {
         // Remove all null values from JSON object
         JsonGenerator jsonGenerator = new JsonGenerator.Options()
             .excludeNulls()
             .build()
-        Object obj = fileToObject(file, schema)
-        if (obj in List) {
-            return new JSONArray(jsonGenerator.toJson(obj))
-        } else if (obj in Map) {
-            return new JSONObject(jsonGenerator.toJson(obj))
+        if (groovyObject in List) {
+            return new JSONArray(jsonGenerator.toJson(groovyObject))
+        } else if (groovyObject in Map) {
+            return new JSONObject(jsonGenerator.toJson(groovyObject))
         }
         String msg = 'Could not determine if the file is a list or map of values'
         throw new SchemaValidationException(msg, [])
@@ -124,16 +123,12 @@ public class FilesHelper {
     //
     // Get a map that contains the type for each key in a JSON schema file
     //
-    static Map getSchemaTypes(Path schema) {
+    static Map getSchemaTypes(Map schema) {
         Map types = [:]
         String type = ''
 
-        // Read the schema
-        JsonSlurper slurper = new JsonSlurper()
-        Map parsed = (Map) slurper.parse(schema)
-
         // Obtain the type of each variable in the schema
-        Map properties = (Map) parsed['items'] ? parsed['items']['properties'] : parsed['properties']
+        Map properties = (Map) schema['items'] ? schema['items']['properties'] : schema['properties']
         properties.each { p ->
             String key = (String) p.key
             Map property = properties[key] as Map

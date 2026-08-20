@@ -2,6 +2,8 @@ package nextflow.validation.validators.evaluators
 
 import groovy.transform.CompileDynamic
 
+import java.nio.file.Path
+
 import nextflow.Global
 import nextflow.Session
 import dev.harrel.jsonschema.EvaluatorFactory
@@ -19,12 +21,12 @@ import nextflow.validation.config.ValidationConfig
 class CustomEvaluatorFactory implements EvaluatorFactory {
 
     final private ValidationConfig config
-    final private String baseDir
+    final private Path baseDir
 
     CustomEvaluatorFactory(ValidationConfig configInput) {
         Session session = Global.session
         config = configInput
-        baseDir = session.baseDir.toString()
+        baseDir = session.baseDir
     }
 
     @Override

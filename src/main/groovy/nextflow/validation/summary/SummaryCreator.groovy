@@ -59,7 +59,7 @@ class SummaryCreator {
 
         // Get pipeline parameters defined in JSON Schema
         Map paramsSummary = [:]
-        Map paramsMap = paramsLoad(Path.of(getBasePath(baseDir, schemaFilename)))
+        Map paramsMap = paramsLoad(getBasePath(baseDir, schemaFilename))
         for (group in paramsMap.keySet()) {
             Map groupSummary = getSummaryMapFromParams(params, paramsMap.get(group) as Map)
             config.summary.hideParams.each { hideParam ->

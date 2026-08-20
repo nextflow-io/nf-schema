@@ -28,15 +28,13 @@ public class ValidationResult {
 
     final private Validator.Result result
     final private Object rawInput
-    final private String schemaString
-    final private JSONObject schemaJson
+    final private JSONObject schema
     final private ValidationConfig config
 
-    ValidationResult(Validator.Result result, Object rawInput, String schemaString, ValidationConfig config) {
+    ValidationResult(Validator.Result result, Object rawInput, JSONObject schema, ValidationConfig config) {
         this.result = result
         this.rawInput = rawInput
-        this.schemaString = schemaString
-        this.schemaJson = new JSONObject(schemaString)
+        this.schema = schema
         this.config = config
     }
 
@@ -89,7 +87,7 @@ public class ValidationResult {
             String schemaLocation = error.schemaLocation.replaceFirst(/^[^#]+/, '')
             String customError = ''
             if (!errorString.startsWith('Validation of file failed:')) {
-                customError = getValueFromJsonPointer("${schemaLocation}/errorMessage", this.schemaJson) as String
+                customError = getValueFromJsonPointer("${schemaLocation}/errorMessage", this.schema) as String
             }
 
             // Change some error messages to make them more clear

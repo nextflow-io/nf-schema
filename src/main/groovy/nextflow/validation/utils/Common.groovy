@@ -8,6 +8,7 @@ import groovy.util.logging.Slf4j
 import groovy.transform.CompileDynamic
 import java.nio.file.Path
 import java.util.stream.IntStream
+import nextflow.Nextflow
 
 /**
  * A collection of commonly used functions
@@ -24,11 +25,12 @@ public class Common {
     //
     // Get full path based on the base directory of the pipeline run
     //
-    static String getBasePath(String baseDir, String schemaFilename) {
-        if (Path.of(schemaFilename).exists()) {
-            return schemaFilename
+    static Path getBasePath(Path baseDir, String schemaFilename) {
+        Path schemaPath = Nextflow.file(schemaFilename)
+        if (schemaPath.exists()) {
+            return schemaPath
         }
-        return "${baseDir}/${schemaFilename}"
+        return baseDir.resolve(schemaFilename)
     }
 
     //

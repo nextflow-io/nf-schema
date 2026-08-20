@@ -57,9 +57,8 @@ class ValidationExtension extends PluginExtensionPoint {
         final Path samplesheet,
         final CharSequence schema
     ) {
-        String fullPathSchema = getBasePath(session.baseDir.toString(), schema as String)
-        Path schemaFile = Nextflow.file(fullPathSchema) as Path
-        return samplesheetToList(samplesheet, schemaFile)
+        Path schemaPath = getBasePath(session.baseDir, schema as String)
+        return samplesheetToList(samplesheet, schemaPath)
     }
 
     @Function
@@ -125,7 +124,8 @@ class ValidationExtension extends PluginExtensionPoint {
         } else {
             jsonObj = input
         }
-        ValidationResult result = validator.validate(jsonObj, getBasePath(session.baseDir.toString(), schema))
+        JSONObject schemaJson = new JSONObject(getBasePath(session.baseDir, schema).text)
+        ValidationResult result = validator.validate(jsonObj, schemaJson)
         List<String> errors = result.getErrors('object')
         if (exitOnError && errors != []) {
             Map<String, String> colors = getLogColors(config.monochromeLogs)

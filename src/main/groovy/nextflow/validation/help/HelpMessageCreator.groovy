@@ -39,10 +39,10 @@ class HelpMessageCreator {
 
     HelpMessageCreator(ValidationConfig inputConfig, Session session) {
         config = inputConfig
-        this.assetsHelper = new AssetsHelper(session.baseDir.toString(), config.parametersSchema, config.monochromeLogs)
+        this.assetsHelper = new AssetsHelper(session.baseDir, config.parametersSchema, config.monochromeLogs)
         enumLength = config.help.enumLength
         colors = getLogColors(config.monochromeLogs)
-        paramsMap = paramsLoad(Path.of(getBasePath(session.baseDir.toString(), config.parametersSchema)))
+        paramsMap = paramsLoad(getBasePath(session.baseDir, config.parametersSchema))
         addHelpParameters()
     }
 

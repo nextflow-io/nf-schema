@@ -3,12 +3,10 @@ package nextflow.validation.utils
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 
-import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileDynamic
 import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.Files
+import org.json.JSONObject
 
 /**
  * Helper class for discovering and generating help for schema files referenced in nextflow_schema.json
@@ -20,13 +18,19 @@ import java.nio.file.Files
 @CompileDynamic
 class AssetsHelper {
 
-    private final String baseDir
+    private final Path baseDir
     private final Map colors
-    private final String schemaFileName
+    private final Path schemaPath
+    private final Map schemaMap
 
-    AssetsHelper(String baseDir, String schemaFileName, Boolean monochromeLogs = false) {
-        this.baseDir = baseDir
-        this.schemaFileName = schemaFileName
+    AssetsHelper(Path baseDir, String schemaFileName, Boolean monochromeLogs = false) {
+        this.schemaPath = getBasePath(baseDir, schemaFileName)
+        if (schemaPath.exists()) {
+            JSONObject schemaJson = new JSONObject(schemaPath.text)
+            schemaMap = schemaJson.toMap()
+        } else {
+            log.warn("nextflow_schema.json not found at: ${schemaPath.toUriString()}")
+        }
         this.colors = getLogColors(monochromeLogs)
     }
 
@@ -37,17 +41,7 @@ class AssetsHelper {
      */
     String discoverSchemaFile(String param) {
         try {
-            Path schemaPath = Paths.get(getBasePath(baseDir, schemaFileName))
-            if (!Files.exists(schemaPath)) {
-                log.warn("nextflow_schema.json not found at: ${schemaPath}")
-                return null
-            }
-
-            JsonSlurper jsonSlurper = new JsonSlurper()
-            Map schema = jsonSlurper.parse(schemaPath.toFile()) as Map
-
-            // Search for the specific parameter's schema reference
-            return findSchemaReference(schema, param, '')
+            return findSchemaReference(this.schemaMap, param, '')
         } catch (e) {
             log.error("Error discovering schema file for parameter ${param}: ${e.message}")
         }
@@ -61,16 +55,15 @@ class AssetsHelper {
      */
     String generateSchemaHelp(String schemaPath) {
         try {
-            Path fullSchemaPath = Paths.get(getBasePath(baseDir, schemaPath))
-            if (!Files.exists(fullSchemaPath)) {
-                log.warn("Schema file not found: ${fullSchemaPath}")
+            Path fullSchemaPath = getBasePath(baseDir, schemaPath)
+            if (!fullSchemaPath.exists()) {
+                log.warn("Schema file not found: ${fullSchemaPath.toUriString()}")
                 return null
             }
 
-            JsonSlurper jsonSlurper = new JsonSlurper()
-            Map schema = jsonSlurper.parse(fullSchemaPath.toFile()) as Map
+            JSONObject schemaJson = new JSONObject(fullSchemaPath.text)
 
-            return formatSchemaHelp(schema)
+            return formatSchemaHelp(schemaJson.toMap())
         } catch (e) {
             log.error("Error generating help for schema ${schemaPath}: ${e.message}")
         }

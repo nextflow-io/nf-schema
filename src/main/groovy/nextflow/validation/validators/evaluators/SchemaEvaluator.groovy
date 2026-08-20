@@ -2,6 +2,7 @@ package nextflow.validation.validators.evaluators
 
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.FilesHelper.fileToJson
+import static nextflow.validation.utils.FilesHelper.fileToObject
 
 import org.json.JSONObject
 import dev.harrel.jsonschema.Evaluator
@@ -27,10 +28,10 @@ import nextflow.validation.validators.ValidationResult
 class SchemaEvaluator implements Evaluator {
 
     private final String schema
-    private final String baseDir
+    private final Path baseDir
     private final ValidationConfig config
 
-    SchemaEvaluator(String schema, String baseDir, ValidationConfig config) {
+    SchemaEvaluator(String schema, Path baseDir, ValidationConfig config) {
         this.baseDir = baseDir
         this.schema = schema
         this.config = config
@@ -63,11 +64,12 @@ class SchemaEvaluator implements Evaluator {
 
         log.debug("Started validating ${file}")
 
-        String schemaFull = getBasePath(this.baseDir, this.schema)
-        Object json = fileToJson(file, Path.of(schemaFull))
+        JSONObject schemaJson = new JSONObject(getBasePath(this.baseDir, this.schema).text)
+        Object groovyObject = fileToObject(file, schemaJson)
+        Object json = fileToJson(groovyObject)
         JsonSchemaValidator validator = new JsonSchemaValidator(config)
 
-        ValidationResult validationResult = validator.validate(json, schemaFull)
+        ValidationResult validationResult = validator.validate(json, schemaJson)
         List<String> validationErrors = validationResult.getErrors((json in JSONObject) ? 'parameter' : 'field')
         if (validationErrors) {
             List<String> errors = ['Validation of file failed:'] +

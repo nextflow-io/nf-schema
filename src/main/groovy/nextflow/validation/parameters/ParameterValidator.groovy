@@ -166,7 +166,8 @@ class ParameterValidator {
 
         // Validate
         String baseDir = session.baseDir
-        ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
+        JSONObject schemaJson = new JSONObject(getBasePath(baseDir, schemaFilename).text)
+        ValidationResult validationResult = validator.validate(paramsJSON, schemaJson)
         List<String> paramErrors = validationResult.getErrors('parameter')
         errors.addAll(paramErrors)
 
