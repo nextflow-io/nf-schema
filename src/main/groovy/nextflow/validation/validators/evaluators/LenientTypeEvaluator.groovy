@@ -9,7 +9,7 @@ import dev.harrel.jsonschema.JsonNode
 import dev.harrel.jsonschema.SimpleType
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.util.stream.Collectors
 
 /**
@@ -19,7 +19,7 @@ import java.util.stream.Collectors
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class LenientTypeEvaluator implements Evaluator {
 
     private final Set<SimpleType> types

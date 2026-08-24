@@ -3,7 +3,7 @@ package nextflow.validation.logging
 import static nextflow.validation.utils.Colors.getLogColors
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import nextflow.validation.exceptions.SchemaValidationException
 
@@ -14,7 +14,7 @@ import nextflow.validation.exceptions.SchemaValidationException
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class ValidationLogger {
 
     final private String level = 'info'
@@ -45,7 +45,7 @@ class ValidationLogger {
                 log.warn(message)
                 break
             case 'error':
-                throw new SchemaValidationException(colors.red + message + colors.reset)
+                throw new SchemaValidationException("${colors.red}${message}${colors.reset}" as String)
             default:
                 log.info(message) // Fallback to info if something goes wrong
         }

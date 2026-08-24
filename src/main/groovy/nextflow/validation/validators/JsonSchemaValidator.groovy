@@ -4,10 +4,8 @@ package nextflow.validation.validators
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.json.JSONObject
-import java.nio.file.Files
-import java.nio.file.Path
 import dev.harrel.jsonschema.ValidatorFactory
 import dev.harrel.jsonschema.Validator
 import dev.harrel.jsonschema.EvaluatorFactory
@@ -26,7 +24,7 @@ import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 public class JsonSchemaValidator {
 
     final private ValidatorFactory validator
@@ -42,24 +40,12 @@ public class JsonSchemaValidator {
         this.config = config
     }
 
-    ValidationResult validate(Object input, String schemaFileName) {
+    ValidationResult validate(Object input, JSONObject schema) {
         JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
-        return validateObject(jsonInput, input, schemaFileName)
+        return validateObject(jsonInput, input, schema)
     }
 
-    private ValidationResult validateObject(JsonNode input, Object rawJson, String schemaFileName) {
-        JSONObject schema
-        String schemaString
-        try {
-            schemaString = Files.readString(Path.of(schemaFileName))
-            schema = new JSONObject(schemaString)
-        } catch (org.json.JSONException e) {
-            throw new SchemaValidationException("""Failed to load JSON schema (${schemaFileName}):
-    ${e.message}
-
-""")
-        }
-
+    private ValidationResult validateObject(JsonNode input, Object rawJson, JSONObject schema) {
         String draft = getValueFromJsonPointer("#/\$schema", schema)
         if (draft != 'https://json-schema.org/draft/2020-12/schema') {
             log.error("""Failed to load the meta schema:
@@ -72,7 +58,7 @@ public class JsonSchemaValidator {
             throw new SchemaValidationException('', [])
         }
         Validator.Result result = this.validator.validate(schema, input)
-        return new ValidationResult(result, rawJson, schemaString, this.config)
+        return new ValidationResult(result, rawJson, schema, this.config)
     }
 
 }

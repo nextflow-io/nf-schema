@@ -3,12 +3,10 @@ package nextflow.validation.utils
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 
-import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.Files
+import org.json.JSONObject
 
 /**
  * Helper class for discovering and generating help for schema files referenced in nextflow_schema.json
@@ -17,16 +15,24 @@ import java.nio.file.Files
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class AssetsHelper {
 
-    private final String baseDir
+    private final Path baseDir
     private final Map colors
-    private final String schemaFileName
+    private final Path schemaPath
+    private final Map schemaMap
 
-    AssetsHelper(String baseDir, String schemaFileName, Boolean monochromeLogs = false) {
+    AssetsHelper(Path baseDir, CharSequence schemaFileName, Boolean monochromeLogs = false) {
         this.baseDir = baseDir
-        this.schemaFileName = schemaFileName
+        this.schemaPath = getBasePath(baseDir, schemaFileName)
+        if (schemaPath.exists()) {
+            JSONObject schemaJson = new JSONObject(schemaPath.text)
+            schemaMap = schemaJson.toMap()
+        } else {
+            schemaMap = [:]
+            log.warn("nextflow_schema.json not found at: ${schemaPath.toUriString()}")
+        }
         this.colors = getLogColors(monochromeLogs)
     }
 
@@ -37,17 +43,7 @@ class AssetsHelper {
      */
     String discoverSchemaFile(String param) {
         try {
-            Path schemaPath = Paths.get(getBasePath(baseDir, schemaFileName))
-            if (!Files.exists(schemaPath)) {
-                log.warn("nextflow_schema.json not found at: ${schemaPath}")
-                return null
-            }
-
-            JsonSlurper jsonSlurper = new JsonSlurper()
-            Map schema = jsonSlurper.parse(schemaPath.toFile()) as Map
-
-            // Search for the specific parameter's schema reference
-            return findSchemaReference(schema, param, '')
+            return findSchemaReference(this.schemaMap, param, '')
         } catch (e) {
             log.error("Error discovering schema file for parameter ${param}: ${e.message}")
         }
@@ -61,16 +57,15 @@ class AssetsHelper {
      */
     String generateSchemaHelp(String schemaPath) {
         try {
-            Path fullSchemaPath = Paths.get(getBasePath(baseDir, schemaPath))
-            if (!Files.exists(fullSchemaPath)) {
-                log.warn("Schema file not found: ${fullSchemaPath}")
+            Path fullSchemaPath = getBasePath(baseDir, schemaPath)
+            if (!fullSchemaPath.exists()) {
+                log.warn("Schema file not found: ${fullSchemaPath.toUriString()}")
                 return null
             }
 
-            JsonSlurper jsonSlurper = new JsonSlurper()
-            Map schema = jsonSlurper.parse(fullSchemaPath.toFile()) as Map
+            JSONObject schemaJson = new JSONObject(fullSchemaPath.text)
 
-            return formatSchemaHelp(schema)
+            return formatSchemaHelp(schemaJson.toMap())
         } catch (e) {
             log.error("Error generating help for schema ${schemaPath}: ${e.message}")
         }
@@ -175,39 +170,41 @@ class AssetsHelper {
         help.append("${colors.bold}Fields:${colors.reset}\n")
 
         // Calculate max width for alignment
-        Integer maxWidth = properties.keySet()*.length().max() ?: 0
+        Integer maxWidth = properties.keySet().collect { w -> (w as String).length() }.max() ?: 0
         maxWidth = Math.max(maxWidth, 10)
 
-        properties.each { String key, Map property ->
-            String type = property.type ?: 'string'
+        properties.each { key, property ->
+            String keyStr = key as String
+            Map propertyMap = property as Map
+            String type = propertyMap.type ?: 'string'
             String typeStr = "[${type}]"
-            String requiredStr = required?.contains(key) ? '[required]' : ''
+            String requiredStr = required?.contains(keyStr) ? '[required]' : ''
 
             /* groovylint-disable-next-line LineLength */
-            help.append("    ${colors.cyan}${key.padRight(maxWidth)}${colors.reset} ${colors.dim}${typeStr.padRight(10)}${colors.reset}")
+            help.append("    ${colors.cyan}${keyStr.padRight(maxWidth)}${colors.reset} ${colors.dim}${typeStr.padRight(10)}${colors.reset}")
 
             if (requiredStr) {
                 help.append(" ${colors.dim}${requiredStr}${colors.reset}")
             }
 
-            if (property.description) {
-                help.append(" ${property.description}")
+            if (propertyMap.description) {
+                help.append(" ${propertyMap.description}")
             }
 
             // Add pattern information
-            if (property.pattern) {
-                help.append(" ${colors.dim}(pattern: ${property.pattern})${colors.reset}")
+            if (propertyMap.pattern) {
+                help.append(" ${colors.dim}(pattern: ${propertyMap.pattern})${colors.reset}")
             }
 
             // Add enum values
-            if (property.enum) {
-                String enumStr = (property.enum as List).join(', ')
+            if (propertyMap.enum) {
+                String enumStr = (propertyMap.enum as List).join(', ')
                 help.append(" ${colors.dim}(allowed: ${enumStr})${colors.reset}")
             }
 
             // Add error message if available
-            if (property.errorMessage) {
-                help.append("\n      ${colors.yellow}Note: ${property.errorMessage}${colors.reset}")
+            if (propertyMap.errorMessage) {
+                help.append("\n      ${colors.yellow}Note: ${propertyMap.errorMessage}${colors.reset}")
             }
 
             help.append('\n')

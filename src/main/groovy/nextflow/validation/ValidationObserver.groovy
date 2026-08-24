@@ -4,7 +4,7 @@ import nextflow.Session
 import nextflow.trace.TraceObserverV2
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 /**
  * An observer for initial checks that always need to be run at the start of the pipeline
@@ -13,7 +13,7 @@ import groovy.transform.CompileDynamic
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class ValidationObserver implements TraceObserverV2 {
 
     @Override

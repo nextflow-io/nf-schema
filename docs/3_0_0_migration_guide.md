@@ -48,3 +48,27 @@ The `paramsSummaryMap` and `paramsSummaryLog` function no longer take the workfl
     paramsSummaryMap()
     paramsSummaryLog()
     ```
+
+## Removal of `validation.failUnrecognisedParams` and `validation.failUnrecognisedHeaders`
+
+These options were already deprecated since version 2.5.0 and have now been fully removed. The logic behind it will thus no longer work. You can migrate to the new [`validation.logging`](./configuration/configuration.md#logging) configuration options.
+
+=== "2.x"
+
+    ```groovy
+    validation {
+        failUnrecognisedHeaders = true
+        failUnrecognisedParams = true
+    }
+    ```
+
+=== "3.x"
+
+    ```groovy
+    validation {
+        logging {
+            unrecognisedHeaders = 'error'
+            unrecognisedParams = 'error'
+        }
+    }
+    ```

@@ -1,7 +1,7 @@
 package nextflow.validation.config
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import nextflow.validation.logging.ValidationLogger
 
@@ -16,8 +16,10 @@ import nextflow.script.dsl.Description
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class LoggingConfig implements ConfigScope {
+
+    final private static List<String> OPTIONS = ['skip', 'debug', 'info', 'warn', 'error']
 
     @ConfigOption
     @Description('Define the logging level of unrecognised parameters. Defaults to `warn`.')
@@ -29,34 +31,34 @@ Define the logging level of unrecognised headers that are found in the sampleshe
 ''')
     final ValidationLogger unrecognisedHeaders
 
-    final private List<String> options = ['skip', 'debug', 'info', 'warn', 'error']
-
     LoggingConfig(Map map, Boolean monochromeLogs = false) {
         Map config = map ?: [:]
 
         // unrecognisedParams
-        String level = config.get('unrecognisedParams') in CharSequence ? config.get('unrecognisedParams') : 'warn'
-        if (options.contains(level)) {
-            if (config.get('unrecognisedParams')) {
+        String unrecognisedParamsOption = config.get('unrecognisedParams')
+        String level = unrecognisedParamsOption in CharSequence ? unrecognisedParamsOption : 'warn'
+        if (OPTIONS.contains(level)) {
+            if (unrecognisedParamsOption) {
                 log.debug("Set `validation.unrecognisedParams` to ${level}")
             }
             unrecognisedParams = new ValidationLogger(level, monochromeLogs)
         } else {
             /* groovylint-disable-next-line LineLength */
-            log.warn("Incorrect value detected for `validation.unrecognisedParams`, one of (${options.join(', ')}) is expected. Defaulting to `warn`")
+            log.warn("Incorrect value detected for `validation.unrecognisedParams`, one of (${OPTIONS.join(', ')}) is expected. Defaulting to `warn`")
             unrecognisedParams = new ValidationLogger('warn', monochromeLogs)
         }
 
         // unrecognisedHeaders
-        level = config.get('unrecognisedHeaders') in CharSequence ? config.get('unrecognisedHeaders') : 'warn'
-        if (options.contains(level)) {
-            if (config.get('unrecognisedHeaders')) {
+        String unrecognisedHeadersOption = config.get('unrecognisedHeaders')
+        level = unrecognisedHeadersOption in CharSequence ? unrecognisedHeadersOption : 'warn'
+        if (OPTIONS.contains(level)) {
+            if (unrecognisedHeadersOption) {
                 log.debug("Set `validation.unrecognisedHeaders` to ${level}")
             }
             unrecognisedHeaders = new ValidationLogger(level, monochromeLogs)
         } else {
             /* groovylint-disable-next-line LineLength */
-            log.warn("Incorrect value detected for `validation.unrecognisedHeaders`, one of (${options.join(', ')}) is expected. Defaulting to `warn`")
+            log.warn("Incorrect value detected for `validation.unrecognisedHeaders`, one of (${OPTIONS.join(', ')}) is expected. Defaulting to `warn`")
             unrecognisedHeaders = new ValidationLogger('warn', monochromeLogs)
         }
     }

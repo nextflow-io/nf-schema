@@ -1,7 +1,7 @@
 package nextflow.validation.utils
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 /**
  * A collection of functions for everything color related
@@ -12,14 +12,14 @@ import groovy.transform.CompileDynamic
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 public class Colors {
 
     //
     // ANSII Colours used for terminal logging
     //
-    static Map getLogColors(Boolean monochromeLogs) {
-        Map colorcodes = [:]
+    static Map<String, String> getLogColors(Boolean monochromeLogs) {
+        Map<String, String> colorcodes = [:]
 
         // Reset / Meta
         colorcodes['reset']      = monochromeLogs ? '' : '\033[0m'
@@ -89,7 +89,7 @@ public class Colors {
     static String removeColors(String input) {
         if (!input) { return input }
         String output = input
-        List colors = getLogColors(false)*.value
+        List<String> colors = getLogColors(false)*.value
         colors.each { color ->
             output = output.replace(color, '')
         }

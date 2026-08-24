@@ -7,7 +7,7 @@ import nextflow.config.spec.ConfigScope
 import nextflow.script.dsl.Description
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 /**
  * This class is used to read, parse and validate the `validation.help` config block.
@@ -16,7 +16,7 @@ import groovy.transform.CompileDynamic
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class HelpConfig implements ConfigScope {
 
     @ConfigOption
@@ -64,7 +64,7 @@ class HelpConfig implements ConfigScope {
         // showHiddenParameter
         if (config.containsKey('showHiddenParameter')) {
             if (config.showHiddenParameter in CharSequence) {
-                showHiddenParameter = config.showHiddenParameter
+                showHiddenParameter = config.showHiddenParameter as String
                 log.debug("Set `validation.help.showHiddenParameter` to ${showHiddenParameter}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -75,10 +75,10 @@ class HelpConfig implements ConfigScope {
         // showHidden
         if (params.containsKey(showHiddenParameter) || config.containsKey('showHidden')) {
             if (params.containsKey(showHiddenParameter) && params.get(showHiddenParameter) in Boolean) {
-                showHidden = params.get(showHiddenParameter)
+                showHidden = params.get(showHiddenParameter) as Boolean
                 log.debug("Set `validation.help.showHidden` to ${showHidden} (Due to --${showHiddenParameter})")
             } else if (config.showHidden in Boolean) {
-                showHidden = config.showHidden
+                showHidden = config.showHidden as Boolean
                 log.debug("Set `validation.help.showHidden` to ${showHidden}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -89,7 +89,7 @@ class HelpConfig implements ConfigScope {
         // shortParameter
         if (config.containsKey('shortParameter')) {
             if (config.shortParameter in CharSequence) {
-                shortParameter = config.shortParameter
+                shortParameter = config.shortParameter as String
                 log.debug("Set `validation.help.shortParameter` to ${shortParameter}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -100,7 +100,7 @@ class HelpConfig implements ConfigScope {
         // fullParameter
         if (config.containsKey('fullParameter')) {
             if (config.fullParameter in CharSequence) {
-                fullParameter = config.fullParameter
+                fullParameter = config.fullParameter as String
                 log.debug("Set `validation.help.fullParameter` to ${fullParameter}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -112,9 +112,9 @@ class HelpConfig implements ConfigScope {
         if (config.containsKey('beforeText')) {
             if (config.beforeText in CharSequence) {
                 if (monochromeLogs) {
-                    beforeText = removeColors(config.beforeText)
+                    beforeText = removeColors(config.beforeText as String)
                 } else {
-                    beforeText = config.beforeText
+                    beforeText = config.beforeText as String
                 }
                 log.debug("Set `validation.help.beforeText` to ${beforeText}")
             } else {
@@ -127,9 +127,9 @@ class HelpConfig implements ConfigScope {
         if (config.containsKey('afterText')) {
             if (config.afterText in CharSequence) {
                 if (monochromeLogs) {
-                    afterText = removeColors(config.afterText)
+                    afterText = removeColors(config.afterText as String)
                 } else {
-                    afterText = config.afterText
+                    afterText = config.afterText as String
                 }
                 log.debug("Set `validation.help.afterText` to ${afterText}")
             } else {
@@ -142,9 +142,9 @@ class HelpConfig implements ConfigScope {
         if (config.containsKey('command')) {
             if (config.command in CharSequence) {
                 if (monochromeLogs) {
-                    command = config.command
+                    command = config.command as String
                 } else {
-                    command = removeColors(config.command)
+                    command = removeColors(config.command as String)
                 }
                 log.debug("Set `validation.help.command` to ${command}")
             } else {
@@ -156,7 +156,7 @@ class HelpConfig implements ConfigScope {
         // enumLength
         if (config.containsKey('enumLength')) {
             if (config.enumLength in Integer) {
-                enumLength = config.enumLength
+                enumLength = config.enumLength as Integer
                 log.debug("Set `validation.help.enumLength` to ${enumLength}")
             } else {
                 /* groovylint-disable-next-line LineLength */

@@ -5,7 +5,7 @@ import dev.harrel.jsonschema.EvaluationContext
 import dev.harrel.jsonschema.JsonNode
 
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 /**
  * Checks if the use of this value is deprecated
@@ -14,7 +14,7 @@ import groovy.transform.CompileDynamic
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class DeprecatedEvaluator implements Evaluator {
 
     private final Boolean deprecated

@@ -10,7 +10,7 @@ import static nextflow.validation.utils.Types.parseParamValue
 import java.nio.file.Path
 import groovy.json.JsonGenerator
 import groovy.util.logging.Slf4j
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import nextflow.Nextflow
 import nextflow.Session
 import nextflow.util.Duration
@@ -30,7 +30,7 @@ import nextflow.validation.validators.ValidationResult
  */
 
 @Slf4j
-@CompileDynamic
+@CompileStatic
 class ParameterValidator {
 
     final private ValidationConfig config
@@ -41,9 +41,9 @@ class ParameterValidator {
     ParameterValidator(ValidationConfig config) {
         this.config = config
         this.expectedParamsDefaults = [
-            (config.help.shortParameter): false,
-            (config.help.fullParameter): false,
-            (config.help.showHiddenParameter): false
+            (config.help.shortParameter as String): false,
+            (config.help.fullParameter as String): false,
+            (config.help.showHiddenParameter as String): false
         ]
     }
 
@@ -127,7 +127,7 @@ class ParameterValidator {
         Map<String, Object> params = initialiseExpectedParams(session.params)
         String schemaFilename = options?.containsKey('parameters_schema') ?
             options.parameters_schema as String :
-            config.parametersSchema
+            config.parametersSchema as String
         Boolean castCliParams = options?.containsKey('cast_cli_params') ?
             options.cast_cli_params as Boolean :
             /* groovylint-disable-next-line UnnecessaryGetter */
@@ -147,11 +147,11 @@ class ParameterValidator {
         // in which case we can rely on the static type system to do the casting for us.
         // This mimics the type casting behaviour of syntax parser V1 so shouldn't introduce any breaking changes.
         if (castCliParams) {
-            List<String> cliParams = session.cliParams?.keySet()?.toList() ?: []
+            List<String> cliParams = (session.cliParams?.keySet()?.toList()*.toString() ?: []) as List<String>
             generatorOptions.addConverter(Map<String, Object>) { Map<String,Object> map ->
                 map.collectEntries { k, v ->
                     // Only cast parameters that were explicitly provided via the CLI
-                    return (cliParams.contains(k) && v in String) ? [k, parseParamValue(v)] : [k, v]
+                    return (cliParams.contains(k) && v in String) ? [k, parseParamValue(v as String)] : [k, v]
                 }
             }
         }
@@ -165,8 +165,8 @@ class ParameterValidator {
         Map<String,String> colors = getLogColors(config.monochromeLogs)
 
         // Validate
-        String baseDir = session.baseDir
-        ValidationResult validationResult = validator.validate(paramsJSON, getBasePath(baseDir, schemaFilename))
+        JSONObject schemaJson = new JSONObject(getBasePath(session.baseDir, schemaFilename).text)
+        ValidationResult validationResult = validator.validate(paramsJSON, schemaJson)
         List<String> paramErrors = validationResult.getErrors('parameter')
         errors.addAll(paramErrors)
 
@@ -180,7 +180,7 @@ class ParameterValidator {
                     errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
                 }
                 else if (!config.ignoreParams.any { ignoreParam ->
-                    dotParam == ignoreParam || dotParam.startsWith(ignoreParam + '.')
+                    dotParam == ignoreParam.toString() || dotParam.startsWith(ignoreParam.toString() + '.')
                 }) {
                     // Check if an ignore param is present
                     /* groovylint-disable-next-line LineLength */
