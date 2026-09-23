@@ -757,6 +757,119 @@ class SamplesheetConverterTest extends Dsl2Spec {
         stdout.contains("[[string1:extraField, string2:extraField, integer1:10, integer2:10, boolean1:true, boolean2:true], string1, 25, false, ${rootString}/src/testResources/test.txt, ${rootString}/src/testResources/testDir, ${rootString}/src/testResources/testDir, unique3, 1, itDoesExist]" as String)
     }
 
+    void 'should substitute parameters correctly'() {
+        given:
+        String scriptText = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            params.input = "src/testResources/samplesheet_with_params.yaml"
+            params.schema = "src/testResources/schema_input_with_params.json"
+            params.single = "success"
+            params.nested = [value: "success"]
+
+            workflow {
+                channel.fromList(samplesheetToList(params.input, params.schema))
+                    .view()
+            }
+        '''
+        Map opts = [
+            'config': [
+                'validation': [
+                    'allowParamsSubstitution': true
+                ]
+            ]
+        ]
+
+        when:
+        runScript(opts, scriptText)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> line.startsWith('[') ? line : null }
+
+        then:
+        noExceptionThrown()
+        stdout.contains('[test, success, success]')
+    }
+
+    void 'should not substitute parameters when disabled'() {
+        given:
+        String scriptText = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            params.input = "src/testResources/samplesheet_with_params.yaml"
+            params.schema = "src/testResources/schema_input_with_params.json"
+            params.single = "success"
+            params.nested = [value: "success"]
+
+            workflow {
+                channel.fromList(samplesheetToList(params.input, params.schema))
+                    .view()
+            }
+        '''
+        Map opts = [
+            'config': [
+                'validation': [
+                    'allowParamsSubstitution': false
+                ]
+            ]
+        ]
+
+        when:
+        runScript(opts, scriptText)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> line.startsWith('[') ? line : null }
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == """The following errors have been detected in ${rootString}/src/testResources/samplesheet_with_params.yaml:
+
+-> Entry 1: Error for field 'single' (\${params.single}): Expected success
+-> Entry 1: Error for field 'nested' (\${params.nested.value}): Expected success
+
+"""
+    }
+
+    void 'should not substitute missing parameters'() {
+        given:
+        String scriptText = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            params.input = "src/testResources/samplesheet_with_params.yaml"
+            params.schema = "src/testResources/schema_input_with_params.json"
+            params.single = "success"
+
+            workflow {
+                channel.fromList(samplesheetToList(params.input, params.schema))
+                    .view()
+            }
+        '''
+        Map opts = [
+            'config': [
+                'validation': [
+                    'allowParamsSubstitution': true
+                ]
+            ]
+        ]
+
+        when:
+        runScript(opts, scriptText)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> line.startsWith('[') ? line : null }
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == """The following errors have been detected in ${rootString}/src/testResources/samplesheet_with_params.yaml:
+
+-> Entry 1: Error for field 'nested' (\${params.nested.value}): Expected success
+
+"""
+    }
+
     private String getRootString() { return this.root.toString() }
 
 }

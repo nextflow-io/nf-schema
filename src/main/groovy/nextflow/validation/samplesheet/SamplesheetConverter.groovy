@@ -20,6 +20,7 @@ import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
 import nextflow.validation.validators.ValidationResult
+import nextflow.validation.utils.GroovyVariables
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -84,7 +85,7 @@ class SamplesheetConverter {
         List samplesheetListTemp = fileToObject(samplesheetFile, schemaJson) as List
         if (config.allowParamsSubstitution) {
             paramsBinding = new Binding([params: params])
-            samplesheetList = substituteParameters(samplesheetListTemp)
+            samplesheetList = substituteParameters(samplesheetListTemp) as List
         } else {
             samplesheetList = samplesheetListTemp
         }
@@ -124,7 +125,7 @@ class SamplesheetConverter {
             return input.collect { entry -> substituteParameters(entry) }
         }
         if (input in Map) {
-            return input.collectEntries { key, value -> [key, substituteParameters(value)] }
+            return (input as Map).collectEntries { key, value -> [key, substituteParameters(value)] }
         }
         if (input in String) {
             return GroovyVariables.evaluate(input as String, paramsBinding)

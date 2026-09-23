@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nextflow-io/nf-schema/master/src/testResources/schema_input_with_params.json",
+    "title": "Samplesheet validation schema",
+    "description": "Schema for the samplesheet used in this pipeline",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string"
+            },
+            "single": {
+                "type": "string",
+                "const": "success"
+            },
+            "nested": {
+                "type": "string",
+                "const": "success"
+            }
+        }
+    }
+}

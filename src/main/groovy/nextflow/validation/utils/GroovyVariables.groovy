@@ -42,12 +42,24 @@ class GroovyVariables {
                 continue
             }
 
-            Object value = new GroovyShell(binding, CONFIG).evaluate(variablePath)
+            Object value
+            try {
+                value = new GroovyShell(binding, CONFIG).evaluate(variablePath)
+
+            } catch (NullPointerException) {
+                // Skip NullPointerException as this usually points to a nested parameter not existing
+                matcher.appendReplacement(
+                    result,
+                    Matcher.quoteReplacement(matcher.group(0))
+                )
+                continue
+            }
 
             matcher.appendReplacement(
                 result,
                 Matcher.quoteReplacement(String.valueOf(value))
             )
+
         }
 
         matcher.appendTail(result)

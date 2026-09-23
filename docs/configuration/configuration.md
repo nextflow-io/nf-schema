@@ -95,7 +95,7 @@ See the below example where the limit is to 20 characters:
 validation.maxErrValSize = 100 // default: 150
 ```
 
-## allowParamsSubsitution
+## allowParamsSubstitution
 
 Allow substitution of parameters in String values in the samplesheet. This options requires a boolean (`true` or `false` (default)) which indicates whether or not parameters should be substituted when converting and validating samplesheets.
 

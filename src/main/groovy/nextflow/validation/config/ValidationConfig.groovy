@@ -64,8 +64,8 @@ A list of default parameters to ignore during validation. This option should onl
     final Set<CharSequence> ignoreParams = ['nf_test_output']
 
     @ConfigOption
-    @Description('Allow subsitution of parameters in the samplesheet.')
-    final Boolean allowParamsSubsitution = false
+    @Description('Allow substitution of parameters in the samplesheet.')
+    final Boolean allowParamsSubstitution = false
 
     @Description('Configuration scope for the help message.')
     final HelpConfig help
@@ -174,14 +174,14 @@ A list of default parameters to ignore during validation. This option should onl
             }
         }
 
-        // allowParamsSubsitution
-        if (config.containsKey('allowParamsSubsitution')) {
-            if (config.allowParamsSubsitution in Boolean) {
-                allowParamsSubsitution = config.allowParamsSubsitution as Boolean
-                log.debug("Set `validation.allowParamsSubsitution` to ${allowParamsSubsitution}")
+        // allowParamsSubstitution
+        if (config.containsKey('allowParamsSubstitution')) {
+            if (config.allowParamsSubstitution in Boolean) {
+                allowParamsSubstitution = config.allowParamsSubstitution as Boolean
+                log.debug("Set `validation.allowParamsSubstitution` to ${allowParamsSubstitution}")
             } else {
                 /* groovylint-disable-next-line LineLength */
-                log.warn("Incorrect value detected for `validation.allowParamsSubsitution`, a boolean value is expected. Defaulting to `${allowParamsSubsitution}`")
+                log.warn("Incorrect value detected for `validation.allowParamsSubstitution`, a boolean value is expected. Defaulting to `${allowParamsSubstitution}`")
             }
         }
 
