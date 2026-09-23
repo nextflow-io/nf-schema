@@ -108,6 +108,10 @@ class SamplesheetConverter {
         return channelFormat
     }
 
+    private Object replaceParameters(Object input, Map params) {
+        
+    }
+
     private void resetMeta() {
         meta = [:]
     }

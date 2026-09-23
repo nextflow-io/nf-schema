@@ -15,6 +15,9 @@
         },
         "JUnitTestMethodWithoutAssert": {
             "enabled": false
+        },
+        "UnnecessaryObjectReferences": {
+            "enabled": false
         }
     }
 }
