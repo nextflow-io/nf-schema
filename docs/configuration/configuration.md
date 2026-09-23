@@ -95,6 +95,38 @@ See the below example where the limit is to 20 characters:
 validation.maxErrValSize = 100 // default: 150
 ```
 
+## allowParamsSubsitution
+
+Allow substitution of parameters in String values in the samplesheet. This options requires a boolean (`true` or `false` (default)) which indicates whether or not parameters should be substituted when converting and validating samplesheets.
+
+See for example this samplesheet:
+
+```yaml
+- sample: test
+  genome: hg38
+  reference: '${params.hg38.fasta}'
+```
+
+With `validation.allowParamsSubstitution = false` (the default), this would create a channel with contents like this:
+
+```groovy
+['test', 'hg38', '${params.hg38.fasta}']
+```
+
+With `validation.allowParamsSubstitution = true` and a parameter `--hg38.fasta test.fasta` this would create a channel with contents like this:
+
+```groovy
+['test', 'hg38', 'test.fasta']
+```
+
+!!! warning
+
+    Whenever a parameter has not been found in the parameters list, the substitution will be skipped. This will probably cause a failure in the validation of the samplesheet since the substitution happens before validation.
+
+```groovy
+validation.allowParamsSubstitution = true // default: false
+```
+
 ## help
 
 The `validation.help` config scope can be used to configure the creation of the help message.
