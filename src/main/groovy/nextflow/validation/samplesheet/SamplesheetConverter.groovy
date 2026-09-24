@@ -20,6 +20,7 @@ import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.validators.JsonSchemaValidator
 import nextflow.validation.validators.ValidationResult
+import nextflow.validation.utils.GroovyVariables
 
 /**
  * @author : mirpedrol <mirp.julia@gmail.com>
@@ -41,12 +42,15 @@ class SamplesheetConverter {
     private List<Map> rows = []
     private Map meta = [:]
 
+    private Binding paramsBinding
+
     /*
     Convert the samplesheet to a list of entries based on a schema
     */
     List validateAndConvertToList(
         Path samplesheetFile,
-        Path schemaFile
+        Path schemaFile,
+        Map params
     ) {
 
         Map colors = getLogColors(config.monochromeLogs)
@@ -77,7 +81,14 @@ class SamplesheetConverter {
         // Validate
         JsonSchemaValidator validator = new JsonSchemaValidator(config)
         JSONObject schemaJson = new JSONObject(schemaFile.text)
-        List samplesheetList = fileToObject(samplesheetFile, schemaJson) as List
+        List samplesheetList
+        List samplesheetListTemp = fileToObject(samplesheetFile, schemaJson) as List
+        if (config.allowParamsSubstitution) {
+            paramsBinding = new Binding([params: params])
+            samplesheetList = substituteParameters(samplesheetListTemp) as List
+        } else {
+            samplesheetList = samplesheetListTemp
+        }
         JSONArray samplesheet = fileToJson(samplesheetList) as JSONArray
         ValidationResult validationResult = validator.validate(samplesheet, schemaJson)
         List<String> validationErrors = validationResult.getErrors('field')
@@ -106,6 +117,20 @@ class SamplesheetConverter {
         logUnrecognisedHeaders(samplesheetName)
 
         return channelFormat
+    }
+
+    // Substitute parameters in the input object recursively using the paramsBinding
+    private Object substituteParameters(Object input) {
+        if (input in List) {
+            return input.collect { entry -> substituteParameters(entry) }
+        }
+        if (input in Map) {
+            return (input as Map).collectEntries { key, value -> [key, substituteParameters(value)] }
+        }
+        if (input in String) {
+            return GroovyVariables.evaluate(input as String, paramsBinding)
+        }
+        return input
     }
 
     private void resetMeta() {
