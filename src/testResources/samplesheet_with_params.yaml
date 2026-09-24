@@ -1,3 +1,4 @@
 - sample: test
   single: '${params.single}'
-  nested: '${params.nested.value}'
+  nested:
+    value: '${params.nested.value}'

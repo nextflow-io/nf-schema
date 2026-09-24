@@ -789,7 +789,7 @@ class SamplesheetConverterTest extends Dsl2Spec {
 
         then:
         noExceptionThrown()
-        stdout.contains('[test, success, success]')
+        stdout.contains('[test, success, [success]]')
     }
 
     void 'should not substitute parameters when disabled'() {
@@ -823,7 +823,7 @@ class SamplesheetConverterTest extends Dsl2Spec {
         error.message == """The following errors have been detected in ${rootString}/src/testResources/samplesheet_with_params.yaml:
 
 -> Entry 1: Error for field 'single' (\${params.single}): Expected success
--> Entry 1: Error for field 'nested' (\${params.nested.value}): Expected success
+-> Entry 1: Error for field 'nested/value' (\${params.nested.value}): Expected success
 
 """
     }
@@ -857,7 +857,7 @@ class SamplesheetConverterTest extends Dsl2Spec {
         SchemaValidationException error = thrown(SchemaValidationException)
         error.message == """The following errors have been detected in ${rootString}/src/testResources/samplesheet_with_params.yaml:
 
--> Entry 1: Error for field 'nested' (\${params.nested.value}): Expected success
+-> Entry 1: Error for field 'nested/value' (\${params.nested.value}): Expected success
 
 """
     }

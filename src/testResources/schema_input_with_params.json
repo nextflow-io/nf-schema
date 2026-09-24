@@ -15,8 +15,13 @@
                 "const": "success"
             },
             "nested": {
-                "type": "string",
-                "const": "success"
+                "type": "object",
+                "properties": {
+                    "value": {
+                        "type": "string",
+                        "const": "success"
+                    }
+                }
             }
         }
     }
