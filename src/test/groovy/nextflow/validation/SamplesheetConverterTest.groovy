@@ -1,4 +1,4 @@
-/* groovylint-disable LineLength, MethodName, TrailingWhitespace, UnnecessaryObjectReferences */
+/* groovylint-disable LineLength, MethodName, MethodCount, TrailingWhitespace, UnnecessaryObjectReferences */
 package nextflow.validation
 
 import static test.ScriptHelper.runScript
@@ -817,10 +817,6 @@ class SamplesheetConverterTest extends Dsl2Spec {
 
         when:
         runScript(opts, scriptText)
-        List<String> stdout = capture
-                .toString()
-                .readLines()
-                .findResults { line -> line.startsWith('[') ? line : null }
 
         then:
         SchemaValidationException error = thrown(SchemaValidationException)
@@ -856,10 +852,6 @@ class SamplesheetConverterTest extends Dsl2Spec {
 
         when:
         runScript(opts, scriptText)
-        List<String> stdout = capture
-                .toString()
-                .readLines()
-                .findResults { line -> line.startsWith('[') ? line : null }
 
         then:
         SchemaValidationException error = thrown(SchemaValidationException)

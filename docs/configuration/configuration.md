@@ -104,7 +104,7 @@ See for example this samplesheet:
 ```yaml
 - sample: test
   genome: hg38
-  reference: '${params.hg38.fasta}'
+  reference: "${params.hg38.fasta}"
 ```
 
 With `validation.allowParamsSubstitution = false` (the default), this would create a channel with contents like this:
