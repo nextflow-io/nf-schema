@@ -4,6 +4,10 @@
 
 This version contains some breaking changes to the nf-schema API. See the [migration guide](https://nextflow-io.github.io/nf-schema/3.0.0/3_0_0_migration_guide) for more information.
 
+## Added
+
+1. Added a new configuration option `validation.allowParamsSubstitution` to substitute parameters in String values in the samplesheet. See the [docs](docs/configuration/configuration.md#allowparamssubstitution) for more information.
+
 ## Removed
 
 1. Removed support for help message creation via configuration. Use the `paramsHelp()` function instead. All configuration options (except for `validation.help.enabled`) are still available and will still change the output of the `paramsHelp()` function
