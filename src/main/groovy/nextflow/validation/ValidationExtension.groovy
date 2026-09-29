@@ -76,7 +76,7 @@ class ValidationExtension extends PluginExtensionPoint {
         final Path schema
     ) {
         SamplesheetConverter converter = new SamplesheetConverter(config)
-        List output = converter.validateAndConvertToList(samplesheet, schema)
+        List output = converter.validateAndConvertToList(samplesheet, schema, session.params)
         return output
     }
 

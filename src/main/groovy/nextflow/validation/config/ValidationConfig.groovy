@@ -63,6 +63,10 @@ A list of default parameters to ignore during validation. This option should onl
     // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
     final Set<CharSequence> ignoreParams = ['nf_test_output']
 
+    @ConfigOption
+    @Description('Allow substitution of parameters in the samplesheet.')
+    final Boolean allowParamsSubstitution = false
+
     @Description('Configuration scope for the help message.')
     final HelpConfig help
 
@@ -167,6 +171,17 @@ A list of default parameters to ignore during validation. This option should onl
             } else {
                 /* groovylint-disable-next-line LineLength */
                 log.warn("Incorrect value detected for `validation.defaultIgnoreParams`, a list with string values is expected. Defaulting to `${ignoreParams}`")
+            }
+        }
+
+        // allowParamsSubstitution
+        if (config.containsKey('allowParamsSubstitution')) {
+            if (config.allowParamsSubstitution in Boolean) {
+                allowParamsSubstitution = config.allowParamsSubstitution as Boolean
+                log.debug("Set `validation.allowParamsSubstitution` to ${allowParamsSubstitution}")
+            } else {
+                /* groovylint-disable-next-line LineLength */
+                log.warn("Incorrect value detected for `validation.allowParamsSubstitution`, a boolean value is expected. Defaulting to `${allowParamsSubstitution}`")
             }
         }
 
