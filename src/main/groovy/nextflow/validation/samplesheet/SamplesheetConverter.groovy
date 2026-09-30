@@ -149,7 +149,7 @@ class SamplesheetConverter {
         if (unrecognisedHeaders.size() > 0) {
             String processedHeaders = unrecognisedHeaders.collect { header -> "\t- ${header}" }.join('\n')
             String msg = "Found the following unidentified headers in ${fileName}:\n${processedHeaders}\n" as String
-            config.logging.unrecognisedHeaders.log(msg)
+            config.logging.unrecognisedHeadersLogger.log(msg)
         }
     }
 

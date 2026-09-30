@@ -45,8 +45,8 @@ class ValidationExtension extends PluginExtensionPoint {
 
     @Function
     List samplesheetToList(
-        final CharSequence samplesheet,
-        final CharSequence schema
+        final String samplesheet,
+        final String schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
         return samplesheetToList(samplesheetFile, schema)
@@ -55,15 +55,15 @@ class ValidationExtension extends PluginExtensionPoint {
     @Function
     List samplesheetToList(
         final Path samplesheet,
-        final CharSequence schema
+        final String schema
     ) {
-        Path schemaPath = getBasePath(session.baseDir, schema as String)
+        Path schemaPath = getBasePath(session.baseDir, schema)
         return samplesheetToList(samplesheet, schemaPath)
     }
 
     @Function
     List samplesheetToList(
-        final CharSequence samplesheet,
+        final String samplesheet,
         final Path schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path

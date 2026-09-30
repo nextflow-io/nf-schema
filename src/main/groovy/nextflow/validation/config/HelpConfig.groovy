@@ -25,27 +25,27 @@ class HelpConfig implements ConfigScope {
 
     @ConfigOption
     @Description('The parameter to use to show hidden parameters in the help message.')
-    final CharSequence showHiddenParameter = 'showHidden'
+    final String showHiddenParameter = 'showHidden'
 
     @ConfigOption
     @Description('The parameter to use to show the short help message.')
-    final CharSequence shortParameter = 'help'
+    final String shortParameter = 'help'
 
     @ConfigOption
     @Description('The parameter to use to show the full help message.')
-    final CharSequence fullParameter = 'helpFull'
+    final String fullParameter = 'helpFull'
 
     @ConfigOption
     @Description('The text to show before the help message.')
-    final CharSequence beforeText = ''
+    final String beforeText = ''
 
     @ConfigOption
     @Description('The text to show after the help message.')
-    final CharSequence afterText = ''
+    final String afterText = ''
 
     @ConfigOption
     @Description('An example command of how to run the pipeline.')
-    final CharSequence command = ''
+    final String command = ''
 
     @ConfigOption
     @Description('''

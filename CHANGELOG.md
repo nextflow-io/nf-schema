@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 3.0.1
+
+## Bug fixes
+
+1. Fixed the plugin spec to only use standard Nextflow types. `CharSequence` function parameters and config options are now `String`, and the `validation.logging.unrecognisedParams` and `validation.logging.unrecognisedHeaders` options are declared as strings instead of an internal logger class.
+
 # Version 3.0.0
 
 This version contains some breaking changes to the nf-schema API. See the [migration guide](https://nextflow-io.github.io/nf-schema/3.0.0/3_0_0_migration_guide) for more information.

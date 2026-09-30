@@ -190,7 +190,7 @@ class ParameterValidator {
         }
 
         if (unexpectedParams.size() > 0) {
-            config.logging.unrecognisedParams.log(
+            config.logging.unrecognisedParamsLogger.log(
                 'The following invalid input values have been detected:\n\n' +
                 unexpectedParams.join('\n').trim() + '\n\n'
             )

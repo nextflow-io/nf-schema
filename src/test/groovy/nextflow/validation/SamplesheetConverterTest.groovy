@@ -74,6 +74,31 @@ class SamplesheetConverterTest extends Dsl2Spec {
         pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
     }
 
+    void 'should accept GString arguments'() {
+        given:
+        /* groovylint-disable-next-line GStringExpressionWithinString */
+        String scriptText = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            workflow {
+                def dir = "src/testResources"
+                channel.fromList(samplesheetToList("${dir}/correct.csv", "${dir}/schema_input.json"))
+                    .view()
+            }
+        '''
+
+        when:
+        runScript(scriptText)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> line.startsWith('[[') ? line : null }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 4
+    }
+
     void 'should work fine - CSV'() {
         given:
         String scriptText = '''
