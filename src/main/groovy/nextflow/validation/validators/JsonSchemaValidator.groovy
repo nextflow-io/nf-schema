@@ -5,6 +5,8 @@ import static nextflow.validation.utils.Common.getValueFromJsonPointer
 
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
+import java.nio.file.FileSystems
+import java.nio.file.Path
 import org.json.JSONObject
 import dev.harrel.jsonschema.ValidatorFactory
 import dev.harrel.jsonschema.Validator
@@ -28,20 +30,29 @@ import nextflow.validation.validators.evaluators.CustomEvaluatorFactory
 public class JsonSchemaValidator {
 
     final private ValidatorFactory validator
+    final private CustomEvaluatorFactory customEvaluators
     final private ValidationConfig config
 
     JsonSchemaValidator(ValidationConfig config) {
+        this.customEvaluators = new CustomEvaluatorFactory(config)
         this.validator = new ValidatorFactory()
             .withJsonNodeFactory(new OrgJsonNode.Factory())
             // .withDialect() // TODO define the dialect
             .withEvaluatorFactory(
-                EvaluatorFactory.compose(new CustomEvaluatorFactory(config), new FormatEvaluatorFactory())
+                EvaluatorFactory.compose(this.customEvaluators, new FormatEvaluatorFactory())
             )
         this.config = config
     }
 
-    ValidationResult validate(Object input, JSONObject schema) {
+    //
+    // The location of the schema is used to find the schemas it references (with the `schema` keyword)
+    // next to it
+    //
+    ValidationResult validate(Object input, JSONObject schema, Path schemaPath = null) {
         JsonNode jsonInput = new OrgJsonNode.Factory().wrap(input)
+        this.customEvaluators.schemaDir = schemaPath?.fileSystem == FileSystems.default ?
+            schemaPath.toAbsolutePath().parent?.toString() :
+            null
         return validateObject(jsonInput, input, schema)
     }
 

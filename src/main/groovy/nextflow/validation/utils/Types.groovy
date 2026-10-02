@@ -109,8 +109,11 @@ public class Types {
     // Values that were not given on the command line are left as they are.
     //
     static Map castCliValues(Map params, Map cliParams) {
+        if (cliParams == null) {
+            return params
+        }
         return params.collectEntries { Object name, Object value ->
-            if (cliParams == null || !cliParams.containsKey(name)) {
+            if (!cliParams.containsKey(name)) {
                 return [(name): value]
             }
             Object cast = value
