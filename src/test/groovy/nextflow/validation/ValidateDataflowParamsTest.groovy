@@ -97,6 +97,29 @@ class ValidateDataflowParamsTest extends Specification {
         error.message.contains('--input (src/testResources/correct.txt)')
     }
 
+    void 'should accept a valid value of a dataflow param when the command line values are not cast'() {
+        given:
+        Session session = mockSession(topLevelParams(new ValueImpl(new DataflowVariable())), [input: 'src/testResources/correct.csv'])
+
+        when:
+        validate(session, SCHEMA, [cast_cli_params: false])
+
+        then:
+        noExceptionThrown()
+    }
+
+    void 'should reject an invalid value of a dataflow param when the command line values are not cast'() {
+        given:
+        Session session = mockSession(topLevelParams(new ValueImpl(new DataflowVariable())), [input: 'src/testResources/correct.txt'])
+
+        when:
+        validate(session, SCHEMA, [cast_cli_params: false])
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message.contains('--input (src/testResources/correct.txt)')
+    }
+
     void 'should accept a valid value of a dataflow value nested in a record param'() {
         given:
         Session session = mockSession(
@@ -134,10 +157,10 @@ class ValidateDataflowParamsTest extends Specification {
         return session
     }
 
-    private void validate(Session session, String schema) {
+    private void validate(Session session, String schema, Map options = [:]) {
         ValidationConfig config = new ValidationConfig([monochromeLogs: true], session)
         new ParameterValidator(config).validateParametersMap(
-            [parameters_schema: Path.of(schema).toAbsolutePath().toString()],
+            [parameters_schema: Path.of(schema).toAbsolutePath().toString()] + options,
             session
         )
     }

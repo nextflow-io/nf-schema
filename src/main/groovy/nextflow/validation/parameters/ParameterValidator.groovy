@@ -125,10 +125,7 @@ class ParameterValidator {
         final Map options = [:],
         Session session
     ) {
-        Map<String, Object> params = replaceDataflowParams(
-            initialiseExpectedParams(session.params),
-            session.config?.params
-        )
+        Map<String, Object> params = initialiseExpectedParams(session.params)
         String schemaFilename = options?.containsKey('parameters_schema') ?
             options.parameters_schema as String :
             config.parametersSchema as String
@@ -146,17 +143,18 @@ class ParameterValidator {
             .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
             .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
 
-        // Cast parameters provided via the CLI to their respective types.
-        // This is a temporary workaround until static typing is introduced in Nextflow,
-        // in which case we can rely on the static type system to do the casting for us.
-        // This mimics the type casting behaviour of syntax parser V1 so shouldn't introduce any breaking changes.
-        if (castCliParams) {
-            List<String> cliParams = (session.cliParams?.keySet()?.toList()*.toString() ?: []) as List<String>
-            generatorOptions.addConverter(Map<String, Object>) { Map<String,Object> map ->
-                map.collectEntries { k, v ->
-                    // Only cast parameters that were explicitly provided via the CLI
-                    return (cliParams.contains(k) && v in String) ? [k, parseParamValue(v as String)] : [k, v]
-                }
+        // The generator calls this converter for the params map before it reads any entry, so the dataflow
+        // params are replaced once on the root map and the nested maps it reaches afterwards hold none.
+        // Parameters provided via the CLI are cast here too (a temporary workaround until static typing is
+        // introduced in Nextflow), which mimics the type casting behaviour of syntax parser V1.
+        List<String> cliParams = castCliParams ?
+            (session.cliParams?.keySet()?.toList()*.toString() ?: []) as List<String> :
+            []
+        generatorOptions.addConverter(Map) { Map map ->
+            Map<Object, Object> level = map.is(params) ? replaceDataflowParams(map, session.config?.params) : map
+            return level.collectEntries { Object k, Object v ->
+                // Only cast parameters that were explicitly provided via the CLI
+                (cliParams.contains(k) && v in String) ? [k, parseParamValue(v as String)] : [k, v]
             }
         }
 
