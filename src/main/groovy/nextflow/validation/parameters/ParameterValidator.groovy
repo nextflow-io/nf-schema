@@ -5,7 +5,7 @@ import static nextflow.NF.isSyntaxParserV2
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
-import static nextflow.validation.utils.Types.parseParamValue
+import static nextflow.validation.utils.Types.castCliValues
 
 import java.nio.file.Path
 import groovy.json.JsonGenerator
@@ -147,13 +147,7 @@ class ParameterValidator {
         // in which case we can rely on the static type system to do the casting for us.
         // This mimics the type casting behaviour of syntax parser V1 so shouldn't introduce any breaking changes.
         if (castCliParams) {
-            List<String> cliParams = (session.cliParams?.keySet()?.toList()*.toString() ?: []) as List<String>
-            generatorOptions.addConverter(Map<String, Object>) { Map<String,Object> map ->
-                map.collectEntries { k, v ->
-                    // Only cast parameters that were explicitly provided via the CLI
-                    return (cliParams.contains(k) && v in String) ? [k, parseParamValue(v as String)] : [k, v]
-                }
-            }
+            params = castCliValues(params, session.cliParams as Map) as Map<String, Object>
         }
 
         JSONObject paramsJSON = new JSONObject(generatorOptions.build().toJson(params))

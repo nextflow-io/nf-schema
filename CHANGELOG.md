@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 3.1.0
+
+## Bug fixes
+
+1. Fixed an issue where the command line value of a nested parameter (e.g. `--group.flag true`) was not cast to the type in the schema, while the value of a top-level parameter was. The nested values of the command line parameters are now followed to find the values to cast.
+
 # Version 3.0.0
 
 This version contains some breaking changes to the nf-schema API. See the [migration guide](https://nextflow-io.github.io/nf-schema/3.0.0/3_0_0_migration_guide) for more information.
