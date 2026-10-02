@@ -1,5 +1,9 @@
 package nextflow.validation.utils
 
+import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.DataflowWriteChannel
+import nextflow.dataflow.ChannelImpl
+import nextflow.dataflow.ValueImpl
 import org.json.JSONObject
 import org.json.JSONArray
 import org.json.JSONPointer
@@ -124,10 +128,11 @@ public class Common {
         }
     }
 
-    // Matched by package because the dataflow classes are not on the plugin's compile classpath
+    // The values a Channel or Value param holds: the typed wrappers and the dataflow channels and variables
+    // underneath them
     static boolean isDataflowValue(Object value) {
-        String className = value?.getClass()?.name ?: ''
-        return className.startsWith('groovyx.gpars.dataflow.') || className.startsWith('nextflow.dataflow.')
+        return value in ChannelImpl || value in ValueImpl ||
+            value in DataflowReadChannel || value in DataflowWriteChannel
     }
 
     // Channel and Value params hold live dataflow objects: reading them blocks, and they print as object
