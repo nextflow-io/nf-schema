@@ -124,7 +124,7 @@ class ParameterValidator {
         final Map options = [:],
         Session session
     ) {
-        Map<String, Object> params = initialiseExpectedParams(session.params)
+        Map<String, Object> params = replaceDataflowParams(initialiseExpectedParams(session.params), session)
         String schemaFilename = options?.containsKey('parameters_schema') ?
             options.parameters_schema as String :
             config.parametersSchema as String
@@ -213,6 +213,46 @@ class ParameterValidator {
     private List<String> getErrors() { return errors }
 
     private List<String> getWarnings() { return warnings }
+
+    //
+    // Matched by package because the dataflow classes are not on the plugin's compile classpath
+    //
+    private static boolean isDataflowValue(Object value) {
+        String className = value?.getClass()?.name ?: ''
+        return className.startsWith('groovyx.gpars.dataflow.') || className.startsWith('nextflow.dataflow.')
+    }
+
+    //
+    // Channel and Value params hold live dataflow objects, and serialising them blocks forever.
+    // The value they were created from (given on the command line, else set in the config) is
+    // validated in their place, and a param without one is left out. Params nested in a record
+    // (e.g. the params of an included pipeline) are handled the same way.
+    //
+    private Map<String, Object> replaceDataflowParams(Map<String, Object> params, Session session) {
+        return replaceDataflowValues(params, session.cliParams, session.config?.params) as Map<String, Object>
+    }
+
+    private Object replaceDataflowValues(Object value, Object cliValue, Object configValue) {
+        if (isDataflowValue(value)) {
+            Object source = cliValue != null ? cliValue : configValue
+            return source != null && !isDataflowValue(source) ? source : null
+        }
+        if (value instanceof Map) {
+            Map<Object, Object> result = [:]
+            (value as Map<Object, Object>).each { Object name, Object entry ->
+                Object replaced = replaceDataflowValues(
+                    entry,
+                    cliValue instanceof Map ? (cliValue as Map)[name] : null,
+                    configValue instanceof Map ? (configValue as Map)[name] : null
+                )
+                if (replaced != null || !isDataflowValue(entry)) {
+                    result[name] = replaced
+                }
+            }
+            return result
+        }
+        return value
+    }
 
     //
     // Initialise expected params if not present
