@@ -210,10 +210,6 @@ class ParameterValidator {
         log.debug 'Finishing parameters validation'
     }
 
-    private List<String> getErrors() { return errors }
-
-    private List<String> getWarnings() { return warnings }
-
     //
     // Matched by package because the dataflow classes are not on the plugin's compile classpath
     //
@@ -221,6 +217,10 @@ class ParameterValidator {
         String className = value?.getClass()?.name ?: ''
         return className.startsWith('groovyx.gpars.dataflow.') || className.startsWith('nextflow.dataflow.')
     }
+
+    private List<String> getErrors() { return errors }
+
+    private List<String> getWarnings() { return warnings }
 
     //
     // Channel and Value params hold live dataflow objects, and serialising them blocks forever.
@@ -237,13 +237,13 @@ class ParameterValidator {
             Object source = cliValue != null ? cliValue : configValue
             return source != null && !isDataflowValue(source) ? source : null
         }
-        if (value instanceof Map) {
+        if (value in Map) {
             Map<Object, Object> result = [:]
             (value as Map<Object, Object>).each { Object name, Object entry ->
                 Object replaced = replaceDataflowValues(
                     entry,
-                    cliValue instanceof Map ? (cliValue as Map)[name] : null,
-                    configValue instanceof Map ? (configValue as Map)[name] : null
+                    cliValue in Map ? (cliValue as Map)[name] : null,
+                    configValue in Map ? (configValue as Map)[name] : null
                 )
                 if (replaced != null || !isDataflowValue(entry)) {
                     result[name] = replaced
