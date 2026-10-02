@@ -14,6 +14,7 @@ import nextflow.plugin.extension.PluginExtensionProvider
 import org.junit.Rule
 import org.pf4j.PluginDescriptorFinder
 import spock.lang.Shared
+import spock.lang.Timeout
 import test.Dsl2Spec
 import test.OutputCapture
 
@@ -110,6 +111,58 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         noExceptionThrown()
         stdout.size() == 11
         stdout ==~ /.*outdir     : outDir.*/
+    }
+
+    @Timeout(60)
+    void 'should leave a param that holds a dataflow value out of the params summary'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                params.outdir = 'outDir'
+                params.input = new groovyx.gpars.dataflow.DataflowVariable()
+                log.info paramsSummaryLog(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': ['validation': ['monochromeLogs': true]]]
+        runScript(opts, script)
+        String stdout = capture
+
+        then:
+        noExceptionThrown()
+        stdout ==~ /(?s).*outdir     : outDir.*/
+        !stdout.contains('DataflowVariable')
+        !stdout.contains('input ')
+    }
+
+    @Timeout(60)
+    void 'should print the config value of a param that holds a dataflow value in the params summary'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                params.outdir = 'outDir'
+                params.input = new groovyx.gpars.dataflow.DataflowVariable()
+                log.info paramsSummaryLog(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': ['monochromeLogs': true],
+            'params': ['input': 'src/testResources/correct.csv']
+        ]]
+        runScript(opts, script)
+        String stdout = capture
+
+        then:
+        noExceptionThrown()
+        stdout ==~ /(?s).*input      : src\/testResources\/correct.csv.*/
+        !stdout.contains('DataflowVariable')
     }
 
     void 'should print params summary - nested parameters'() {

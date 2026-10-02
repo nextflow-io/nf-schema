@@ -124,4 +124,40 @@ public class Common {
         }
     }
 
+    // Matched by package because the dataflow classes are not on the plugin's compile classpath
+    static boolean isDataflowValue(Object value) {
+        String className = value?.getClass()?.name ?: ''
+        return className.startsWith('groovyx.gpars.dataflow.') || className.startsWith('nextflow.dataflow.')
+    }
+
+    // Channel and Value params hold live dataflow objects: reading them blocks, and they print as object
+    // names. The value they were created from (given on the command line, else set in the config) is used
+    // in their place, and a param without one is left out. Params nested in a record (e.g. the params of an
+    // included pipeline) are handled the same way.
+    static Map replaceDataflowParams(Map params, Object cliParams, Object configParams) {
+        return replaceDataflowValues(params, cliParams, configParams) as Map
+    }
+
+    private static Object replaceDataflowValues(Object value, Object cliValue, Object configValue) {
+        if (isDataflowValue(value)) {
+            Object source = cliValue != null ? cliValue : configValue
+            return source != null && !isDataflowValue(source) ? source : null
+        }
+        if (value in Map) {
+            Map<Object, Object> result = [:]
+            (value as Map<Object, Object>).each { Object name, Object entry ->
+                Object replaced = replaceDataflowValues(
+                    entry,
+                    cliValue in Map ? (cliValue as Map)[name] : null,
+                    configValue in Map ? (configValue as Map)[name] : null
+                )
+                if (replaced != null || !isDataflowValue(entry)) {
+                    result[name] = replaced
+                }
+            }
+            return result
+        }
+        return value
+    }
+
 }
