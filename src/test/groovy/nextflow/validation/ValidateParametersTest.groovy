@@ -398,6 +398,118 @@ class ValidateParametersTest extends Dsl2Spec {
         !stdout
     }
 
+    void 'should find a referenced schema next to the schema that references it'() {
+        given:
+        Path dir = Files.createTempDirectory('nf-schema-referenced')
+        String parameters = new File('src/testResources/nextflow_schema_with_samplesheet.json').text
+            .replace('src/testResources/samplesheet_schema.json', 'samplesheet_schema.json')
+        new File(dir.toFile(), 'nextflow_schema.json').text = parameters
+        new File(dir.toFile(), 'samplesheet_schema.json').text = new File('src/testResources/samplesheet_schema.json').text
+        String schema = dir.resolve('nextflow_schema.json')
+        String wrongCsv = Path.of('src/testResources/wrong.csv').toAbsolutePath()
+        String script = """
+            include { validateParameters } from 'plugin/nf-schema'
+            workflow {
+                params.input = '${wrongCsv}'
+                params.outdir = 'src/testResources/testDir'
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': ['validation': ['monochromeLogs': true]]]
+        runScript(opts, script)
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message.readLines()[2].startsWith('* --input')
+        error.message.contains("Error for field 'strandedness' (weird)")
+
+        cleanup:
+        dir.toFile().deleteDir()
+    }
+
+    void 'should find a referenced schema relative to the project when it is not next to the schema'() {
+        given:
+        Path dir = Files.createTempDirectory('nf-schema-referenced')
+        String schema = dir.resolve('nextflow_schema.json')
+        new File(schema).text = new File('src/testResources/nextflow_schema_with_samplesheet.json').text
+        String wrongCsv = Path.of('src/testResources/wrong.csv').toAbsolutePath()
+        String script = """
+            include { validateParameters } from 'plugin/nf-schema'
+            workflow {
+                params.input = '${wrongCsv}'
+                params.outdir = 'src/testResources/testDir'
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': ['validation': ['monochromeLogs': true]]]
+        runScript(opts, script)
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message.contains("Error for field 'strandedness' (weird)")
+
+        cleanup:
+        dir.toFile().deleteDir()
+    }
+
+    void 'should find a schema referenced by a referenced schema next to the schema that references it'() {
+        given:
+        Path dir = Files.createTempDirectory('nf-schema-referenced')
+        String draft = 'https://json-schema.org/draft/2020-12/schema'
+        String extraCsv = dir.resolve('extra.csv')
+        String samplesheet = dir.resolve('samplesheet.csv')
+        new File(dir.toFile(), 'nextflow_schema.json').text = """{
+            "\$schema": "${draft}",
+            "type": "object",
+            "properties": { "input": { "type": "string", "format": "file-path", "schema": "samplesheet_schema.json" } }
+        }"""
+        new File(dir.toFile(), 'samplesheet_schema.json').text = """{
+            "\$schema": "${draft}",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "sample": { "type": "string" },
+                    "extra": { "type": "string", "format": "file-path", "schema": "extra_schema.json" }
+                },
+                "required": ["sample"]
+            }
+        }"""
+        new File(dir.toFile(), 'extra_schema.json').text = """{
+            "\$schema": "${draft}",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": { "count": { "type": "integer" } },
+                "required": ["count"]
+            }
+        }"""
+        new File(extraCsv).text = 'count\nnot_a_number\n'
+        new File(samplesheet).text = "sample,extra\ns1,${extraCsv}\n"
+        String script = """
+            include { validateParameters } from 'plugin/nf-schema'
+            workflow {
+                params.input = '${samplesheet}'
+                validateParameters(parameters_schema: '${dir.resolve('nextflow_schema.json')}')
+            }
+        """
+
+        when:
+        Map opts = ['config': ['validation': ['monochromeLogs': true]]]
+        runScript(opts, script)
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message.contains("Error for field 'count' (not_a_number)")
+
+        cleanup:
+        dir.toFile().deleteDir()
+    }
+
     void 'should validate a schema with failures - TSV'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()

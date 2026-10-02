@@ -4,7 +4,8 @@
 
 ## Bug fixes
 
-1. Fixed an issue where `validateParameters()` would hang, and the params summary would print an object name, when a parameter holds a `Channel` or `Value` (e.g. a typed `Channel<...>` param). The value the parameter was created from (from the `params` config scope, which also holds the values given on the command line and in a params file) is validated and printed in its place, also when the dataflow value is nested in a record parameter. A parameter without such a value is left out.
+1. Fixed an issue where a schema referenced with the `schema` keyword was only looked up relative to the project that is running. It is now looked up next to the schema that references it first, and relative to the project otherwise, so a pipeline schema keeps working when it is read from another directory (e.g. when the pipeline is included in another one).
+2. Fixed an issue where `validateParameters()` would hang, and the params summary would print an object name, when a parameter holds a `Channel` or `Value` (e.g. a typed `Channel<...>` param). The value the parameter was created from (from the `params` config scope, which also holds the values given on the command line and in a params file) is validated and printed in its place, also when the dataflow value is nested in a record parameter. A parameter without such a value is left out.
 
 # Version 3.0.0
 

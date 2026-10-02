@@ -117,7 +117,7 @@ class ValidationExtension extends PluginExtensionPoint {
             jsonObj = input
         }
         JSONObject schemaJson = new JSONObject(schema.text)
-        ValidationResult result = validator.validate(jsonObj, schemaJson)
+        ValidationResult result = validator.validate(jsonObj, schemaJson, schema)
         List<String> errors = result.getErrors('object')
         if (exitOnError && errors != []) {
             Map<String, String> colors = getLogColors(config.monochromeLogs)
