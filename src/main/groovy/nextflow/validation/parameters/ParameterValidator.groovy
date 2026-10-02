@@ -165,8 +165,9 @@ class ParameterValidator {
         Map<String,String> colors = getLogColors(config.monochromeLogs)
 
         // Validate
-        JSONObject schemaJson = new JSONObject(getBasePath(session.baseDir, schemaFilename).text)
-        ValidationResult validationResult = validator.validate(paramsJSON, schemaJson)
+        Path schemaPath = getBasePath(session.baseDir, schemaFilename)
+        JSONObject schemaJson = new JSONObject(schemaPath.text)
+        ValidationResult validationResult = validator.validate(paramsJSON, schemaJson, schemaPath)
         List<String> paramErrors = validationResult.getErrors('parameter')
         errors.addAll(paramErrors)
 
