@@ -23,6 +23,7 @@ This version contains some breaking changes to the nf-schema API. See the [migra
 
 1. Fixed an issue where the summary creation functions would fail if the default of a parameter was set in the schema, but not in the pipeline.
 2. Fixed an issue where parameters with the `Path` type containing a remote file would show the wrong file path in the summary.
+3. Fixed an issue where a schema referenced with the `schema` keyword was only looked up relative to the project that is running. It is now looked up next to the schema that references it first, and relative to the project otherwise, so a pipeline schema keeps working when it is read from another directory (e.g. when the pipeline is included in another one).
 
 # Version 2.8.0
 
