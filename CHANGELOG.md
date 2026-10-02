@@ -1,6 +1,6 @@
 # nextflow-io/nf-schema: Changelog
 
-# Version 3.0.1
+# Version 3.1.0
 
 ## Bug fixes
 
