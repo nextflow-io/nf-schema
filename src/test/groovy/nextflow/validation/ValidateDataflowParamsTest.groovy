@@ -16,9 +16,10 @@ import spock.lang.Timeout
 import java.nio.file.Path
 
 /**
- * Validation of params that hold a dataflow value (a typed `Channel` or `Value` param), where the
- * value given on the command line or in the config is validated in place of the dataflow object.
- * The session is mocked so that the command line params can be set directly.
+ * Validation of params that hold a dataflow value (a typed `Channel` or `Value` param), where the value
+ * the param was created from is validated in place of the dataflow object. Nextflow keeps that value in
+ * the params scope of the config, which also holds the values given on the command line and in a params
+ * file. The session is mocked so that the config params can be set directly.
  */
 @CompileDynamic
 @Timeout(60)
@@ -27,9 +28,9 @@ class ValidateDataflowParamsTest extends Specification {
     private static final String SCHEMA = 'src/testResources/nextflow_schema.json'
     private static final String NESTED_SCHEMA = 'src/testResources/nextflow_schema_nested_parameters.json'
 
-    void 'should accept a valid command line value for a dataflow param'() {
+    void 'should accept a valid value of a dataflow param'() {
         given:
-        Session session = mockSession(topLevelParams(new DataflowVariable()), [input: 'src/testResources/correct.csv'], [:])
+        Session session = mockSession(topLevelParams(new DataflowVariable()), [input: 'src/testResources/correct.csv'])
 
         when:
         validate(session, SCHEMA)
@@ -38,9 +39,9 @@ class ValidateDataflowParamsTest extends Specification {
         noExceptionThrown()
     }
 
-    void 'should reject an invalid command line value for a dataflow param'() {
+    void 'should reject an invalid value of a dataflow param'() {
         given:
-        Session session = mockSession(topLevelParams(new DataflowVariable()), [input: 'src/testResources/correct.txt'], [:])
+        Session session = mockSession(topLevelParams(new DataflowVariable()), [input: 'src/testResources/correct.txt'])
 
         when:
         validate(session, SCHEMA)
@@ -50,13 +51,20 @@ class ValidateDataflowParamsTest extends Specification {
         error.message.contains('--input (src/testResources/correct.txt)')
     }
 
-    void 'should validate the command line value over the config value - invalid command line value'() {
+    void 'should accept a valid value of a Value param'() {
         given:
-        Session session = mockSession(
-            topLevelParams(new DataflowVariable()),
-            [input: 'src/testResources/correct.txt'],
-            [input: 'src/testResources/correct.csv']
-        )
+        Session session = mockSession(topLevelParams(new ValueImpl(new DataflowVariable())), [input: 'src/testResources/correct.csv'])
+
+        when:
+        validate(session, SCHEMA)
+
+        then:
+        noExceptionThrown()
+    }
+
+    void 'should reject an invalid value of a Value param'() {
+        given:
+        Session session = mockSession(topLevelParams(new ValueImpl(new DataflowVariable())), [input: 'src/testResources/correct.txt'])
 
         when:
         validate(session, SCHEMA)
@@ -66,13 +74,9 @@ class ValidateDataflowParamsTest extends Specification {
         error.message.contains('--input (src/testResources/correct.txt)')
     }
 
-    void 'should validate the command line value over the config value - valid command line value'() {
+    void 'should accept a valid value of a Channel param'() {
         given:
-        Session session = mockSession(
-            topLevelParams(new DataflowVariable()),
-            [input: 'src/testResources/correct.csv'],
-            [input: 'src/testResources/correct.txt']
-        )
+        Session session = mockSession(topLevelParams(new ChannelImpl(new DataflowQueue())), [input: 'src/testResources/correct.csv'])
 
         when:
         validate(session, SCHEMA)
@@ -81,20 +85,9 @@ class ValidateDataflowParamsTest extends Specification {
         noExceptionThrown()
     }
 
-    void 'should accept a valid command line value for a Value param'() {
+    void 'should reject an invalid value of a Channel param'() {
         given:
-        Session session = mockSession(topLevelParams(new ValueImpl(new DataflowVariable())), [input: 'src/testResources/correct.csv'], [:])
-
-        when:
-        validate(session, SCHEMA)
-
-        then:
-        noExceptionThrown()
-    }
-
-    void 'should reject an invalid command line value for a Value param'() {
-        given:
-        Session session = mockSession(topLevelParams(new ValueImpl(new DataflowVariable())), [input: 'src/testResources/correct.txt'], [:])
+        Session session = mockSession(topLevelParams(new ChannelImpl(new DataflowQueue())), [input: 'src/testResources/correct.txt'])
 
         when:
         validate(session, SCHEMA)
@@ -104,35 +97,11 @@ class ValidateDataflowParamsTest extends Specification {
         error.message.contains('--input (src/testResources/correct.txt)')
     }
 
-    void 'should accept a valid command line value for a Channel param'() {
-        given:
-        Session session = mockSession(topLevelParams(new ChannelImpl(new DataflowQueue())), [input: 'src/testResources/correct.csv'], [:])
-
-        when:
-        validate(session, SCHEMA)
-
-        then:
-        noExceptionThrown()
-    }
-
-    void 'should reject an invalid command line value for a Channel param'() {
-        given:
-        Session session = mockSession(topLevelParams(new ChannelImpl(new DataflowQueue())), [input: 'src/testResources/correct.txt'], [:])
-
-        when:
-        validate(session, SCHEMA)
-
-        then:
-        SchemaValidationException error = thrown(SchemaValidationException)
-        error.message.contains('--input (src/testResources/correct.txt)')
-    }
-
-    void 'should accept a valid command line value for a dataflow value nested in a record param'() {
+    void 'should accept a valid value of a dataflow value nested in a record param'() {
         given:
         Session session = mockSession(
             [map: [is: [so: [deep: new ValueImpl(new DataflowVariable())]]]],
-            [map: [is: [so: [deep: true]]]],
-            [:]
+            [map: [is: [so: [deep: true]]]]
         )
 
         when:
@@ -142,12 +111,11 @@ class ValidateDataflowParamsTest extends Specification {
         noExceptionThrown()
     }
 
-    void 'should reject an invalid command line value for a dataflow value nested in a record param'() {
+    void 'should reject an invalid value of a dataflow value nested in a record param'() {
         given:
         Session session = mockSession(
             [map: [is: [so: [deep: new ValueImpl(new DataflowVariable())]]]],
-            [map: [is: [so: [deep: 'maybe']]]],
-            [:]
+            [map: [is: [so: [deep: 'maybe']]]]
         )
 
         when:
@@ -158,10 +126,9 @@ class ValidateDataflowParamsTest extends Specification {
         error.message.contains('--map.is.so.deep')
     }
 
-    private Session mockSession(Map params, Map cliParams, Map configParams) {
+    private Session mockSession(Map params, Map configParams) {
         Session session = Mock(Session)
         session.params >> params
-        session.cliParams >> cliParams
         session.config >> [params: configParams]
         session.baseDir >> Path.of('.').toAbsolutePath()
         return session

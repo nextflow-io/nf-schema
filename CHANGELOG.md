@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 3.0.1
+
+## Bug fixes
+
+1. Fixed an issue where `validateParameters()` would hang, and the params summary would print an object name, when a parameter holds a `Channel` or `Value` (e.g. a typed `Channel<...>` param). The value the parameter was created from (from the `params` config scope, which also holds the values given on the command line and in a params file) is validated and printed in its place, also when the dataflow value is nested in a record parameter. A parameter without such a value is left out.
+
 # Version 3.0.0
 
 This version contains some breaking changes to the nf-schema API. See the [migration guide](https://nextflow-io.github.io/nf-schema/3.0.0/3_0_0_migration_guide) for more information.
@@ -23,7 +29,6 @@ This version contains some breaking changes to the nf-schema API. See the [migra
 
 1. Fixed an issue where the summary creation functions would fail if the default of a parameter was set in the schema, but not in the pipeline.
 2. Fixed an issue where parameters with the `Path` type containing a remote file would show the wrong file path in the summary.
-3. Fixed an issue where `validateParameters()` would hang, and the params summary would print an object name, when a parameter holds a `Channel` or `Value` (e.g. a typed `Channel<...>` param). The value the parameter was created from (given on the command line, otherwise set in the `params` config scope) is validated and printed in its place, also when the dataflow value is nested in a record parameter. A parameter without such a value is left out.
 
 # Version 2.8.0
 

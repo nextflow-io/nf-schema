@@ -127,7 +127,6 @@ class ParameterValidator {
     ) {
         Map<String, Object> params = replaceDataflowParams(
             initialiseExpectedParams(session.params),
-            session.cliParams,
             session.config?.params
         )
         String schemaFilename = options?.containsKey('parameters_schema') ?

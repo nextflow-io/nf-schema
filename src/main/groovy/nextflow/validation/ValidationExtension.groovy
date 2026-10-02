@@ -198,7 +198,7 @@ class ValidationExtension extends PluginExtensionPoint {
             options,
             session.workflowMetadata,
             session.baseDir,
-            replaceDataflowParams(session.params, session.cliParams, session.config?.params)
+            replaceDataflowParams(session.params, session.config?.params)
         )
     }
 
