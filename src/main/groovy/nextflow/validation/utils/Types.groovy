@@ -103,4 +103,28 @@ public class Types {
         return str
     }
 
+    //
+    // Cast the String values given on the command line to the type they have. The values of a nested
+    // parameter (`--group.flag true`) are found in the nested maps of the command line parameters.
+    // Values that were not given on the command line are left as they are.
+    //
+    static Map castCliValues(Map params, Map cliParams) {
+        if (cliParams == null) {
+            return params
+        }
+        return params.collectEntries { Object name, Object value ->
+            if (!cliParams.containsKey(name)) {
+                return [(name): value]
+            }
+            Object cast = value
+            if (value in Map) {
+                Object cliValue = cliParams[name]
+                cast = castCliValues(value as Map, cliValue in Map ? cliValue as Map : [:])
+            } else if (value in String) {
+                cast = parseParamValue(value as String)
+            }
+            return [(name): cast]
+        } as Map
+    }
+
 }
