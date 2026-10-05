@@ -90,7 +90,7 @@ class SamplesheetConverter {
             samplesheetList = samplesheetListTemp
         }
         JSONArray samplesheet = fileToJson(samplesheetList) as JSONArray
-        ValidationResult validationResult = validator.validate(samplesheet, schemaJson)
+        ValidationResult validationResult = validator.validate(samplesheet, schemaJson, schemaFile)
         List<String> validationErrors = validationResult.getErrors('field')
         if (validationErrors) {
             /* groovylint-disable-next-line LineLength */

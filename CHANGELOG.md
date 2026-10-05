@@ -1,10 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
-# Version 3.0.1
+# Version 3.1.0
 
 ## Bug fixes
 
-1. Fixed the plugin spec to only use standard Nextflow types. `CharSequence` function parameters and config options are now `String`, and the `validation.logging.unrecognisedParams` and `validation.logging.unrecognisedHeaders` options are declared as strings instead of an internal logger class.
+1. Fixed an issue where a schema referenced with the `schema` keyword was only looked up relative to the project that is running. It is now looked up next to the schema that references it first, and relative to the project otherwise, so a pipeline schema keeps working when it is read from another directory (e.g. when the pipeline is included in another one).
+2. Fixed the plugin spec to only use standard Nextflow types. `CharSequence` function parameters and config options are now `String`, and the `validation.logging.unrecognisedParams` and `validation.logging.unrecognisedHeaders` options are declared as strings instead of an internal logger class.
 
 # Version 3.0.0
 
