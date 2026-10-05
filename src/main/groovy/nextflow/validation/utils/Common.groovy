@@ -152,6 +152,8 @@ public class Common {
     // That value is found in the params scope of the config, which also holds the values given on the
     // command line and in a params file. Params nested in a record (e.g. the params of an included pipeline)
     // are handled the same way.
+    // TODO use `session.params.toPlainMap()` instead once it is in a Nextflow release
+    // (https://github.com/nextflow-io/nextflow/pull/7759), see https://github.com/nextflow-io/nf-schema/pull/230
     static Map replaceDataflowParams(Map params, Object configParams) {
         return replaceDataflowValues(params, configParams) as Map
     }
