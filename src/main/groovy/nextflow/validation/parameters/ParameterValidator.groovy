@@ -6,7 +6,7 @@ import static nextflow.NF.isSyntaxParserV2
 import static nextflow.validation.utils.Colors.getLogColors
 import static nextflow.validation.utils.Common.getBasePath
 import static nextflow.validation.utils.Common.getValueFromJsonPointer
-import static nextflow.validation.utils.Types.parseParamValue
+import static nextflow.validation.utils.Types.castCliValues
 
 import java.nio.file.Path
 import groovy.json.JsonGenerator
@@ -143,19 +143,16 @@ class ParameterValidator {
             .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
             .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
 
-        // The generator calls this converter for the params map before it reads any entry, so the dataflow
-        // params are replaced once on the root map and the nested maps it reaches afterwards hold none.
-        // Parameters provided via the CLI are cast here too (a temporary workaround until static typing is
-        // introduced in Nextflow), which mimics the type casting behaviour of syntax parser V1.
-        List<String> cliParams = castCliParams ?
-            (session.cliParams?.keySet()?.toList()*.toString() ?: []) as List<String> :
-            []
-        generatorOptions.addConverter(Map) { Map map ->
-            Map<Object, Object> level = map.is(params) ? replaceDataflowParams(map, session.config?.params) : map
-            return level.collectEntries { Object k, Object v ->
-                // Only cast parameters that were explicitly provided via the CLI
-                (cliParams.contains(k) && v in String) ? [k, parseParamValue(v as String)] : [k, v]
-            }
+        // A `Channel` or `Value` parameter is replaced by the value it was created from before the CLI values
+        // are cast, so that a value given on the command line is cast to its type in the schema.
+        params = replaceDataflowParams(params, session.config?.params) as Map<String, Object>
+
+        // Cast parameters provided via the CLI to their respective types.
+        // This is a temporary workaround until static typing is introduced in Nextflow,
+        // in which case we can rely on the static type system to do the casting for us.
+        // This mimics the type casting behaviour of syntax parser V1 so shouldn't introduce any breaking changes.
+        if (castCliParams) {
+            params = castCliValues(params, session.cliParams as Map) as Map<String, Object>
         }
 
         JSONObject paramsJSON = new JSONObject(generatorOptions.build().toJson(params))
