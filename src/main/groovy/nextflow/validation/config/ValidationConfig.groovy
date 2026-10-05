@@ -50,18 +50,18 @@ If the value is larger than this threshold, it will be truncated. Set to -1 to d
 
     @ConfigOption
     @Description('The JSON schema file to use for parameter validation.')
-    final CharSequence  parametersSchema = 'nextflow_schema.json'
+    final String parametersSchema = 'nextflow_schema.json'
 
     @ConfigOption
     @Description('''
 A list of default parameters to ignore during validation. This option should only be used by pipeline developers.
 ''')
-    final Set<CharSequence> defaultIgnoreParams
+    final Set<String> defaultIgnoreParams
 
     @ConfigOption
     @Description('A list of parameters to ignore during validation.')
     // Always ignore the `--nf_test_output` parameter to avoid warnings when running with nf-test
-    final Set<CharSequence> ignoreParams = ['nf_test_output']
+    final Set<String> ignoreParams = ['nf_test_output']
 
     @ConfigOption
     @Description('Allow substitution of parameters in the samplesheet.')
@@ -144,7 +144,7 @@ A list of default parameters to ignore during validation. This option should onl
         // parameterSchema
         if (config.containsKey('parametersSchema')) {
             if (config.parametersSchema in CharSequence) {
-                parametersSchema = config.parametersSchema as CharSequence
+                parametersSchema = config.parametersSchema as String
                 log.debug("Set `validation.parametersSchema` to ${parametersSchema}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -155,7 +155,7 @@ A list of default parameters to ignore during validation. This option should onl
         // ignoreParams
         if (config.containsKey('ignoreParams')) {
             if (config.ignoreParams in List<CharSequence>) {
-                ignoreParams += config.ignoreParams as List<CharSequence>
+                ignoreParams += config.ignoreParams as List<String>
                 log.debug("Added the following parameters to the ignored parameters: ${config.ignoreParams}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -166,7 +166,7 @@ A list of default parameters to ignore during validation. This option should onl
         // defaultIgnoreParams
         if (config.containsKey('defaultIgnoreParams')) {
             if (config.defaultIgnoreParams in List<CharSequence>) {
-                ignoreParams += config.defaultIgnoreParams as List<CharSequence>
+                ignoreParams += config.defaultIgnoreParams as List<String>
                 log.debug("Added the following parameters to the ignored parameters: ${config.defaultIgnoreParams}")
             } else {
                 /* groovylint-disable-next-line LineLength */
