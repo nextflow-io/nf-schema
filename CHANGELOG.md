@@ -1,5 +1,11 @@
 # nextflow-io/nf-schema: Changelog
 
+# Version 3.2.0
+
+## Changes
+
+1. `Channel` and `Value` parameters are validated and summarised using the values Nextflow resolves them from (`ParamsMap.toPlainMap()`, nextflow-io/nextflow#7759) instead of a lookup in the config. Typed parameters are now given in their declared types and with their script defaults. This requires Nextflow 26.10.0.
+
 # Version 3.1.0
 
 ## Bug fixes
