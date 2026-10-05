@@ -1,5 +1,9 @@
 package nextflow.validation.utils
 
+import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.DataflowWriteChannel
+import nextflow.dataflow.ChannelImpl
+import nextflow.dataflow.ValueImpl
 import org.json.JSONObject
 import org.json.JSONArray
 import org.json.JSONPointer
@@ -134,6 +138,42 @@ public class Common {
         return s.replaceAll('(-)([A-Za-z0-9])') { String full, String dash, String letter ->
             letter.toUpperCase()
         }
+    }
+
+    // The values a Channel or Value param holds: the typed wrappers and the dataflow channels and variables
+    // underneath them
+    static boolean isDataflowValue(Object value) {
+        return value in ChannelImpl || value in ValueImpl ||
+            value in DataflowReadChannel || value in DataflowWriteChannel
+    }
+
+    // Channel and Value params hold live dataflow objects: reading them blocks, and they print as object
+    // names. The value they were created from is used in their place, and a param without one is left out.
+    // That value is found in the params scope of the config, which also holds the values given on the
+    // command line and in a params file. Params nested in a record (e.g. the params of an included pipeline)
+    // are handled the same way.
+    // TODO if Nextflow gains a core way to get these plain values
+    // (https://github.com/nextflow-io/nextflow/issues/7758), consider using it here instead,
+    // see https://github.com/nextflow-io/nf-schema/pull/230
+    static Map replaceDataflowParams(Map params, Object configParams) {
+        return replaceDataflowValues(params, configParams) as Map
+    }
+
+    private static Object replaceDataflowValues(Object value, Object configValue) {
+        if (isDataflowValue(value)) {
+            return configValue != null && !isDataflowValue(configValue) ? configValue : null
+        }
+        if (value in Map) {
+            Map<Object, Object> result = [:]
+            (value as Map<Object, Object>).each { Object name, Object entry ->
+                Object replaced = replaceDataflowValues(entry, configValue in Map ? (configValue as Map)[name] : null)
+                if (replaced != null || !isDataflowValue(entry)) {
+                    result[name] = replaced
+                }
+            }
+            return result
+        }
+        return value
     }
 
 }
