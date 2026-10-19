@@ -74,7 +74,7 @@ class HelpConfig implements ConfigScope {
         }
 
         // showHidden
-        Object showHiddenValue = params.get(showHiddenParameter)
+        Object showHiddenValue = params.containsKey(showHiddenParameter) ? params.get(showHiddenParameter) : null
         if (showHiddenValue in String) {
             showHiddenValue = parseParamValue(showHiddenValue as String)
         }
