@@ -8,6 +8,7 @@
 2. Fixed an issue where the command line value of a nested parameter (e.g. `--group.flag true`) was not cast to the type in the schema, while the value of a top-level parameter was. The nested values of the command line parameters are now followed to find the values to cast.
 3. Fixed an issue where `validateParameters()` would hang, and the params summary would print an object name, when a parameter holds a `Channel` or `Value` (e.g. a typed `Channel<...>` param). The value the parameter was created from (from the `params` config scope, which also holds the values given on the command line and in a params file) is validated and printed in its place, also when the dataflow value is nested in a record parameter. A parameter without such a value is left out.
 4. Fixed an issue where the show hidden parameter given on the command line was not cast to a boolean with the v2 syntax parser, ([#237](https://github.com/nextflow-io/nf-schema/issues/237)).
+5. Fixed the `properties` keyword of a schema not being read when nf-schema is built with Groovy 5, which resolves `map.properties` to the bean properties of the map instead of the map entry.
 
 # Version 3.0.0
 

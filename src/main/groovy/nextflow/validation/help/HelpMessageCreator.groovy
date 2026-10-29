@@ -57,7 +57,7 @@ class HelpMessageCreator {
             if (paramNames.size() > 1) {
                 paramNames.remove(0)
                 paramNames.each { paramName ->
-                    paramOptions = (Map) paramOptions?.properties?[paramName] ?: [:]
+                    paramOptions = (Map) (paramOptions?.get('properties') as Map)?.get(paramName) ?: [:]
                 }
             }
             if (!paramOptions) {
@@ -65,7 +65,7 @@ class HelpMessageCreator {
                 throw new SchemaValidationException("Unable to create help message: Specified param '${param}' does not exist in JSON schema.")
             }
             if (paramOptions.containsKey('properties')) {
-                paramOptions.properties = removeHidden(paramOptions.properties as Map)
+                paramOptions.put('properties', removeHidden(paramOptions.get('properties') as Map))
             }
             helpMessage = getDetailedHelpString(param, paramOptions)
 
@@ -196,7 +196,7 @@ class HelpMessageCreator {
             if (!value.hidden) {
                 returnMap[key] = value
             } else if (value.containsKey('properties')) {
-                value.properties = removeHidden(value.properties as Map)
+                value.put('properties', removeHidden(value.get('properties') as Map))
                 returnMap[key] = value
             } else {
                 hiddenParametersCount++
@@ -233,7 +233,7 @@ class HelpMessageCreator {
             String description = paramOptions.description ? paramOptions.description as String + ' ' : ''
             String defaultValue = paramOptions.default != null ? '[default: ' + paramOptions.default + '] ' : ''
             String nestedParamName = parentParameter ? parentParameter + '.' + paramName : paramName
-            String nestedString = paramOptions.properties ?
+            String nestedString = paramOptions.get('properties') ?
                 "(This parameter has sub-parameters. Use '--help ${nestedParamName}' to see all sub-parameters) " :
                 ''
             String descriptionDefault = description + colors.dim + enumsString +
@@ -260,7 +260,7 @@ class HelpMessageCreator {
             String paramKey = key as String
             Map paramValue = value as Map
             if (paramValue.containsKey('properties')) {
-                Map flattenedMap = flattenNestedSchemaMap(paramValue.properties as Map)
+                Map flattenedMap = flattenNestedSchemaMap(paramValue.get('properties') as Map)
                 flattenedMap.each { k, v ->
                     returnMap.put(paramKey + '.' + k, v as Map)
                 }

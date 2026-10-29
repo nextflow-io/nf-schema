@@ -136,8 +136,8 @@ class AssetsHelper {
             help.append(formatArraySchema(schema.items as Map))
         }
         // Handle object schemas
-        else if (schema.type == 'object' && schema.properties) {
-            help.append(formatObjectSchema(schema.properties as Map, schema.required as List))
+        else if (schema.type == 'object' && schema.get('properties')) {
+            help.append(formatObjectSchema(schema.get('properties') as Map, schema.required as List))
         }
         // Handle items directly if no explicit type
         else if (schema.items) {
@@ -154,8 +154,8 @@ class AssetsHelper {
     private String formatArraySchema(Map items) {
         StringBuilder help = new StringBuilder()
 
-        if (items.type == 'object' && items.properties) {
-            help.append(formatObjectSchema(items.properties as Map, items.required as List))
+        if (items.type == 'object' && items.get('properties')) {
+            help.append(formatObjectSchema(items.get('properties') as Map, items.required as List))
         }
 
         return help.toString()
