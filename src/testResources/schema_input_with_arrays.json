@@ -1,0 +1,110 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nextflow-io/nf-schema/master/src/testResources/schema_input.json",
+    "title": "Samplesheet validation schema",
+    "description": "Schema for the samplesheet used in this pipeline",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "field_1": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "format": "file-path",
+                    "pattern": "^.*\\.txt$",
+                    "exists": true
+                }
+            },
+            "field_2": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true
+                }
+            },
+            "field_3": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "format": "path",
+                    "exists": true
+                }
+            },
+            "field_4": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "uniqueItems": true
+            },
+            "field_5": {
+                "type": "array",
+                "items": {
+                    "type": "integer"
+                },
+                "minItems": 2,
+                "maxItems": 3
+            },
+            "field_6": {
+                "type": "array",
+                "items": {
+                    "type": "number"
+                },
+                "uniqueItems": true
+            },
+            "field_7": {
+                "type": "array",
+                "items": {
+                    "type": "boolean"
+                }
+            },
+            "field_8": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "default": ["1", "2", "3"] 
+            },
+            "field_9": {
+                "type": "array",
+                "items": {
+                    "type": "boolean"
+                },
+                "default": [false, true, false] 
+            },
+            "field_10": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "format": "file-path",
+                    "pattern": "^.*\\.txt$",
+                    "exists": true
+                },
+                "default": ["src/testResources/testDir/testFile.txt"] 
+            },
+            "field_11": {
+                "type": "array",
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "format": "file-path",
+                        "pattern": "^.*\\.txt$",
+                        "exists": true
+                    }
+                },
+                "default": [["src/testResources/testDir/testFile.txt"]] 
+            },
+            "field_12": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "meta": ["array_meta"]
+            }
+        },
+        "required": ["field_4", "field_6"]
+    }
+}

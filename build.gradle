@@ -1,0 +1,33 @@
+plugins {
+    id 'io.nextflow.nextflow-plugin' version '1.0.0-beta.15'
+}
+
+dependencies {
+    implementation 'org.json:json:20260522'
+    implementation 'dev.harrel:json-schema:1.9.1'
+    implementation 'com.sanctionco.jmail:jmail:2.1.0' // Needed for e-mail format validation
+
+    // Ensure the platform launcher is available at test runtime
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.1'
+}
+
+version = '3.1.0'
+
+nextflowPlugin {
+    nextflowVersion = '26.04.0'
+
+    provider = 'nextflow-io'
+    className = 'nextflow.validation.ValidationPlugin'
+    extensionPoints = [
+        'nextflow.validation.config.ValidationConfig',
+        'nextflow.validation.ValidationExtension',
+        'nextflow.validation.ValidationObserverFactory'
+    ]
+
+    test {
+        useJUnitPlatform()
+        jvmArgs += [
+            '--add-opens', 'java.base/sun.net.www.protocol.ftp=ALL-UNNAMED'
+        ]
+    }
+}

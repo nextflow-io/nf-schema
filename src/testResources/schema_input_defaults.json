@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nextflow-io/nf-schema/master/src/testResources/schema_input.json",
+    "title": "Samplesheet validation schema",
+    "description": "Schema for the samplesheet used in this pipeline",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "integer": {
+                "type": "integer",
+                "default": 25
+            },
+            "string": {
+                "type": "string",
+                "default": "defaultString"
+            },
+            "boolean": {
+                "type": "boolean",
+                "default": true
+            },
+            "null_default": {
+                "type": "string",
+                "default": null
+            },
+            "null_meta": {
+                "type": "string",
+                "meta": "nullValue",
+                "default": null
+            }
+        }
+    }
+}

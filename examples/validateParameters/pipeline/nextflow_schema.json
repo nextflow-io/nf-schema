@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/testpipeline/master/nextflow_schema.json",
+    "title": "nf-core/testpipeline pipeline parameters",
+    "description": "this is a test",
+    "type": "object",
+    "$defs": {
+        "test_parameters": {
+            "title": "Test parameters",
+            "type": "object",
+            "fa_icon": "fas fa-terminal",
+            "description": "Some example test parameters",
+            "required": ["param1", "param2"],
+            "properties": {
+                "param1": {
+                    "type": "string"
+                },
+                "param2": {
+                    "type": "integer"
+                },
+                "param3": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/$defs/test_parameters"
+        }
+    ]
+}

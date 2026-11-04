@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/nf-schema/example/master/assets/schema_input.json",
+  "title": "nf-schema example - params.input schema",
+  "description": "Schema for the file provided with params.input",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "sample": {
+        "type": "string",
+        "pattern": "^\\S+$",
+        "errorMessage": "Sample name must be provided and cannot contain spaces"
+      },
+      "fastq_1": {
+        "type": "string",
+        "pattern": "^\\S+\\.f(ast)?q\\.gz$",
+        "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+      },
+      "fastq_2": {
+        "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
+        "type": "string",
+        "pattern": "^\\S+\\.f(ast)?q\\.gz$"
+      },
+      "strandedness": {
+        "type": "string",
+        "errorMessage": "Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'",
+        "enum": ["forward", "reverse", "unstranded"]
+      }
+    },
+    "required": ["sample", "fastq_1", "strandedness"]
+  }
+}

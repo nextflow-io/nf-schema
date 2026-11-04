@@ -1,0 +1,4 @@
+field_1,field_2,field_3,field_4,field_5,field_6,field_7,field_8,field_9,field_10,field_11
+fullField,,true,1111,string,20,non_existing_file.tsv,src/testResources/test.txt,non_existing_path,non_unique,1
+,,,,,,,,,,,
+2222,false,3333,string1,25,false,,,,non_unique,1

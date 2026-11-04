@@ -1,0 +1,579 @@
+/* groovylint-disable LineLength, MethodName, TrailingWhitespace */
+package nextflow.validation
+
+import groovy.transform.CompileDynamic
+
+import java.nio.file.Path
+
+import nextflow.Session
+import spock.lang.Specification
+
+import nextflow.validation.config.ValidationConfig
+import nextflow.validation.help.HelpMessageCreator
+
+/**
+ * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
+ */
+
+@CompileDynamic
+class HelpMessageCreatorTest extends Specification {
+
+    final private Session session = Mock(Session)
+
+    void 'should get a short help message'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json'
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('')
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+help message of that parameter will be printed. 
+--helpFull        [boolean]         Show the help message for all non-hidden parameters. 
+--showHidden      [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
+or `--helpFull`. 
+
+Input/output options
+  --input         [string] Path to comma-separated file containing information about the samples in the experiment. 
+  --outdir        [string] The output directory where the results will be saved. You have to use absolute paths to storage on 
+Cloud infrastructure. 
+  --email         [string] Email address for completion summary. 
+  --multiqc_title [string] MultiQC report title. Printed as page header, used for filename if not otherwise specified. 
+
+Reference genome options
+  --genome        [string] Name of iGenomes reference. 
+  --fasta         [string] Path to FASTA genome file. 
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a short help message with hidden params - config'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                showHidden: true
+            ]
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('')
+
+        then:
+        noExceptionThrown()
+        /* groovylint-disable-next-line GStringExpressionWithinString */
+        String expectedHelp = '''--help                         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+help message of that parameter will be printed. 
+--helpFull                     [boolean]         Show the help message for all non-hidden parameters. 
+--showHidden                   [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
+or `--helpFull`. 
+
+Input/output options
+  --input                      [string] Path to comma-separated file containing information about the samples in the experiment. 
+  --outdir                     [string] The output directory where the results will be saved. You have to use absolute paths to storage on 
+Cloud infrastructure. 
+  --email                      [string] Email address for completion summary. 
+  --multiqc_title              [string] MultiQC report title. Printed as page header, used for filename if not otherwise specified. 
+
+Reference genome options
+  --genome                     [string]  Name of iGenomes reference. 
+  --fasta                      [string]  Path to FASTA genome file. 
+  --igenomes_base              [string]  Directory / URL base for iGenomes references. [default: s3://ngi-igenomes/igenomes] 
+  --igenomes_ignore            [boolean] Do not load the iGenomes reference config. 
+
+Institutional config options
+  --custom_config_version      [string] Git commit id for Institutional configs. [default: master] 
+  --custom_config_base         [string] Base directory for Institutional configs. [default: 
+https://raw.githubusercontent.com/nf-core/configs/master] 
+  --config_profile_name        [string] Institutional config name. 
+  --config_profile_description [string] Institutional config description. 
+  --config_profile_contact     [string] Institutional config contact information. 
+  --config_profile_url         [string] Institutional config URL link. 
+
+Max job request options
+  --max_cpus                   [integer] Maximum number of CPUs that can be requested for any single job. [default: 16] 
+  --max_memory                 [string]  Maximum amount of memory that can be requested for any single job. [default: 128.GB] 
+  --max_time                   [string]  Maximum amount of time that can be requested for any single job. [default: 240.h] 
+
+Generic options
+  --help                       [string, boolean] Display help text. 
+  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, rellink, link, copy, 
+copyNoFollow, move) [default: copy] 
+  --email_on_fail              [string]          Email address for completion summary, only when pipeline fails. 
+  --plaintext_email            [boolean]         Send plain-text email instead of HTML. 
+  --max_multiqc_email_size     [string]          File size limit when attaching MultiQC reports to summary emails. [default: 25.MB] 
+  --monochrome_logs            [boolean]         Do not use coloured log outputs. 
+  --multiqc_config             [string]          Custom config file to supply to MultiQC. 
+  --tracedir                   [string]          Directory to keep pipeline Nextflow logs and reports. [default: ${params.outdir}/pipeline_info] 
+  --validate_params            [boolean]         Boolean whether to validate parameters against the schema at runtime [default: true] 
+  --validationShowHiddenParams [boolean]         Show all params when using `--help` 
+  --enable_conda               [boolean]         Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter. 
+  --testCamelCase              [string]          A camelCase param 
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a short help message with hidden params - param'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                showHiddenParameter: 'showMeThoseHiddenParams'
+            ]
+        ]
+        Map params = [
+            showMeThoseHiddenParams:true
+        ]
+        // Create new session to use the parameter
+        Session newSession = Mock(Session)
+        newSession.params >> params
+        ValidationConfig config = new ValidationConfig(validationConfig, newSession)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, newSession)
+
+        when:
+        String help = helpCreator.getShortMessage('')
+
+        then:
+        noExceptionThrown()
+        /* groovylint-disable-next-line GStringExpressionWithinString */
+        String expectedHelp = """--help                         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+help message of that parameter will be printed. 
+--helpFull                     [boolean]         Show the help message for all non-hidden parameters. 
+--showMeThoseHiddenParams      [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
+or `--helpFull`. 
+
+Input/output options
+  --input                      [string] Path to comma-separated file containing information about the samples in the experiment. 
+  --outdir                     [string] The output directory where the results will be saved. You have to use absolute paths to storage on 
+Cloud infrastructure. 
+  --email                      [string] Email address for completion summary. 
+  --multiqc_title              [string] MultiQC report title. Printed as page header, used for filename if not otherwise specified. 
+
+Reference genome options
+  --genome                     [string]  Name of iGenomes reference. 
+  --fasta                      [string]  Path to FASTA genome file. 
+  --igenomes_base              [string]  Directory / URL base for iGenomes references. [default: s3://ngi-igenomes/igenomes] 
+  --igenomes_ignore            [boolean] Do not load the iGenomes reference config. 
+
+Institutional config options
+  --custom_config_version      [string] Git commit id for Institutional configs. [default: master] 
+  --custom_config_base         [string] Base directory for Institutional configs. [default: 
+https://raw.githubusercontent.com/nf-core/configs/master] 
+  --config_profile_name        [string] Institutional config name. 
+  --config_profile_description [string] Institutional config description. 
+  --config_profile_contact     [string] Institutional config contact information. 
+  --config_profile_url         [string] Institutional config URL link. 
+
+Max job request options
+  --max_cpus                   [integer] Maximum number of CPUs that can be requested for any single job. [default: 16] 
+  --max_memory                 [string]  Maximum amount of memory that can be requested for any single job. [default: 128.GB] 
+  --max_time                   [string]  Maximum amount of time that can be requested for any single job. [default: 240.h] 
+
+Generic options
+  --help                       [string, boolean] Display help text. 
+  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, rellink, link, copy, 
+copyNoFollow, move) [default: copy] 
+  --email_on_fail              [string]          Email address for completion summary, only when pipeline fails. 
+  --plaintext_email            [boolean]         Send plain-text email instead of HTML. 
+  --max_multiqc_email_size     [string]          File size limit when attaching MultiQC reports to summary emails. [default: 25.MB] 
+  --monochrome_logs            [boolean]         Do not use coloured log outputs. 
+  --multiqc_config             [string]          Custom config file to supply to MultiQC. 
+  --tracedir                   [string]          Directory to keep pipeline Nextflow logs and reports. [default: \${params.outdir}/pipeline_info] 
+  --validate_params            [boolean]         Boolean whether to validate parameters against the schema at runtime [default: true] 
+  --validationShowHiddenParams [boolean]         Show all params when using `--help` 
+  --enable_conda               [boolean]         Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter. 
+  --testCamelCase              [string]          A camelCase param 
+
+"""
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a full help message'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema_nested_parameters.json'
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.fullMessage
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''--help             [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+help message of that parameter will be printed. 
+--helpFull         [boolean]         Show the help message for all non-hidden parameters. 
+--showHidden       [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
+or `--helpFull`. 
+
+Nested Parameters
+  --map.is.so.deep [boolean] so deep [default: true] 
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a detailed help message - nested'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema_nested_parameters.json'
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('map')
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''--map
+    description: map is map
+    options    : 
+      --map.is.so.deep [boolean] so deep [default: true] 
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a detailed help message - not nested'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json'
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('input')
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = """--input
+    type       : string
+    format     : file-path
+    mimetype   : text/csv
+    pattern    : ^\\S+\\.(csv|tsv|yaml|json)\$
+    description: Path to comma-separated file containing information about the samples in the experiment.
+    help_text  : You will need to create a design file with information about the samples in your experiment before 
+running the pipeline. Use this parameter to specify its location. It has to be a comma-separated 
+file with 3 columns, and a header row. See [usage 
+docs](https://nf-co.re/testpipeline/usage#samplesheet-input). 
+
+"""
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a before text - with command'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                command: 'nextflow run test/test --profile test,docker --outdir results',
+                beforeText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.'''
+            ]
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.beforeText
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
+Typical pipeline command:
+
+  nextflow run test/test --profile test,docker --outdir results
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a before text - without command'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                beforeText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
+'''
+            ]
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.beforeText
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get an after text'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                afterText: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
+'''
+            ]
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.afterText
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''------------------------------------------------------
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas condimentum ligula ac metus sollicitudin rutrum. Vestibulum a lectus ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras consequat placerat aliquet. Maecenas et vulputate nibh. Donec luctus, purus ut scelerisque ornare, sem nisl mollis libero, non faucibus nibh nunc ac nulla. Donec et pharetra neque. Etiam id nibh vel turpis ornare efficitur. Cras eu eros mi.
+Etiam at nulla ac dui ullamcorper viverra. Donec posuere imperdiet eros nec consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam nec aliquam magna. Quisque nec dapibus velit, id convallis justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse bibendum ipsum quis nulla fringilla laoreet. Integer dictum, purus et pretium ultrices, nunc nisl vestibulum erat, et tempus ex massa eget nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer varius aliquam vestibulum. Proin sit amet lobortis ipsum. Vestibulum fermentum lorem ac erat pharetra, eu eleifend sapien hendrerit. Quisque id varius ex. Morbi et dui et libero varius tempus. Ut eu sagittis lorem, sed congue libero.
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a short help message with after text'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json'
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('') + helpCreator.afterText
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''--help            [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+help message of that parameter will be printed. 
+--helpFull        [boolean]         Show the help message for all non-hidden parameters. 
+--showHidden      [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
+or `--helpFull`. 
+
+Input/output options
+  --input         [string] Path to comma-separated file containing information about the samples in the experiment. 
+  --outdir        [string] The output directory where the results will be saved. You have to use absolute paths to storage on 
+Cloud infrastructure. 
+  --email         [string] Email address for completion summary. 
+  --multiqc_title [string] MultiQC report title. Printed as page header, used for filename if not otherwise specified. 
+
+Reference genome options
+  --genome        [string] Name of iGenomes reference. 
+  --fasta         [string] Path to FASTA genome file. 
+
+ !! Hiding 23 param(s), use the `--showHidden` parameter to show them !!
+------------------------------------------------------
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get a help message when missing the type keyword'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema_no_type.json'
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('') + helpCreator.afterText
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''--input        [string]          Path to comma-separated file containing information about the samples in the experiment. 
+--help         [boolean, string] Show the help message for all top level parameters. When a parameter is given to `--help`, the full 
+help message of that parameter will be printed. 
+--helpFull     [boolean]         Show the help message for all non-hidden parameters. 
+--showHidden   [boolean]         Show all hidden parameters in the help message. This needs to be used in combination with `--help` 
+or `--helpFull`. 
+
+------------------------------------------------------
+
+'''
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should get integrated schema help with parameter help'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema_with_samplesheet.json'
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('input')
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = """--input
+    type       : string
+    format     : file-path
+    mimetype   : text/csv
+    pattern    : ^\\S+\\.csv\$
+    schema     : src/testResources/samplesheet_schema.json
+    description: Path to comma-separated file containing information about the samples in the experiment.
+    help_text  : You will need to create a design file with information about the samples in your experiment before 
+running the pipeline. Use this parameter to specify its location. It has to be a comma-separated 
+file with 3 columns, and a header row. See [usage 
+docs](https://nf-co.re/testpipeline/usage#samplesheet-input). 
+    exists     : true
+
+== Top-level schema below ==
+Title: Test schema for samplesheets
+Description: Schema for the file provided with params.input
+Fields:
+    sample       [string]   [required] Sample name to use in the analysis (pattern: ^\\S+\$)
+      Note: Sample name must be provided and cannot contain spaces
+    fastq_1      [string]   [required] FastQ file for R1 reads (pattern: ^\\S+\\.f(ast)?q\\.gz\$)
+      Note: FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
+    fastq_2      [string]   FastQ file for R2 reads
+      Note: FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'
+    strandedness [string]   [required] Strandedness of the library (allowed: forward, reverse, unstranded)
+      Note: Strandedness must be provided and be one of 'forward', 'reverse' or 'unstranded'
+
+"""
+        List<String> resultHelp = help.readLines()
+        expectedHelp.readLines().each { line ->
+            assert help.contains(line)
+            resultHelp.removeElement(line)
+        }
+        assert resultHelp.size() == 0, "Found extra unexpected lines: ${resultHelp}"
+    }
+
+    void 'should be able to limit the enum length'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                enumLength: 10,
+                showHidden: true
+            ]
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('')
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, ...) [default: copy] '
+        assert help.readLines().find { line -> line.startsWith('  --publish_dir_mode') } == expectedHelp
+    }
+
+    void 'should be able to set unlimited enum length'() {
+        given:
+        Map validationConfig = [
+            monochromeLogs: true,
+            parametersSchema: 'src/testResources/nextflow_schema.json',
+            help: [
+                enumLength: -1,
+                showHidden: true
+            ]
+        ]
+        ValidationConfig config = new ValidationConfig(validationConfig, session)
+        HelpMessageCreator helpCreator = new HelpMessageCreator(config, session)
+
+        when:
+        String help = helpCreator.getShortMessage('')
+
+        then:
+        noExceptionThrown()
+        String expectedHelp = '''  --publish_dir_mode           [string]          Method used to save pipeline results to output directory.  (accepted: symlink, rellink, link, copy, 
+copyNoFollow, move) [default: copy] '''
+        assert help.readLines()[35..36].join('\n') == expectedHelp
+    }
+
+}

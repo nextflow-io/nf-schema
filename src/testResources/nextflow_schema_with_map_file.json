@@ -1,0 +1,14 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nf-core/testpipeline/master/nextflow_schema.json",
+    "title": "nf-core/testpipeline pipeline parameters",
+    "description": "this is a test",
+    "type": "object",
+    "properties": {
+        "map_file": {
+            "type": "string",
+            "format": "file-path",
+            "schema": "src/testResources/schema_map_file.json"
+        }
+    }
+}

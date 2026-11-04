@@ -1,0 +1,17 @@
+
+ N E X T F L O W   ~  version 26.04.4
+
+Launching `examples/paramsHelp/pipeline/main.nf` [irreverent_meitner] revision: df33e40799
+
+This is a help message for the pipeline.
+Typical pipeline command:
+
+  nextflow run main.nf
+
+--outdir
+    type       : string
+    format     : directory-path
+    description: The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
+------------------------------------------------------
+Done with the help message.
+

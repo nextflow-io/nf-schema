@@ -1,0 +1,504 @@
+/* groovylint-disable LineLength, TrailingWhitespace, MethodName, UnnecessaryGString */
+package nextflow.validation
+
+import static test.ScriptHelper.runScript
+
+import groovy.transform.CompileDynamic
+
+import java.nio.file.Path
+
+import nextflow.plugin.Plugins
+import nextflow.plugin.TestPluginDescriptorFinder
+import nextflow.plugin.TestPluginManager
+import nextflow.plugin.extension.PluginExtensionProvider
+import org.junit.Rule
+import org.pf4j.PluginDescriptorFinder
+import spock.lang.Shared
+import spock.lang.Timeout
+import test.Dsl2Spec
+import test.OutputCapture
+
+import java.nio.file.Files
+import java.util.jar.Manifest
+
+/**
+ * @author : mirpedrol <mirp.julia@gmail.com>
+ * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
+ * @author : KevinMenden
+ */
+
+@CompileDynamic
+class ParamsSummaryLogTest extends Dsl2Spec {
+
+    @Rule
+    final private OutputCapture capture = new OutputCapture()
+
+    @Shared 
+    private String pluginsMode
+
+    final private Path root = Path.of('.').toAbsolutePath().normalize()
+
+    void setup() {
+        // reset previous instances
+        PluginExtensionProvider.reset()
+        // this need to be set *before* the plugin manager class is created
+        pluginsMode = System.getProperty('pf4j.mode')
+        System.setProperty('pf4j.mode', 'dev')
+        // the plugin root should
+        TestPluginManager manager = new TestPluginManager(root){
+
+            @Override
+            protected PluginDescriptorFinder createPluginDescriptorFinder() {
+                return new TestPluginDescriptorFinder(){
+
+                    @Override
+                    protected Manifest readManifestFromDirectory(Path pluginPath) {
+                        Path manifestPath = getManifestPath(pluginPath)
+                        InputStream input = Files.newInputStream(manifestPath)
+                        return new Manifest(input)
+                    }
+                    protected Path getManifestPath(Path pluginPath) {
+                        return pluginPath.resolve('build/tmp/jar/MANIFEST.MF')
+                    }
+
+                }
+            }
+
+        }
+        Plugins.init(root, 'dev', manager)
+    }
+
+    void cleanup() {
+        Plugins.stop()
+        PluginExtensionProvider.reset()
+        pluginsMode ? System.setProperty('pf4j.mode', pluginsMode) : System.clearProperty('pf4j.mode')
+    }
+
+    void 'should print params summary'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            params.outdir = "outDir"
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
+                log.info summary_params
+            }
+        """
+
+        when:
+        Map opts = [:]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('Input/output options') ||
+                    line.contains('outdir')
+                    ? line : null
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 11
+        stdout ==~ /.*outdir     : outDir.*/
+    }
+
+    @Timeout(60)
+    void 'should leave a param that holds a dataflow value out of the params summary'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                params.outdir = 'outDir'
+                params.input = new groovyx.gpars.dataflow.DataflowVariable()
+                log.info paramsSummaryLog(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': ['validation': ['monochromeLogs': true]]]
+        runScript(opts, script)
+        String stdout = capture
+
+        then:
+        noExceptionThrown()
+        stdout ==~ /(?s).*outdir     : outDir.*/
+        !stdout.contains('DataflowVariable')
+        !stdout.contains('input ')
+    }
+
+    @Timeout(60)
+    void 'should print the config value of a param that holds a dataflow value in the params summary'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                params.outdir = 'outDir'
+                params.input = new groovyx.gpars.dataflow.DataflowVariable()
+                log.info paramsSummaryLog(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': ['monochromeLogs': true],
+            'params': ['input': 'src/testResources/correct.csv']
+        ]]
+        runScript(opts, script)
+        String stdout = capture
+
+        then:
+        noExceptionThrown()
+        stdout ==~ /(?s).*input      : src\/testResources\/correct.csv.*/
+        !stdout.contains('DataflowVariable')
+    }
+
+    void 'should print params summary - nested parameters'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath()
+        String script = """
+            params.map = [is: [so: [deep: "changed_value"]]]
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
+                log.info summary_params
+            }
+        """
+
+        when:
+        Map opts = [
+            'params': [
+                'map': [
+                    'is': [
+                        'so': [
+                            'deep': true
+                        ]
+                    ]
+                ]
+            ]
+        ]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('Nested Parameters') ||
+                    line.contains('map.is.so.deep')
+                    ? line : null
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 11
+        stdout ==~ /.*map.is.so.deep: changed_value.*/
+    }
+
+    void 'should print params summary - adds before and after text'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            params.outdir = "outDir"
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
+                log.info summary_params
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': [
+                'summary': [
+                    'beforeText': "This text is printed before \n",
+                    'afterText': "\nThis text is printed after",
+                ]
+            ]
+        ] ]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> !line.contains('DEBUG') && !line.contains('after]]') ? line : null }
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('Input/output options') ||
+                    line.contains('outdir') ||
+                    line.contains('This text is printed before') ||
+                    line.contains('This text is printed after')
+                    ? line : null
+                }
+        then:
+        noExceptionThrown()
+        stdout.size() == 14
+        stdout ==~ /.*outdir     : outDir.*/
+    }
+
+    void 'should print params summary - adds before and after text via arguments'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            params.outdir = 'outDir'
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                def summary_params = paramsSummaryLog(
+                    parameters_schema: '${schema}',
+                    beforeText: "This text is printed before \\n",
+                    afterText: "\\nThis text is printed after"
+                )
+                log.info summary_params
+            }
+        """
+
+        when:
+        Map opts = [:]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> !line.contains('DEBUG') && !line.contains('after]]') ? line : null }
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('Input/output options') ||
+                    line.contains('outdir') ||
+                    line.contains('This text is printed before') ||
+                    line.contains('This text is printed after')
+                    ? line : null 
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 13
+        stdout ==~ /.*outdir     : outDir.*/
+    }
+
+    void 'should print params summary - nested parameters - hide params'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema_nested_parameters.json').toAbsolutePath()
+        String script = """
+            params.map = [is: [so: [deep: "changed_value"]]]
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            workflow {
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
+                log.info summary_params
+            }
+        """
+
+        when:
+        Map opts = [
+            'params': [
+                'map': [
+                    'is': [
+                        'so': [
+                            'deep': true
+                        ]
+                    ]
+                ]
+            ],
+            'config': ['validation': [
+                'summary': [
+                    'hideParams': ['params.map.is.so.deep']
+                ]
+            ]]
+        ]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line -> 
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('Nested Parameters') ||
+                    line.contains('map.is.so.deep ')
+                    ? line : null
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 10
+        stdout != ~ /.*map.is.so.deep: changed_value.*/
+    }
+
+    void 'should print params summary - hide params'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            include { paramsSummaryLog } from 'plugin/nf-schema'
+            params.outdir = "outDir"
+            workflow {
+                def summary_params = paramsSummaryLog(parameters_schema: '$schema')
+                log.info summary_params
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': [
+                'summary': [
+                    'hideParams': ['outdir']
+                ]
+            ]
+        ]]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('outdir ')
+                    ? line : null
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 9
+        stdout != ~ /.*outdir     : outDir.*/
+    }
+
+    void 'should print params summary - mask params - default mask'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+        include { paramsSummaryLog } from 'plugin/nf-schema'
+        params.outdir = "s3://bucket/outDir"
+        workflow {
+            def summary_params = paramsSummaryLog(parameters_schema: '$schema')
+            log.info summary_params
+        }
+        """
+
+        when:
+        Map opts = [
+            'config': [
+                'validation': [
+                    'summary': [
+                        'hideParams': ['outdir'],
+                        'maskSubpaths': 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+                    ]
+                ]
+            ]
+        ]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('outdir ')
+                    ? line : null
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 9
+        stdout != ~ /.*outdir     : [** masked **]\\/outDir.*/
+    }
+
+    void 'should print params summary - mask params - custom mask'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+        include { paramsSummaryLog } from 'plugin/nf-schema'
+        params.outdir = "s3://bucket/outDir"
+        workflow {
+            def summary_params = paramsSummaryLog(parameters_schema: '$schema')
+            log.info summary_params
+        }
+        """
+
+        when:
+        Map opts = [
+            'config': [
+                'validation': [
+                    'summary': [
+                        'hideParams': ['outdir'],
+                        'mask': '/mask',
+                        'maskSubpaths': 's3:\\/\\/[a-z0-9][a-z0-9-]{1,61}[a-z0-9]\\/'
+                    ]
+                ]
+            ]
+        ]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .findResults { line ->
+                    line.contains('Only displaying parameters that differ from the pipeline defaults') ||
+                    line.contains('Core Nextflow options') ||
+                    line.contains('runName') ||
+                    line.contains('launchDir') ||
+                    line.contains('workDir') ||
+                    line.contains('projectDir') ||
+                    line.contains('userName') ||
+                    line.contains('profile') ||
+                    line.contains('configFiles') ||
+                    line.contains('outdir ')
+                    ? line : null
+                }
+
+        then:
+        noExceptionThrown()
+        stdout.size() == 9
+        stdout != ~ /.*outdir     : \\/mask\\/outDir.*/
+    }
+
+}

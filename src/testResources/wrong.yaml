@@ -1,0 +1,6 @@
+- fastq_1: test1_fastq1.fastq.gz
+  fastq_2: test1_fastq2.fasta
+  strandedness: weird
+- sample: test 2
+  fastq_1: test2_fastq1.fastq.gz
+  strandedness: forward

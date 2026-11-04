@@ -1,0 +1,7 @@
+# Ignore everything
+/*
+
+# Except docs and markdown files
+!docs/
+!*.md
+!*.yml

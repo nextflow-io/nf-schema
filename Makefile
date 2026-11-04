@@ -1,0 +1,31 @@
+# Build the plugin
+assemble:
+	./gradlew assemble
+
+clean:
+	rm -rf .nextflow*
+	rm -rf work
+	rm -rf build
+	./gradlew clean
+
+#
+# Run all tests or selected ones
+#
+test:
+	./gradlew test
+
+# Install the plugin into local nextflow plugins dir
+install:
+	./gradlew installPlugin
+
+# Publish the plugin
+release:
+	./gradlew releasePlugin
+
+# Lint the groovy code
+lint:
+	npm-groovy-lint "src/**/*.groovy" --fix
+
+# Format the groovy code
+format:
+	npm-groovy-lint "src/**/*.groovy" --format

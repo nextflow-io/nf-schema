@@ -1,0 +1,51 @@
+- field_1:
+    - src/testResources/testDir/testFile.txt
+    - src/testResources/testDir2/testFile2.txt
+  field_2:
+    - src/testResources/testDir
+    - src/testResources/testDir2
+  field_3:
+    - src/testResources/testDir
+    - src/testResources/testDir2/testFile2.txt
+  field_4:
+    - string1
+    - string2
+  field_5:
+    - 25
+    - 26
+  field_6:
+    - 25
+    - 26.5
+  field_7:
+    - false
+    - true
+  field_9:
+    - true
+- field_4:
+    - string1
+    - string2
+  field_5:
+    - 25
+    - 26
+  field_6:
+    - 25
+    - 26.5
+  field_12:
+    - look
+    - an
+    - array
+    - in
+    - meta
+- field_4:
+    - string1
+    - string2
+  field_5:
+    - 25
+    - 26
+  field_6:
+    - 25
+    - 26.5
+  field_11:
+    - - src/testResources/testDir/testFile.txt
+    - - src/testResources/testDir/testFile.txt
+      - src/testResources/testDir2/testFile2.txt

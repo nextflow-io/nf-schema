@@ -1,0 +1,130 @@
+package nextflow.validation.utils
+
+import org.json.JSONObject
+
+import groovy.util.logging.Slf4j
+import groovy.transform.CompileStatic
+
+/**
+ * A collection of functions related to type casting and type checking
+ *
+ * @author : mirpedrol <mirp.julia@gmail.com>
+ * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
+ * @author : KevinMenden
+ */
+
+@Slf4j
+@CompileStatic
+public class Types {
+
+    //
+    // Cast a value to the provided type in a Strict mode
+    //
+    static Object inferType(Object input) {
+        if (input in Map) {
+            // Cast all values in the map
+            Map output = [:]
+            ((Map) input).each { k, v ->
+                output[k] = inferType(v)
+            }
+            return output
+        }
+        else if (input in List) {
+            // Cast all values in the list
+            List output = []
+            ((List) input).each { entry ->
+                output.add(inferType(entry))
+            }
+            return output
+        } else if (input in String) {
+            // Cast the string if there is one
+            String inputString = (String) input
+            if (inputString == '') {
+                return null
+            }
+            return JSONObject.stringToValue(inputString)
+        }
+    }
+
+    //
+    // Function to check if a String value is an Integer
+    //
+    static Boolean isInteger(String input) {
+        try {
+            input as Integer
+            return true
+        } catch (NumberFormatException e) {
+            return false
+        }
+    }
+
+    //
+    // Function to check if a String value is a Float
+    //
+    static Boolean isFloat(String input) {
+        try {
+            input as Float
+            return true
+        } catch (NumberFormatException e) {
+            return false
+        }
+    }
+
+    //
+    // Function to check if a String value is a Double
+    //
+    static Boolean isDouble(String input) {
+        try {
+            input as Double
+            return true
+        } catch (NumberFormatException e) {
+            return false
+        }
+    }
+
+    //
+    // Function that casts parameters to the correct type, copied from the Nextflow codebase:
+    /* groovylint-disable-next-line LineLength */
+    // https://github.com/nextflow-io/nextflow/blob/eae9f7d09576cbc97107f472d833910e24bcb85c/modules/nextflow/src/main/groovy/nextflow/cli/CmdRun.groovy#L777-L791
+    //
+    static Object parseParamValue(String str) {
+        if (str == null) { return null }
+
+        if (str.toLowerCase() == 'true') { return Boolean.TRUE }
+        if (str.toLowerCase() == 'false') { return Boolean.FALSE }
+
+        /* groovylint-disable-next-line UnnecessaryGetter */
+        if (str ==~ /-?\d+(\.\d+)?/ && str.isInteger()) { return str.toInteger() }
+        /* groovylint-disable-next-line UnnecessaryGetter */
+        if (str ==~ /-?\d+(\.\d+)?/ && str.isLong()) { return str.toLong() }
+        /* groovylint-disable-next-line UnnecessaryGetter */
+        if (str ==~ /-?\d+(\.\d+)?/ && str.isDouble()) { return str.toDouble() }
+
+        return str
+    }
+
+    //
+    // Cast the String values given on the command line to the type they have. The values of a nested
+    // parameter (`--group.flag true`) are found in the nested maps of the command line parameters.
+    // Values that were not given on the command line are left as they are.
+    //
+    static Map castCliValues(Map params, Map cliParams) {
+        if (cliParams == null) {
+            return params
+        }
+        return params.collectEntries { Object name, Object value ->
+            if (!cliParams.containsKey(name)) {
+                return [(name): value]
+            }
+            Object cast = value
+            if (value in Map) {
+                Object cliValue = cliParams[name]
+                cast = castCliValues(value as Map, cliValue in Map ? cliValue as Map : [:])
+            } else if (value in String) {
+                cast = parseParamValue(value as String)
+            }
+            return [(name): cast]
+        } as Map
+    }
+
+}

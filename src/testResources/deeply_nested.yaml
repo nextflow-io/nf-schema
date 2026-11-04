@@ -1,0 +1,25 @@
+- map:
+    arrayTest:
+      - string1
+      - string2
+    stringTest: string3
+    numberTest: 1
+    integerTest: 1
+    fileTest: file1.txt
+    mapMeta: this is in a map
+  array:
+    - string4
+    - string5
+    - string6
+  arrayInArray: [
+    [ "string7", "string8" ],
+    [ "string9", "string10" ]
+  ]
+  arrayMeta: 
+    - "metaString45"
+    - "metaString478"
+  value: test
+  meta: metaValue
+  metaMap: 
+    entry1: entry1String
+    entry2: 12.56

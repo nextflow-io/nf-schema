@@ -1,0 +1,34 @@
+name: build docs
+on:
+  release:
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # ratchet:actions/checkout@v3
+        with:
+          fetch-depth: 0 # fetch all commits/branches
+      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # ratchet:actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - name: Obtain version from MANIFEST.MF
+        run: echo "plugin_version=$(grep "version = " build.gradle | sed -e 's/version = //' | cut -d "'" -f 2)" >> $GITHUB_ENV
+      - name: Setup git user
+        run: |
+          git config --global user.name "${{github.actor}}"
+          git config --global user.email "${{github.actor}}@users.noreply.github.com"
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # ratchet:actions/cache@v3
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - name: Install dependencies
+        run: pip install mkdocs-material pymdown-extensions pillow cairosvg mike
+      - name: Build docs
+        run: mike deploy --push --update-aliases ${{ env.plugin_version }} latest
+      - name: Set default docs
+        run: mike set-default --push latest

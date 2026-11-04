@@ -1,0 +1,24 @@
+
+ N E X T F L O W   ~  version 25.04.0
+
+Launching `pipeline/main.nf` [angry_poitras] DSL2 - revision: fca518be2f
+
+
+This is a summary message for the pipeline parameters.
+    Input/output options
+  input      : samplesheet.csv
+  outdir     : results
+
+Core Nextflow options
+  runName    : angry_poitras
+  launchDir  : /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryLog
+  workDir    : /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryLog/work
+  projectDir : /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryLog/pipeline
+  userName   : nvnieuwk
+  profile    : standard
+  configFiles: /home/nvnieuwk/.nextflow/config, /home/nvnieuwk/Documents/nextflow/nf-schema/examples/paramsSummaryLog/pipeline/nextflow.config
+
+!! Only displaying parameters that differ from the pipeline defaults !!
+------------------------------------------------------
+For more information, please refer to the documentation.
+    

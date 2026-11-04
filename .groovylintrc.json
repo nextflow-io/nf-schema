@@ -1,0 +1,23 @@
+{
+    "extends": "recommended",
+    "rules": {
+        "DuplicateNumberLiteral": {
+            "enabled": false
+        },
+        "DuplicateStringLiteral": {
+            "enabled": false
+        },
+        "JUnitLostTest": {
+            "enabled": false
+        },
+        "JUnitPublicNonTestMethod": {
+            "enabled": false
+        },
+        "JUnitTestMethodWithoutAssert": {
+            "enabled": false
+        },
+        "UnnecessaryObjectReferences": {
+            "enabled": false
+        }
+    }
+}

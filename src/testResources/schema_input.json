@@ -1,0 +1,70 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/nextflow-io/nf-schema/master/src/testResources/schema_input.json",
+    "title": "Samplesheet validation schema",
+    "description": "Schema for the samplesheet used in this pipeline",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "field_1": {
+                "type": "string",
+                "meta": ["string1","string2"],
+                "default": "value"
+            },
+            "field_2": {
+                "type": "integer",
+                "meta": ["integer1","integer2"],
+                "default": 0
+            },
+            "field_3": {
+                "type": "boolean",
+                "meta": ["boolean1","boolean2"],
+                "default": true
+            },
+            "field_4": {
+                "type": "string"
+            },
+            "field_5": {
+                "type": "number"
+            },
+            "field_6": {
+                "type": "boolean"
+            },
+            "field_7": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^.*\\.txt$"
+            },
+            "field_8": {
+                "type": "string",
+                "format": "directory-path",
+                "exists": true
+            },
+            "field_9": {
+                "type": "string",
+                "format": "path",
+                "exists": true
+            },
+            "field_10": {
+                "type": "string"
+            },
+            "field_11": {
+                "type": "integer"
+            },
+            "field_12": {
+                "type": "string",
+                "default": "itDoesExist"
+            }
+        },
+        "required": ["field_4", "field_6"],
+        "dependentRequired": {
+            "field_1": ["field_2", "field_3"]
+        }
+    },
+    "allOf": [
+        {"uniqueEntries": ["field_11", "field_10"]},
+        {"uniqueEntries": ["field_10"]}
+    ]
+}

@@ -1,0 +1,229 @@
+package nextflow.validation.parameters
+
+import static nextflow.validation.utils.Common.replaceDataflowParams
+import static nextflow.NF.isSyntaxParserV2
+
+import static nextflow.validation.utils.Colors.getLogColors
+import static nextflow.validation.utils.Common.getBasePath
+import static nextflow.validation.utils.Common.getValueFromJsonPointer
+import static nextflow.validation.utils.Types.castCliValues
+
+import java.nio.file.Path
+import groovy.json.JsonGenerator
+import groovy.util.logging.Slf4j
+import groovy.transform.CompileStatic
+import nextflow.Nextflow
+import nextflow.Session
+import nextflow.util.Duration
+import nextflow.util.MemoryUnit
+import nextflow.util.VersionNumber
+import org.json.JSONObject
+
+import nextflow.validation.config.ValidationConfig
+import nextflow.validation.exceptions.SchemaValidationException
+import nextflow.validation.validators.JsonSchemaValidator
+import nextflow.validation.validators.ValidationResult
+
+/**
+ * @author : mirpedrol <mirp.julia@gmail.com>
+ * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
+ * @author : KevinMenden
+ */
+
+@Slf4j
+@CompileStatic
+class ParameterValidator {
+
+    final private ValidationConfig config
+
+    // A map of expected parameters with their default values
+    final private Map<String, Object> expectedParamsDefaults
+
+    ParameterValidator(ValidationConfig config) {
+        this.config = config
+        this.expectedParamsDefaults = [
+            (config.help.shortParameter as String): false,
+            (config.help.fullParameter as String): false,
+            (config.help.showHiddenParameter as String): false
+        ]
+    }
+
+    final List<String> nextflowOptions = [
+            // Options for base `nextflow` command
+            'bg',
+            'c',
+            'C',
+            'config',
+            'd',
+            'D',
+            'dockerize',
+            'h',
+            'log',
+            'q',
+            'quiet',
+            'syslog',
+            'v',
+
+            // Options for `nextflow run` command
+            'ansi',
+            'ansi-log',
+            'bg',
+            'bucket-dir',
+            'c',
+            'cache',
+            'config',
+            'dsl2',
+            'dump-channels',
+            'dump-hashes',
+            'E',
+            'entry',
+            'latest',
+            'lib',
+            'main-script',
+            'N',
+            'name',
+            'offline',
+            'params-file',
+            'pi',
+            'plugins',
+            'poll-interval',
+            'pool-size',
+            'profile',
+            'ps',
+            'qs',
+            'queue-size',
+            'r',
+            'resume',
+            'revision',
+            'stdin',
+            'stub',
+            'stub-run',
+            'test',
+            'w',
+            'with-charliecloud',
+            'with-conda',
+            'with-dag',
+            'with-docker',
+            'with-mpi',
+            'with-notification',
+            'with-podman',
+            'with-report',
+            'with-singularity',
+            'with-timeline',
+            'with-tower',
+            'with-trace',
+            'with-weblog',
+            'without-docker',
+            'without-podman',
+            'work-dir'
+    ]
+
+    final private List<String> errors = []
+    final private List<String> warnings = []
+
+    void validateParametersMap(
+        final Map options = [:],
+        Session session
+    ) {
+        Map<String, Object> params = initialiseExpectedParams(session.params)
+        String schemaFilename = options?.containsKey('parameters_schema') ?
+            options.parameters_schema as String :
+            config.parametersSchema as String
+        Boolean castCliParams = options?.containsKey('cast_cli_params') ?
+            options.cast_cli_params as Boolean :
+            /* groovylint-disable-next-line UnnecessaryGetter */
+            isSyntaxParserV2()
+        log.debug 'Starting parameters validation'
+
+        // Convert to JSONObject
+        JsonGenerator.Options generatorOptions = new JsonGenerator.Options()
+            .excludeNulls()
+            .addConverter(Path) { Path path -> path.toUriString() }
+            .addConverter(Duration) { Duration duration -> duration.toMillis() }
+            .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
+            .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
+
+        // A `Channel` or `Value` parameter is replaced by the value it was created from before the CLI values
+        // are cast, so that a value given on the command line is cast to its type in the schema.
+        params = replaceDataflowParams(params, session.config?.params) as Map<String, Object>
+
+        // Cast parameters provided via the CLI to their respective types.
+        // This is a temporary workaround until static typing is introduced in Nextflow,
+        // in which case we can rely on the static type system to do the casting for us.
+        // This mimics the type casting behaviour of syntax parser V1 so shouldn't introduce any breaking changes.
+        if (castCliParams) {
+            params = castCliValues(params, session.cliParams as Map) as Map<String, Object>
+        }
+
+        JSONObject paramsJSON = new JSONObject(generatorOptions.build().toJson(params))
+
+        // Validate parameters against the schema
+        JsonSchemaValidator validator = new JsonSchemaValidator(config)
+
+        // Colors
+        Map<String,String> colors = getLogColors(config.monochromeLogs)
+
+        // Validate
+        Path schemaPath = getBasePath(session.baseDir, schemaFilename)
+        JSONObject schemaJson = new JSONObject(schemaPath.text)
+        ValidationResult validationResult = validator.validate(paramsJSON, schemaJson, schemaPath)
+        List<String> paramErrors = validationResult.getErrors('parameter')
+        errors.addAll(paramErrors)
+
+        // Check for nextflow core params and unexpected params
+        List<String> unexpectedParams = []
+        if (paramErrors.size() == 0) {
+            validationResult.unevaluated.each { param ->
+                String dotParam = param.replaceAll('/', '.')
+                if (nextflowOptions.contains(param)) {
+                    /* groovylint-disable-next-line LineLength */
+                    errors << "You used a core Nextflow option with two hyphens: '--${param}'. Please resubmit with '-${param}'".toString()
+                }
+                else if (!config.ignoreParams.any { ignoreParam ->
+                    dotParam == ignoreParam.toString() || dotParam.startsWith(ignoreParam.toString() + '.')
+                }) {
+                    // Check if an ignore param is present
+                    /* groovylint-disable-next-line LineLength */
+                    unexpectedParams << "* --${dotParam}: ${getValueFromJsonPointer('/' + param, paramsJSON)}".toString()
+                }
+            }
+        }
+
+        if (unexpectedParams.size() > 0) {
+            config.logging.unrecognisedParams.log(
+                'The following invalid input values have been detected:\n\n' +
+                unexpectedParams.join('\n').trim() + '\n\n'
+            )
+        }
+
+        List<String> modifiedIgnoreParams = config.ignoreParams.collect { param -> "* --${param}" as String }
+        List<String> filteredErrors = errors.findAll { error ->
+            return modifiedIgnoreParams.find { param -> error.startsWith(param) } == null
+        }
+        if (filteredErrors.size() > 0) {
+            /* groovylint-disable-next-line LineLength */
+            String msg = "${colors.red}The following invalid input values have been detected:\n\n" + filteredErrors.join('\n').trim() + "\n${colors.reset}\n"
+            log.error('Validation of pipeline parameters failed!')
+            throw new SchemaValidationException(msg, errors)
+        }
+
+        log.debug 'Finishing parameters validation'
+    }
+
+    private List<String> getErrors() { return errors }
+
+    private List<String> getWarnings() { return warnings }
+
+    //
+    // Initialise expected params if not present
+    //
+    private Map initialiseExpectedParams(Map params) {
+        expectedParamsDefaults.each { param, defaultValue ->
+            if (!params.containsKey(param)) {
+                params[param] = defaultValue
+            }
+        }
+        return params
+    }
+
+}

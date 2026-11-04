@@ -1,0 +1,15 @@
+# Config for pre-commit: https://pre-commit.com/
+---
+exclude: '(build\.gradle|settings\.gradle|gradle\.properties|gradle/.*|\.github/.*|Makefile)'
+repos:
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.1.0"
+    hooks:
+      - id: prettier
+        additional_dependencies:
+          - prettier@3.5.0
+  - repo: https://github.com/nvuillam/npm-groovy-lint
+    rev: "v16.2.0"
+    hooks:
+      - id: format-npm-groovy-lint
+      - id: fix-npm-groovy-lint

@@ -1,0 +1,35 @@
+- field_1: fullField
+  field_2: 10
+  field_3: true
+  field_4: string1
+  field_5: 25.12
+  field_6: false
+  field_7: src/testResources/test.txt
+  field_8: src/testResources/testDir
+  field_9: src/testResources/test.txt
+  field_10: unique1
+  field_11: 1
+- field_4: string1
+  field_5: 25.08
+  field_6: false
+- field_1: dependentRequired
+  field_2: 10
+  field_3: true
+  field_4: string1
+  field_5: 25
+  field_6: false
+  field_7:
+  field_8:
+  field_10: unique2
+  field_11: 1
+- field_1: extraField
+  field_2: 10
+  field_3: true
+  field_4: string1
+  field_5: 25
+  field_6: false
+  field_7: src/testResources/test.txt
+  field_8: src/testResources/testDir
+  field_9: src/testResources/testDir
+  field_10: unique3
+  field_11: 1

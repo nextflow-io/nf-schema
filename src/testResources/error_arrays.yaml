@@ -1,0 +1,35 @@
+- field_1:
+    - src/testResources/testDir/testFile.fasta
+    - src/testResources/testDir2/testFile3.txt
+  field_2:
+    - src/testResources/testDir
+    - src/testResources/testDir3
+  field_3:
+    - src/testResources/testDir3
+    - src/testResources/testDir2/testFile3.txt
+  field_4:
+    - string2
+    - string2
+    - string1
+  field_5:
+    - 25
+    - 25
+    - 27
+    - 28
+  field_6:
+    - 25
+    - 25.0
+  field_7:
+    - null
+    - true
+  field_9:
+    - true
+- field_5:
+    - 25
+  field_6:
+    - 25
+    - 26.5
+- field_4: 'abc'
+  field_6:
+    - 25
+    - 26.5

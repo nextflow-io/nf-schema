@@ -1,0 +1,179 @@
+package nextflow.validation.utils
+
+import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.DataflowWriteChannel
+import nextflow.dataflow.ChannelImpl
+import nextflow.dataflow.ValueImpl
+import org.json.JSONObject
+import org.json.JSONArray
+import org.json.JSONPointer
+import org.json.JSONPointerException
+import groovy.util.logging.Slf4j
+import groovy.transform.CompileStatic
+import java.nio.file.Path
+import java.util.stream.IntStream
+import nextflow.Nextflow
+
+/**
+ * A collection of commonly used functions
+ *
+ * @author : mirpedrol <mirp.julia@gmail.com>
+ * @author : nvnieuwk <nicolas.vannieuwkerke@ugent.be>
+ * @author : KevinMenden
+ */
+
+@Slf4j
+@CompileStatic
+public class Common {
+
+    //
+    // Get full path based on the base directory of the pipeline run
+    //
+    static Path getBasePath(Path baseDir, CharSequence schemaFilename) {
+        Path schemaPath = Nextflow.file(schemaFilename.toString()) as Path
+        if (schemaPath.exists()) {
+            return schemaPath
+        }
+        return baseDir.resolve(schemaFilename.toString())
+    }
+
+    // A schema referenced from another schema is looked up next to the schema that references it first,
+    // then relative to the project, so that a schema keeps working when its pipeline is run from elsewhere
+    static Path getReferencedSchemaPath(String schemaDir, Path baseDir, CharSequence schemaFilename) {
+        if (schemaDir && !Path.of(schemaFilename.toString()).absolute) {
+            Path nextToSchema = Path.of(schemaDir, schemaFilename.toString())
+            if (nextToSchema.exists()) {
+                return nextToSchema
+            }
+        }
+        return getBasePath(baseDir, schemaFilename)
+    }
+
+    //
+    // Function to get the value from a JSON pointer
+    //
+    static Object getValueFromJsonPointer(String jsonPointer, Object json) {
+        JSONPointer schemaPointer = new JSONPointer(jsonPointer)
+        try {
+            return schemaPointer.queryFrom(json) ?: ''
+        } catch (JSONPointerException e) {
+            return ''
+        }
+    }
+
+    //
+    // Get the amount of character of the largest key in a map
+    //
+    static Integer getLongestKeyLength(Map input) {
+        return Collections.max(input.collect { key, val ->
+            Map groupParams = val as Map
+            longestStringLength(groupParams.keySet() as List<String>)
+        })
+    }
+
+    //
+    // Get the size of the longest string value in a list of strings
+    //
+    static Integer longestStringLength(List<String> strings) {
+        return strings ? Collections.max(strings*.size()) : 0
+    }
+
+    //
+    // Find a value in a nested map
+    //
+    static Object findDeep(Object m, String key) {
+        if (m in Map) {
+            Map map = (Map) m
+            if (map.containsKey(key)) {
+                return map[key]
+            }
+            return map.findResult { k, v -> findDeep(v, key) }
+        }
+        else if (m in List) {
+            List list = (List) m
+            return list.findResult { element -> findDeep(element, key) }
+        }
+        return null
+    }
+
+    //
+    // Check if a key exists in a nested map
+    //
+    static boolean hasDeepKey(Object m, String key) {
+        if (m in Map) {
+            Map map = (Map) m
+            if (map.containsKey(key)) {
+                return true
+            }
+            return map.any { k, v -> hasDeepKey(v, key) }
+        }
+        else if (m in List) {
+            List list = (List) m
+            return list.any { element -> hasDeepKey(element, key) }
+        }
+        return false
+    }
+
+    static void findAllKeys(Object object, String key, Set<String> finalKeys, String sep) {
+        if (object in JSONObject) {
+            JSONObject jsonObject = (JSONObject) object
+
+            jsonObject.keySet().forEach { childKey ->
+                findAllKeys(jsonObject.get(childKey), key != null ? key + sep + childKey : childKey, finalKeys, sep)
+            }
+        } else if (object in JSONArray) {
+            JSONArray jsonArray = (JSONArray) object
+            key != null ? finalKeys.add(key) : ''
+
+            IntStream.range(0, jsonArray.length())
+                    .mapToObj(jsonArray::get)
+                    .forEach { jObj -> findAllKeys(jObj, key, finalKeys, sep) }
+        }
+        else {
+            key != null ? finalKeys.add(key) : ''
+        }
+    }
+
+    static String kebabToCamel(String s) {
+        return s.replaceAll('(-)([A-Za-z0-9])') { String full, String dash, String letter ->
+            letter.toUpperCase()
+        }
+    }
+
+    // The values a Channel or Value param holds: the typed wrappers and the dataflow channels and variables
+    // underneath them
+    static boolean isDataflowValue(Object value) {
+        return value in ChannelImpl || value in ValueImpl ||
+            value in DataflowReadChannel || value in DataflowWriteChannel
+    }
+
+    // Channel and Value params hold live dataflow objects: reading them blocks, and they print as object
+    // names. The value they were created from is used in their place, and a param without one is left out.
+    // That value is found in the params scope of the config, which also holds the values given on the
+    // command line and in a params file. Params nested in a record (e.g. the params of an included pipeline)
+    // are handled the same way.
+    // TODO if Nextflow gains a core way to get these plain values
+    // (https://github.com/nextflow-io/nextflow/issues/7758), consider using it here instead,
+    // see https://github.com/nextflow-io/nf-schema/pull/230
+    static Map replaceDataflowParams(Map params, Object configParams) {
+        return replaceDataflowValues(params, configParams) as Map
+    }
+
+    private static Object replaceDataflowValues(Object value, Object configValue) {
+        if (isDataflowValue(value)) {
+            return configValue != null && !isDataflowValue(configValue) ? configValue : null
+        }
+        if (value in Map) {
+            Map<Object, Object> result = [:]
+            (value as Map<Object, Object>).each { Object name, Object entry ->
+                Object replaced = replaceDataflowValues(entry, configValue in Map ? (configValue as Map)[name] : null)
+                if (replaced != null || !isDataflowValue(entry)) {
+                    result[name] = replaced
+                }
+            }
+            return result
+        }
+        return value
+    }
+
+}
