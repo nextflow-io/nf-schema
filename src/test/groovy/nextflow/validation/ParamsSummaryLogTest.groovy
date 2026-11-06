@@ -114,14 +114,19 @@ class ParamsSummaryLogTest extends Dsl2Spec {
     }
 
     @Timeout(60)
-    void 'should leave a param that holds a dataflow value out of the params summary'() {
+    void 'should print the value of a typed Value param in the params summary'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
+            nextflow.enable.types = true
+
             include { paramsSummaryLog } from 'plugin/nf-schema'
+
+            params {
+                outdir: Value<String> = 'outDir'
+            }
+
             workflow {
-                params.outdir = 'outDir'
-                params.input = new groovyx.gpars.dataflow.DataflowVariable()
                 log.info paramsSummaryLog(parameters_schema: '${schema}')
             }
         """
@@ -134,35 +139,48 @@ class ParamsSummaryLogTest extends Dsl2Spec {
         then:
         noExceptionThrown()
         stdout ==~ /(?s).*outdir     : outDir.*/
+        !stdout.contains('ValueImpl')
         !stdout.contains('DataflowVariable')
-        !stdout.contains('input ')
     }
 
     @Timeout(60)
-    void 'should print the config value of a param that holds a dataflow value in the params summary'() {
+    void 'should print the value of a typed Channel param in the params summary'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
+            nextflow.enable.types = true
+
             include { paramsSummaryLog } from 'plugin/nf-schema'
+
+            params {
+                input: Channel<Row>
+                outdir: String = 'outDir'
+            }
+
+            record Row {
+                field_4: String
+            }
+
             workflow {
-                params.outdir = 'outDir'
-                params.input = new groovyx.gpars.dataflow.DataflowVariable()
                 log.info paramsSummaryLog(parameters_schema: '${schema}')
             }
         """
 
         when:
-        Map opts = ['config': [
-            'validation': ['monochromeLogs': true],
-            'params': ['input': 'src/testResources/correct.csv']
-        ]]
+        Map cliParams = ['input': 'src/testResources/correct.csv']
+        Map opts = [
+            'config': ['validation': ['monochromeLogs': true], 'params': cliParams],
+            'params': cliParams,
+            'configParams': cliParams
+        ]
         runScript(opts, script)
         String stdout = capture
 
         then:
         noExceptionThrown()
         stdout ==~ /(?s).*input      : src\/testResources\/correct.csv.*/
-        !stdout.contains('DataflowVariable')
+        !stdout.contains('ChannelImpl')
+        !stdout.contains('DataflowBroadcast')
     }
 
     void 'should print params summary - nested parameters'() {

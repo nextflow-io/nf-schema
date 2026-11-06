@@ -1,6 +1,5 @@
 package nextflow.validation.parameters
 
-import static nextflow.validation.utils.Common.replaceDataflowParams
 import static nextflow.NF.isSyntaxParserV2
 
 import static nextflow.validation.utils.Colors.getLogColors
@@ -125,7 +124,8 @@ class ParameterValidator {
         final Map options = [:],
         Session session
     ) {
-        Map<String, Object> params = initialiseExpectedParams(session.params)
+        // `Channel` and `Value` params are serialized as the values they were created from
+        Map<String, Object> params = initialiseExpectedParams(session.params.toPlainMap())
         String schemaFilename = options?.containsKey('parameters_schema') ?
             options.parameters_schema as String :
             config.parametersSchema as String
@@ -142,10 +142,6 @@ class ParameterValidator {
             .addConverter(Duration) { Duration duration -> duration.toMillis() }
             .addConverter(MemoryUnit) { MemoryUnit memory -> memory.toBytes() }
             .addConverter(VersionNumber) { VersionNumber version -> version.toString() }
-
-        // A `Channel` or `Value` parameter is replaced by the value it was created from before the CLI values
-        // are cast, so that a value given on the command line is cast to its type in the schema.
-        params = replaceDataflowParams(params, session.config?.params) as Map<String, Object>
 
         // Cast parameters provided via the CLI to their respective types.
         // This is a temporary workaround until static typing is introduced in Nextflow,

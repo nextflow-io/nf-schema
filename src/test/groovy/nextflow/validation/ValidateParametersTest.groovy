@@ -108,14 +108,24 @@ class ValidateParametersTest extends Dsl2Spec {
     }
 
     @Timeout(60)
-    void 'should not block on a param that holds a dataflow value'() {
+    void 'should report a typed Channel param without a value as missing'() {
         given:
         String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
+            nextflow.enable.types = true
+
             include { validateParameters } from 'plugin/nf-schema'
+
+            params {
+                input: Channel<Row>?
+                outdir: Value<String> = 'src/testResources/testDir'
+            }
+
+            record Row {
+                field_4: String
+            }
+
             workflow {
-                params.input = new groovyx.gpars.dataflow.DataflowVariable()
-                params.outdir = 'src/testResources/testDir'
                 validateParameters(parameters_schema: '${schema}')
             }
         """
@@ -136,23 +146,34 @@ class ValidateParametersTest extends Dsl2Spec {
     }
 
     @Timeout(60)
-    void 'should accept the config value of a param that holds a dataflow value'() {
+    void 'should accept the value of a typed Channel param'() {
         given:
-        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
         String script = """
+            nextflow.enable.types = true
+
             include { validateParameters } from 'plugin/nf-schema'
+
+            params {
+                input: Channel<Sample>
+            }
+
+            record Sample {
+                fastq_1: String
+            }
+
             workflow {
-                params.input = new groovyx.gpars.dataflow.DataflowVariable()
-                params.outdir = 'src/testResources/testDir'
                 validateParameters(parameters_schema: '${schema}')
             }
         """
 
         when:
-        Map opts = ['config': [
-            'validation': ['monochromeLogs': true],
-            'params': ['input': 'src/testResources/correct.csv']
-        ]]
+        Map cliParams = ['input': 'src/testResources/samplesheet.csv']
+        Map opts = [
+            'config': ['validation': ['monochromeLogs': true], 'params': cliParams],
+            'params': cliParams,
+            'configParams': cliParams
+        ]
         runScript(opts, script)
 
         then:
@@ -160,46 +181,69 @@ class ValidateParametersTest extends Dsl2Spec {
     }
 
     @Timeout(60)
-    void 'should reject an invalid config value of a param that holds a dataflow value'() {
+    void 'should reject an invalid value of a typed Channel param'() {
         given:
-        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String schema = Path.of('src/testResources/nextflow_schema_with_samplesheet.json').toAbsolutePath()
         String script = """
+            nextflow.enable.types = true
+
             include { validateParameters } from 'plugin/nf-schema'
+
+            params {
+                input: Channel<Sample>
+            }
+
+            record Sample {
+                fastq_1: String
+            }
+
             workflow {
-                params.input = new groovyx.gpars.dataflow.DataflowVariable()
-                params.outdir = 'src/testResources/testDir'
                 validateParameters(parameters_schema: '${schema}')
             }
         """
 
         when:
-        Map opts = ['config': [
-            'validation': ['monochromeLogs': true],
-            'params': ['input': 'src/testResources/correct.txt']
-        ]]
+        Map cliParams = ['input': 'src/testResources/wrong.csv']
+        Map opts = [
+            'config': ['validation': ['monochromeLogs': true], 'params': cliParams],
+            'params': cliParams,
+            'configParams': cliParams
+        ]
         runScript(opts, script)
 
         then:
         SchemaValidationException error = thrown(SchemaValidationException)
-        error.message.contains('--input (src/testResources/correct.txt)')
+        error.message.contains('* --input (src/testResources/wrong.csv): Validation of file failed:')
     }
 
     @Timeout(60)
-    void 'should accept the config value of a dataflow value nested in a record param'() {
+    void 'should accept the value of a typed Value param'() {
         given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
+            nextflow.enable.types = true
+
             include { validateParameters } from 'plugin/nf-schema'
+
+            params {
+                input: String
+                outdir: String
+                max_cpus: Value<Integer>
+            }
+
             workflow {
-                params.map = [ is: [ so: [ deep: new groovyx.gpars.dataflow.DataflowVariable() ] ] ]
-                validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+                validateParameters(parameters_schema: '${schema}')
             }
         """
 
         when:
-        Map opts = ['config': [
-            'validation': ['monochromeLogs': true],
-            'params': ['map': ['is': ['so': ['deep': true]]]]
-        ]]
+        Map cliParams = ['max_cpus': '4']
+        Map configParams = ['input': 'src/testResources/correct.csv', 'outdir': 'src/testResources/testDir'] + cliParams
+        Map opts = [
+            'config': ['validation': ['monochromeLogs': true], 'params': configParams],
+            'params': cliParams,
+            'configParams': configParams
+        ]
         runScript(opts, script)
 
         then:
@@ -207,26 +251,125 @@ class ValidateParametersTest extends Dsl2Spec {
     }
 
     @Timeout(60)
-    void 'should reject an invalid config value of a dataflow value nested in a record param'() {
+    void 'should reject an invalid value of a typed Value param'() {
         given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
         String script = """
+            nextflow.enable.types = true
+
             include { validateParameters } from 'plugin/nf-schema'
+
+            params {
+                input: String
+                outdir: String
+                max_memory: Value<String>
+            }
+
             workflow {
-                params.map = [ is: [ so: [ deep: new groovyx.gpars.dataflow.DataflowVariable() ] ] ]
-                validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+                validateParameters(parameters_schema: '${schema}')
             }
         """
 
         when:
-        Map opts = ['config': [
-            'validation': ['monochromeLogs': true],
-            'params': ['map': ['is': ['so': ['deep': 'maybe']]]]
-        ]]
+        Map configParams = [
+            'input': 'src/testResources/correct.csv',
+            'outdir': 'src/testResources/testDir',
+            'max_memory': '8 gigs'
+        ]
+        Map opts = [
+            'config': ['validation': ['monochromeLogs': true], 'params': configParams],
+            'configParams': configParams
+        ]
         runScript(opts, script)
 
         then:
         SchemaValidationException error = thrown(SchemaValidationException)
-        error.message.contains('--map.is.so.deep')
+        error.message.contains('* --max_memory (8 gigs)')
+    }
+
+    @Timeout(60)
+    void 'should accept the value of a typed Channel field of a record param'() {
+        given:
+        Path dir = Files.createTempDirectory('nf-schema-record-param')
+        String schema = writeRecordParamSchema(dir)
+        String script = """
+            nextflow.enable.types = true
+
+            include { validateParameters } from 'plugin/nf-schema'
+
+            params {
+                inputs: Inputs
+            }
+
+            record Inputs {
+                samples: Channel<Sample>
+            }
+
+            record Sample {
+                fastq_1: String
+            }
+
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map configParams = ['inputs': ['samples': 'src/testResources/samplesheet.csv']]
+        Map opts = [
+            'config': ['validation': ['monochromeLogs': true], 'params': configParams],
+            'configParams': configParams
+        ]
+        runScript(opts, script)
+
+        then:
+        noExceptionThrown()
+
+        cleanup:
+        dir.toFile().deleteDir()
+    }
+
+    @Timeout(60)
+    void 'should reject an invalid value of a typed Channel field of a record param'() {
+        given:
+        Path dir = Files.createTempDirectory('nf-schema-record-param')
+        String schema = writeRecordParamSchema(dir)
+        String script = """
+            nextflow.enable.types = true
+
+            include { validateParameters } from 'plugin/nf-schema'
+
+            params {
+                inputs: Inputs
+            }
+
+            record Inputs {
+                samples: Channel<Sample>
+            }
+
+            record Sample {
+                fastq_1: String
+            }
+
+            workflow {
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map configParams = ['inputs': ['samples': 'src/testResources/wrong.csv']]
+        Map opts = [
+            'config': ['validation': ['monochromeLogs': true], 'params': configParams],
+            'configParams': configParams
+        ]
+        runScript(opts, script)
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message.contains('* --inputs.samples (src/testResources/wrong.csv): Validation of file failed:')
+
+        cleanup:
+        dir.toFile().deleteDir()
     }
 
     void 'should validate a schema with no arguments'() {
@@ -1746,6 +1889,24 @@ class ValidateParametersTest extends Dsl2Spec {
 
         then:
         noExceptionThrown()
+    }
+
+    private String writeRecordParamSchema(Path dir) {
+        String samplesheetSchema = Path.of('src/testResources/samplesheet_schema.json').toAbsolutePath()
+        Path schema = dir.resolve('nextflow_schema.json')
+        schema.text = """{
+            "\$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "properties": {
+                "inputs": {
+                    "type": "object",
+                    "properties": {
+                        "samples": { "type": "string", "format": "file-path", "schema": "${samplesheetSchema}" }
+                    }
+                }
+            }
+        }"""
+        return schema.toString()
     }
 
 }
