@@ -459,54 +459,25 @@ class SamplesheetConverterTest extends Dsl2Spec {
         !stdout.contains('\t- extraField')
     }
 
-    void 'extra field - fail with function option'() {
+    void 'extra field - fail with function option #option and config #configLevel'() {
         given:
-        String script = '''
+        String script = """
             include { samplesheetToList } from 'plugin/nf-schema'
 
             params.input = "src/testResources/extraFields.csv"
             params.schema = "src/testResources/schema_input.json"
 
             workflow {
-                channel.fromList(samplesheetToList(params.input, params.schema, unrecognisedHeaders: 'error'))
+                channel.fromList(samplesheetToList(params.input, params.schema, unrecognisedHeaders: '${option}'))
                     .view()
             }
-        '''
-
-        when:
-        Map opts = ['config': [
-            'validation': [
-                'monochromeLogs': true
-            ]
-        ]]
-        runScript(opts, script)
-
-        then:
-        SchemaValidationException error = thrown(SchemaValidationException)
-        error.message == "Found the following unidentified headers in ${rootString}/src/testResources/extraFields.csv:\n\t- extraField\n"
-    }
-
-    void 'extra field - invalid function option falls back to config'() {
-        given:
-        String script = '''
-            include { samplesheetToList } from 'plugin/nf-schema'
-
-            params.input = "src/testResources/extraFields.csv"
-            params.schema = "src/testResources/schema_input.json"
-
-            workflow {
-                channel.fromList(samplesheetToList(params.input, params.schema, unrecognisedHeaders: 'skp'))
-                    .view()
-            }
-        '''
+        """
 
         when:
         Map opts = ['config': [
             'validation': [
                 'monochromeLogs': true,
-                'logging': [
-                    'unrecognisedHeaders': 'error'
-                ]
+                'logging': configLevel ? ['unrecognisedHeaders': configLevel] : [:]
             ]
         ]]
         runScript(opts, script)
@@ -514,7 +485,13 @@ class SamplesheetConverterTest extends Dsl2Spec {
         then:
         SchemaValidationException error = thrown(SchemaValidationException)
         error.message == "Found the following unidentified headers in ${rootString}/src/testResources/extraFields.csv:\n\t- extraField\n"
-        capture.toString().contains('Incorrect value detected for `samplesheetToList(unrecognisedHeaders)`, one of (skip, debug, info, warn, error) is expected. Defaulting to `error`')
+        /* groovylint-disable-next-line LineLength */
+        capture.toString().contains('Incorrect value detected for `samplesheetToList(unrecognisedHeaders)`, one of (skip, debug, info, warn, error) is expected. Defaulting to `error`') == warned
+
+        where:
+        option  | configLevel | warned
+        'error' | null        | false
+        'skp'   | 'error'     | true
     }
 
     void 'no meta'() {

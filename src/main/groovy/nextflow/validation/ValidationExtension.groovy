@@ -19,7 +19,6 @@ import nextflow.plugin.extension.Function
 import nextflow.plugin.extension.PluginExtensionPoint
 import nextflow.Session
 
-import nextflow.validation.config.LoggingConfig
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.help.HelpMessageCreator
@@ -82,7 +81,7 @@ class ValidationExtension extends PluginExtensionPoint {
         final Path samplesheet,
         final Path schema
     ) {
-        ValidationLogger unrecognisedHeadersLogger = LoggingConfig.loggerFor(
+        ValidationLogger unrecognisedHeadersLogger = ValidationLogger.of(
             'samplesheetToList(unrecognisedHeaders)',
             options.unrecognisedHeaders,
             config.logging.unrecognisedHeaders,
