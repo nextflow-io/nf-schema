@@ -17,17 +17,32 @@ import nextflow.validation.exceptions.SchemaValidationException
 @CompileStatic
 class ValidationLogger {
 
+    final private static List<String> LEVELS = ['skip', 'debug', 'info', 'warn', 'error']
+
     final private String level = 'info'
     final private Map colors
 
     ValidationLogger(String level, Boolean monochromeLogs = false) {
         level = level?.toLowerCase()
-        if (level in ['skip', 'debug', 'info', 'warn', 'error']) {
+        if (level in LEVELS) {
             this.level = level
         } else {
             log.error("Invalid log level '${level}' specified, defaulting to 'info'")
         }
         this.colors = getLogColors(monochromeLogs)
+    }
+
+    static ValidationLogger of(String label, Object level, ValidationLogger fallback, Boolean monochromeLogs) {
+        if (level == null) {
+            return fallback
+        }
+        if (LEVELS.contains(level.toString())) {
+            log.debug("Set `${label}` to ${level}")
+            return new ValidationLogger(level.toString(), monochromeLogs)
+        }
+        /* groovylint-disable-next-line LineLength */
+        log.warn("Incorrect value detected for `${label}`, one of (${LEVELS.join(', ')}) is expected. Defaulting to `${fallback.level}`")
+        return fallback
     }
 
     void log(String message) {

@@ -2,6 +2,10 @@
 
 # Version 3.1.0
 
+## Added
+
+1. Added the `unrecognisedHeaders` option to `samplesheetToList()` to set the logging level of unrecognised headers for one samplesheet. It defaults to `validation.logging.unrecognisedHeaders`, ([#236](https://github.com/nextflow-io/nf-schema/issues/236)).
+
 ## Bug fixes
 
 1. Fixed an issue where a schema referenced with the `schema` keyword was only looked up relative to the project that is running. It is now looked up next to the schema that references it first, and relative to the project otherwise, so a pipeline schema keeps working when it is read from another directory (e.g. when the pipeline is included in another one).

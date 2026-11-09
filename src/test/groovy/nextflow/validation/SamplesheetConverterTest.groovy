@@ -423,6 +423,77 @@ class SamplesheetConverterTest extends Dsl2Spec {
         error.message == "Found the following unidentified headers in ${rootString}/src/testResources/extraFields.csv:\n\t- extraField\n"
     }
 
+    void 'extra field - skip with function option'() {
+        given:
+        String script = '''
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            params.input = "src/testResources/extraFields.csv"
+            params.schema = "src/testResources/schema_input.json"
+
+            workflow {
+                channel.fromList(samplesheetToList(params.input, params.schema, unrecognisedHeaders: 'skip'))
+                    .view()
+            }
+        '''
+
+        when:
+        Map opts = ['config': [
+            'validation': [
+                'logging': [
+                    'unrecognisedHeaders': 'error'
+                ]
+            ]
+        ]]
+        runScript(opts, script)
+        List<String> stdout = capture
+                .toString()
+                .readLines()
+                .collect { line ->
+                    line.split('ValidationLogger -- ')[-1]
+                }
+
+        then:
+        noExceptionThrown()
+        !stdout.contains("Found the following unidentified headers in ${rootString}/src/testResources/extraFields.csv:" as String)
+        !stdout.contains('\t- extraField')
+    }
+
+    void 'extra field - fail with function option #option and config #configLevel'() {
+        given:
+        String script = """
+            include { samplesheetToList } from 'plugin/nf-schema'
+
+            params.input = "src/testResources/extraFields.csv"
+            params.schema = "src/testResources/schema_input.json"
+
+            workflow {
+                channel.fromList(samplesheetToList(params.input, params.schema, unrecognisedHeaders: '${option}'))
+                    .view()
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': [
+                'monochromeLogs': true,
+                'logging': configLevel ? ['unrecognisedHeaders': configLevel] : [:]
+            ]
+        ]]
+        runScript(opts, script)
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == "Found the following unidentified headers in ${rootString}/src/testResources/extraFields.csv:\n\t- extraField\n"
+        /* groovylint-disable-next-line LineLength */
+        capture.toString().contains('Incorrect value detected for `samplesheetToList(unrecognisedHeaders)`, one of (skip, debug, info, warn, error) is expected. Defaulting to `error`') == warned
+
+        where:
+        option  | configLevel | warned
+        'error' | null        | false
+        'skp'   | 'error'     | true
+    }
+
     void 'no meta'() {
         given:
         String scriptText = '''

@@ -18,6 +18,7 @@ import nextflow.Nextflow
 
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
+import nextflow.validation.logging.ValidationLogger
 import nextflow.validation.validators.JsonSchemaValidator
 import nextflow.validation.validators.ValidationResult
 import nextflow.validation.utils.GroovyVariables
@@ -50,7 +51,8 @@ class SamplesheetConverter {
     List validateAndConvertToList(
         Path samplesheetFile,
         Path schemaFile,
-        Map params
+        Map params,
+        ValidationLogger unrecognisedHeadersLogger
     ) {
 
         Map colors = getLogColors(config.monochromeLogs)
@@ -114,7 +116,7 @@ class SamplesheetConverter {
             return result
         }
 
-        logUnrecognisedHeaders(samplesheetName)
+        logUnrecognisedHeaders(samplesheetName, unrecognisedHeadersLogger)
 
         return channelFormat
     }
@@ -145,11 +147,11 @@ class SamplesheetConverter {
         unrecognisedHeaders.add(header)
     }
 
-    private void logUnrecognisedHeaders(String fileName) {
+    private void logUnrecognisedHeaders(String fileName, ValidationLogger logger) {
         if (unrecognisedHeaders.size() > 0) {
             String processedHeaders = unrecognisedHeaders.collect { header -> "\t- ${header}" }.join('\n')
             String msg = "Found the following unidentified headers in ${fileName}:\n${processedHeaders}\n" as String
-            config.logging.unrecognisedHeaders.log(msg)
+            logger.log(msg)
         }
     }
 

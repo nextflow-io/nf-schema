@@ -20,6 +20,14 @@ These can be either a string with the relative path (from the root of the pipeli
 samplesheetToList("path/to/samplesheet", "path/to/json/schema")
 ```
 
+The function also accepts the following named options:
+
+- `unrecognisedHeaders`: the logging level of unrecognised headers in this samplesheet, one of `skip`, `debug`, `info`, `warn` or `error`. Defaults to the value of [`validation.logging.unrecognisedHeaders`](../configuration/configuration.md#unrecognisedheaders). An incorrect value is ignored with a warning, and the configured value is used instead.
+
+```groovy
+samplesheetToList("path/to/samplesheet", "path/to/json/schema", unrecognisedHeaders: "skip")
+```
+
 !!! note
 
     All data points in the CSV and TSV samplesheets will be converted to their derived type. (e.g. `"true"` will be converted to the Boolean `true` and `"2"` will be converted to the Integer `2`). You can still convert these types back to a String if this is not the expected behaviour with `.map { val -> val.toString() }`
