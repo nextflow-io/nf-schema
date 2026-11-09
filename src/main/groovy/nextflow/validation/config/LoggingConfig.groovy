@@ -34,15 +34,17 @@ Define the logging level of unrecognised headers that are found in the sampleshe
     LoggingConfig(Map map, Boolean monochromeLogs = false) {
         Map config = map ?: [:]
         ValidationLogger defaultLogger = new ValidationLogger('warn', monochromeLogs)
-        unrecognisedParams = createLogger(
+        unrecognisedParams = loggerFor(
             'validation.logging.unrecognisedParams', config.get('unrecognisedParams'), defaultLogger, monochromeLogs
         )
-        unrecognisedHeaders = createLogger(
+        unrecognisedHeaders = loggerFor(
             'validation.logging.unrecognisedHeaders', config.get('unrecognisedHeaders'), defaultLogger, monochromeLogs
         )
     }
 
-    static ValidationLogger createLogger(String label, Object level, ValidationLogger fallback, Boolean monochromeLogs) {
+    static ValidationLogger loggerFor(
+        String label, Object level, ValidationLogger fallback, Boolean monochromeLogs
+    ) {
         if (level == null) {
             return fallback
         }

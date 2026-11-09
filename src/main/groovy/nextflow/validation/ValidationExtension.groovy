@@ -82,7 +82,7 @@ class ValidationExtension extends PluginExtensionPoint {
         final Path samplesheet,
         final Path schema
     ) {
-        ValidationLogger unrecognisedHeadersLogger = LoggingConfig.createLogger(
+        ValidationLogger unrecognisedHeadersLogger = LoggingConfig.loggerFor(
             'samplesheetToList(unrecognisedHeaders)',
             options.unrecognisedHeaders,
             config.logging.unrecognisedHeaders,
