@@ -33,34 +33,26 @@ Define the logging level of unrecognised headers that are found in the sampleshe
 
     LoggingConfig(Map map, Boolean monochromeLogs = false) {
         Map config = map ?: [:]
+        ValidationLogger defaultLogger = new ValidationLogger('warn', monochromeLogs)
+        unrecognisedParams = createLogger(
+            'validation.logging.unrecognisedParams', config.get('unrecognisedParams'), defaultLogger, monochromeLogs
+        )
+        unrecognisedHeaders = createLogger(
+            'validation.logging.unrecognisedHeaders', config.get('unrecognisedHeaders'), defaultLogger, monochromeLogs
+        )
+    }
 
-        // unrecognisedParams
-        String unrecognisedParamsOption = config.get('unrecognisedParams')
-        String level = unrecognisedParamsOption in CharSequence ? unrecognisedParamsOption : 'warn'
-        if (OPTIONS.contains(level)) {
-            if (unrecognisedParamsOption) {
-                log.debug("Set `validation.unrecognisedParams` to ${level}")
-            }
-            unrecognisedParams = new ValidationLogger(level, monochromeLogs)
-        } else {
-            /* groovylint-disable-next-line LineLength */
-            log.warn("Incorrect value detected for `validation.unrecognisedParams`, one of (${OPTIONS.join(', ')}) is expected. Defaulting to `warn`")
-            unrecognisedParams = new ValidationLogger('warn', monochromeLogs)
+    static ValidationLogger createLogger(String label, Object level, ValidationLogger fallback, Boolean monochromeLogs) {
+        if (level == null) {
+            return fallback
         }
-
-        // unrecognisedHeaders
-        String unrecognisedHeadersOption = config.get('unrecognisedHeaders')
-        level = unrecognisedHeadersOption in CharSequence ? unrecognisedHeadersOption : 'warn'
-        if (OPTIONS.contains(level)) {
-            if (unrecognisedHeadersOption) {
-                log.debug("Set `validation.unrecognisedHeaders` to ${level}")
-            }
-            unrecognisedHeaders = new ValidationLogger(level, monochromeLogs)
-        } else {
-            /* groovylint-disable-next-line LineLength */
-            log.warn("Incorrect value detected for `validation.unrecognisedHeaders`, one of (${OPTIONS.join(', ')}) is expected. Defaulting to `warn`")
-            unrecognisedHeaders = new ValidationLogger('warn', monochromeLogs)
+        if (OPTIONS.contains(level.toString())) {
+            log.debug("Set `${label}` to ${level}")
+            return new ValidationLogger(level.toString(), monochromeLogs)
         }
+        /* groovylint-disable-next-line LineLength */
+        log.warn("Incorrect value detected for `${label}`, one of (${OPTIONS.join(', ')}) is expected. Defaulting to `${fallback.level}`")
+        return fallback
     }
 
 }

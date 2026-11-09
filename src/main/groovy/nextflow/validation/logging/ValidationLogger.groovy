@@ -30,6 +30,10 @@ class ValidationLogger {
         this.colors = getLogColors(monochromeLogs)
     }
 
+    String getLevel() {
+        return level
+    }
+
     void log(String message) {
         switch (level) {
             case 'skip':
