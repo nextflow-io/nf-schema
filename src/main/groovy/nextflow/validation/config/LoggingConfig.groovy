@@ -19,21 +19,25 @@ class LoggingConfig implements ConfigScope {
 
     @ConfigOption
     @Description('Define the logging level of unrecognised parameters. Defaults to `warn`.')
-    final ValidationLogger unrecognisedParams
+    final String unrecognisedParams
 
     @ConfigOption
     @Description('''
 Define the logging level of unrecognised headers that are found in the samplesheets. Defaults to `warn`.
 ''')
-    final ValidationLogger unrecognisedHeaders
+    final String unrecognisedHeaders
+
+    final ValidationLogger unrecognisedParamsLogger
+
+    final ValidationLogger unrecognisedHeadersLogger
 
     LoggingConfig(Map map, Boolean monochromeLogs = false) {
         Map config = map ?: [:]
         ValidationLogger defaultLogger = new ValidationLogger('warn', monochromeLogs)
-        unrecognisedParams = ValidationLogger.of(
+        unrecognisedParamsLogger = ValidationLogger.of(
             'validation.logging.unrecognisedParams', config.get('unrecognisedParams'), defaultLogger, monochromeLogs
         )
-        unrecognisedHeaders = ValidationLogger.of(
+        unrecognisedHeadersLogger = ValidationLogger.of(
             'validation.logging.unrecognisedHeaders', config.get('unrecognisedHeaders'), defaultLogger, monochromeLogs
         )
     }

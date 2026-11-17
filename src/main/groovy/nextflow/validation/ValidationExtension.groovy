@@ -48,8 +48,8 @@ class ValidationExtension extends PluginExtensionPoint {
     @Function
     List samplesheetToList(
         final Map options = [:],
-        final CharSequence samplesheet,
-        final CharSequence schema
+        final String samplesheet,
+        final String schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
         return samplesheetToList(options, samplesheetFile, schema)
@@ -59,16 +59,16 @@ class ValidationExtension extends PluginExtensionPoint {
     List samplesheetToList(
         final Map options = [:],
         final Path samplesheet,
-        final CharSequence schema
+        final String schema
     ) {
-        Path schemaPath = getBasePath(session.baseDir, schema as String)
+        Path schemaPath = getBasePath(session.baseDir, schema)
         return samplesheetToList(options, samplesheet, schemaPath)
     }
 
     @Function
     List samplesheetToList(
         final Map options = [:],
-        final CharSequence samplesheet,
+        final String samplesheet,
         final Path schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
@@ -84,7 +84,7 @@ class ValidationExtension extends PluginExtensionPoint {
         ValidationLogger unrecognisedHeadersLogger = ValidationLogger.of(
             'samplesheetToList(unrecognisedHeaders)',
             options.unrecognisedHeaders,
-            config.logging.unrecognisedHeaders,
+            config.logging.unrecognisedHeadersLogger,
             config.monochromeLogs
         )
         SamplesheetConverter converter = new SamplesheetConverter(config)

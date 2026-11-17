@@ -21,23 +21,23 @@ class SummaryConfig implements ConfigScope {
 
     @ConfigOption
     @Description('The text to show before the summary message.')
-    final CharSequence beforeText = ''
+    final String beforeText = ''
 
     @ConfigOption
     @Description('The text to show after the summary message.')
-    final CharSequence afterText = ''
+    final String afterText = ''
 
     @ConfigOption
     @Description('A list of parameters to hide in the summary message.')
-    final Set<CharSequence> hideParams = []
+    final Set<String> hideParams = []
 
     @ConfigOption
     @Description('Mask value, when replacing bucket names or subpaths. Defaults to [** masked **].')
-    CharSequence mask = '[** masked **]'
+    String mask = '[** masked **]'
 
     @ConfigOption
     @Description('A list of subpaths to mask from path values.')
-    final List<CharSequence> maskSubpaths
+    final List<String> maskSubpaths
 
     SummaryConfig(Map map, Boolean monochromeLogs) {
         Map config = map ?: Collections.emptyMap()
@@ -75,7 +75,7 @@ class SummaryConfig implements ConfigScope {
         // hideParams
         if (config.containsKey('hideParams')) {
             if (config.hideParams in List<CharSequence>) {
-                hideParams = config.hideParams as Set<CharSequence>
+                hideParams = config.hideParams as Set<String>
                 log.debug("Set `validation.summary.hideParams` to ${hideParams}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -86,7 +86,7 @@ class SummaryConfig implements ConfigScope {
         // mask
         if (config.containsKey('mask')) {
             if (config.mask in CharSequence) {
-                mask = config.mask as CharSequence
+                mask = config.mask as String
                 log.debug("Set `validation.summary.mask` to ${mask}")
             } else {
                 /* groovylint-disable-next-line LineLength */
@@ -97,7 +97,7 @@ class SummaryConfig implements ConfigScope {
         // maskSubpaths
         if (config.containsKey('maskSubpaths')) {
             if (config.maskSubpaths in List<CharSequence>) {
-                maskSubpaths = config.maskSubpaths as List<CharSequence>
+                maskSubpaths = config.maskSubpaths as List<String>
                 log.debug("Set `maskSubpaths` to ${maskSubpaths}")
             } else {
                 /* groovylint-disable-next-line LineLength */
