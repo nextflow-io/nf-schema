@@ -84,7 +84,7 @@ class ValidationExtension extends PluginExtensionPoint {
         ValidationLogger unrecognisedHeadersLogger = ValidationLogger.of(
             'samplesheetToList(unrecognisedHeaders)',
             options.unrecognisedHeaders,
-            config.logging.unrecognisedHeaders,
+            config.logging.unrecognisedHeadersLogger,
             config.monochromeLogs
         )
         SamplesheetConverter converter = new SamplesheetConverter(config)
