@@ -3,6 +3,7 @@ package nextflow.validation
 
 import groovy.transform.CompileDynamic
 import nextflow.Session
+import nextflow.script.ScriptBinding
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.parameters.ParameterValidator
@@ -56,7 +57,7 @@ class ValidateCliParamsTest extends Specification {
 
     private Session mockSession(Map params, Map cliParams) {
         Session session = Mock(Session)
-        session.params >> params
+        session.params >> new ScriptBinding.ParamsMap(params)
         session.cliParams >> cliParams
         session.config >> [params: params]
         session.baseDir >> Path.of('.').toAbsolutePath()
