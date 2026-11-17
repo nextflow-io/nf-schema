@@ -1,6 +1,7 @@
 package nextflow.validation.config
 
 import static nextflow.validation.utils.Colors.removeColors
+import static nextflow.validation.utils.Types.parseParamValue
 
 import nextflow.config.spec.ConfigOption
 import nextflow.config.spec.ConfigScope
@@ -25,27 +26,27 @@ class HelpConfig implements ConfigScope {
 
     @ConfigOption
     @Description('The parameter to use to show hidden parameters in the help message.')
-    final CharSequence showHiddenParameter = 'showHidden'
+    final String showHiddenParameter = 'showHidden'
 
     @ConfigOption
     @Description('The parameter to use to show the short help message.')
-    final CharSequence shortParameter = 'help'
+    final String shortParameter = 'help'
 
     @ConfigOption
     @Description('The parameter to use to show the full help message.')
-    final CharSequence fullParameter = 'helpFull'
+    final String fullParameter = 'helpFull'
 
     @ConfigOption
     @Description('The text to show before the help message.')
-    final CharSequence beforeText = ''
+    final String beforeText = ''
 
     @ConfigOption
     @Description('The text to show after the help message.')
-    final CharSequence afterText = ''
+    final String afterText = ''
 
     @ConfigOption
     @Description('An example command of how to run the pipeline.')
-    final CharSequence command = ''
+    final String command = ''
 
     @ConfigOption
     @Description('''
@@ -73,9 +74,13 @@ class HelpConfig implements ConfigScope {
         }
 
         // showHidden
+        Object showHiddenValue = params.containsKey(showHiddenParameter) ? params.get(showHiddenParameter) : null
+        if (showHiddenValue in String) {
+            showHiddenValue = parseParamValue(showHiddenValue as String)
+        }
         if (params.containsKey(showHiddenParameter) || config.containsKey('showHidden')) {
-            if (params.containsKey(showHiddenParameter) && params.get(showHiddenParameter) in Boolean) {
-                showHidden = params.get(showHiddenParameter) as Boolean
+            if (showHiddenValue in Boolean) {
+                showHidden = showHiddenValue as Boolean
                 log.debug("Set `validation.help.showHidden` to ${showHidden} (Due to --${showHiddenParameter})")
             } else if (config.showHidden in Boolean) {
                 showHidden = config.showHidden as Boolean

@@ -21,6 +21,7 @@ import nextflow.Session
 import nextflow.validation.config.ValidationConfig
 import nextflow.validation.exceptions.SchemaValidationException
 import nextflow.validation.help.HelpMessageCreator
+import nextflow.validation.logging.ValidationLogger
 import nextflow.validation.samplesheet.SamplesheetConverter
 import nextflow.validation.summary.SummaryCreator
 import nextflow.validation.parameters.ParameterValidator
@@ -45,38 +46,48 @@ class ValidationExtension extends PluginExtensionPoint {
 
     @Function
     List samplesheetToList(
-        final CharSequence samplesheet,
-        final CharSequence schema
+        final Map options = [:],
+        final String samplesheet,
+        final String schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
-        return samplesheetToList(samplesheetFile, schema)
+        return samplesheetToList(options, samplesheetFile, schema)
     }
 
     @Function
     List samplesheetToList(
+        final Map options = [:],
         final Path samplesheet,
-        final CharSequence schema
+        final String schema
     ) {
-        Path schemaPath = getBasePath(session.baseDir, schema as String)
-        return samplesheetToList(samplesheet, schemaPath)
+        Path schemaPath = getBasePath(session.baseDir, schema)
+        return samplesheetToList(options, samplesheet, schemaPath)
     }
 
     @Function
     List samplesheetToList(
-        final CharSequence samplesheet,
+        final Map options = [:],
+        final String samplesheet,
         final Path schema
     ) {
         Path samplesheetFile = Nextflow.file(samplesheet) as Path
-        return samplesheetToList(samplesheetFile, schema)
+        return samplesheetToList(options, samplesheetFile, schema)
     }
 
     @Function
     List samplesheetToList(
+        final Map options = [:],
         final Path samplesheet,
         final Path schema
     ) {
+        ValidationLogger unrecognisedHeadersLogger = ValidationLogger.of(
+            'samplesheetToList(unrecognisedHeaders)',
+            options.unrecognisedHeaders,
+            config.logging.unrecognisedHeadersLogger,
+            config.monochromeLogs
+        )
         SamplesheetConverter converter = new SamplesheetConverter(config)
-        List output = converter.validateAndConvertToList(samplesheet, schema, session.params)
+        List output = converter.validateAndConvertToList(samplesheet, schema, session.params, unrecognisedHeadersLogger)
         return output
     }
 
