@@ -143,3 +143,9 @@ For example, providing an integer as a string will no longer fail validation.
     It attempts to cast a temporary copy of the params only, during the validation step.
 
 To enable lenient validation mode, set `validation.lenientMode = true` in your configuration file.
+
+## Parameters that are a `Channel` or a `Value`
+
+With typed parameters, a parameter can be declared as a `Channel` or a `Value` (see the [typed parameters](https://github.com/nextflow-io/nextflow/blob/master/docs/typed-parameters.mdx) documentation of Nextflow). For example, a `Channel<Sample>` parameter takes the path of a samplesheet, which Nextflow loads as a channel, and a pipeline that is included in another pipeline can be given a channel by the including pipeline instead.
+
+These parameters hold a dataflow object while the pipeline runs, so there is no value to validate in them. `validateParameters()` validates the value that the parameter was created from instead. Nextflow keeps it in the `params` scope of the configuration, which also holds the values given on the command line and in a params file. A parameter that has no such value, such as one that is given by the dataflow of an including pipeline, is not validated. The same value is shown by [`paramsSummaryLog()` and `paramsSummaryMap()`](summary_log.md), and a parameter without one is left out of the summary.

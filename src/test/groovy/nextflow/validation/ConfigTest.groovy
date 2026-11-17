@@ -8,6 +8,7 @@ import org.junit.Rule
 import test.Dsl2Spec
 import test.OutputCapture
 
+import nextflow.validation.config.HelpConfig
 import nextflow.validation.config.ValidationConfig
 
 /**
@@ -148,6 +149,27 @@ class ConfigTest extends Dsl2Spec {
         then:
         noExceptionThrown()
         stdout
+    }
+
+    void 'should read the show hidden parameter - #params with #config'() {
+        when:
+        HelpConfig help = new HelpConfig(config, params, true)
+        List<String> stdout = capture
+            .toString()
+            .readLines()
+            .findResults { line -> line.contains('WARN') ? line : null }
+
+        then:
+        help.showHidden == expected
+        !stdout.empty == warns
+
+        where:
+        params                 | config                                                  | expected | warns
+        [showHidden: 'true']   | [:]                                                     | true     | false
+        [showHidden: 'false']  | [:]                                                     | false    | false
+        [showHidden: true]     | [:]                                                     | true     | false
+        [stopHiding: 'true']   | [showHiddenParameter: 'stopHiding', showHidden: false]  | true     | false
+        [showHidden: 'maybe']  | [:]                                                     | false    | true
     }
 
 }

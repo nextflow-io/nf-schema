@@ -5,6 +5,7 @@ package nextflow.validation
 import static test.ScriptHelper.runScript
 
 import groovy.transform.CompileDynamic
+import spock.lang.Timeout
 
 import java.nio.file.Path
 
@@ -104,6 +105,128 @@ class ValidateParametersTest extends Dsl2Spec {
 
 '''
         !stdout
+    }
+
+    @Timeout(60)
+    void 'should not block on a param that holds a dataflow value'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            include { validateParameters } from 'plugin/nf-schema'
+            workflow {
+                params.input = new groovyx.gpars.dataflow.DataflowVariable()
+                params.outdir = 'src/testResources/testDir'
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': ['validation': [
+            'monochromeLogs': true
+        ]]]
+        runScript(opts, script)
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message == '''The following invalid input values have been detected:
+
+* Missing required parameter(s): input
+
+'''
+    }
+
+    @Timeout(60)
+    void 'should accept the config value of a param that holds a dataflow value'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            include { validateParameters } from 'plugin/nf-schema'
+            workflow {
+                params.input = new groovyx.gpars.dataflow.DataflowVariable()
+                params.outdir = 'src/testResources/testDir'
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': ['monochromeLogs': true],
+            'params': ['input': 'src/testResources/correct.csv']
+        ]]
+        runScript(opts, script)
+
+        then:
+        noExceptionThrown()
+    }
+
+    @Timeout(60)
+    void 'should reject an invalid config value of a param that holds a dataflow value'() {
+        given:
+        String schema = Path.of('src/testResources/nextflow_schema.json').toAbsolutePath()
+        String script = """
+            include { validateParameters } from 'plugin/nf-schema'
+            workflow {
+                params.input = new groovyx.gpars.dataflow.DataflowVariable()
+                params.outdir = 'src/testResources/testDir'
+                validateParameters(parameters_schema: '${schema}')
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': ['monochromeLogs': true],
+            'params': ['input': 'src/testResources/correct.txt']
+        ]]
+        runScript(opts, script)
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message.contains('--input (src/testResources/correct.txt)')
+    }
+
+    @Timeout(60)
+    void 'should accept the config value of a dataflow value nested in a record param'() {
+        given:
+        String script = """
+            include { validateParameters } from 'plugin/nf-schema'
+            workflow {
+                params.map = [ is: [ so: [ deep: new groovyx.gpars.dataflow.DataflowVariable() ] ] ]
+                validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': ['monochromeLogs': true],
+            'params': ['map': ['is': ['so': ['deep': true]]]]
+        ]]
+        runScript(opts, script)
+
+        then:
+        noExceptionThrown()
+    }
+
+    @Timeout(60)
+    void 'should reject an invalid config value of a dataflow value nested in a record param'() {
+        given:
+        String script = """
+            include { validateParameters } from 'plugin/nf-schema'
+            workflow {
+                params.map = [ is: [ so: [ deep: new groovyx.gpars.dataflow.DataflowVariable() ] ] ]
+                validateParameters(parameters_schema: 'src/testResources/nextflow_schema_nested_parameters.json')
+            }
+        """
+
+        when:
+        Map opts = ['config': [
+            'validation': ['monochromeLogs': true],
+            'params': ['map': ['is': ['so': ['deep': 'maybe']]]]
+        ]]
+        runScript(opts, script)
+
+        then:
+        SchemaValidationException error = thrown(SchemaValidationException)
+        error.message.contains('--map.is.so.deep')
     }
 
     void 'should validate a schema with no arguments'() {

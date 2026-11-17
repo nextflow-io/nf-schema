@@ -1,6 +1,7 @@
 package nextflow.validation.config
 
 import static nextflow.validation.utils.Colors.removeColors
+import static nextflow.validation.utils.Types.parseParamValue
 
 import nextflow.config.spec.ConfigOption
 import nextflow.config.spec.ConfigScope
@@ -73,9 +74,13 @@ class HelpConfig implements ConfigScope {
         }
 
         // showHidden
+        Object showHiddenValue = params.containsKey(showHiddenParameter) ? params.get(showHiddenParameter) : null
+        if (showHiddenValue in String) {
+            showHiddenValue = parseParamValue(showHiddenValue as String)
+        }
         if (params.containsKey(showHiddenParameter) || config.containsKey('showHidden')) {
-            if (params.containsKey(showHiddenParameter) && params.get(showHiddenParameter) in Boolean) {
-                showHidden = params.get(showHiddenParameter) as Boolean
+            if (showHiddenValue in Boolean) {
+                showHidden = showHiddenValue as Boolean
                 log.debug("Set `validation.help.showHidden` to ${showHidden} (Due to --${showHiddenParameter})")
             } else if (config.showHidden in Boolean) {
                 showHidden = config.showHidden as Boolean
